@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import { Layout, Menu, Icon } from 'antd';
-import './Menu.scss';
 const SubMenu = Menu.SubMenu;
-const { Header, Sider, Content } = Layout;
+const { Header, Sider } = Layout;
 
-class Menu extends Component {
+class Sidebar extends Component {
     
     constructor(props){
         super(props);
@@ -45,13 +44,11 @@ class Menu extends Component {
             <Header style={{ background: '#fff', padding: 0 }}>
               hola header
             </Header>
-            <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-              Content
-            </Content>
+            {this.props.children}
           </Layout>
         </Layout>
       );
     }
   }
   
-  export default App;
+  export default Sidebar;

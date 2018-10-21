@@ -1,61 +1,103 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import './App.scss';
-
-import { Layout, Menu, Icon } from 'antd';
-const SubMenu = Menu.SubMenu;
-const { Header, Sider, Content } = Layout;
+import System from './System';
+import Login from './Public/Login';
+import PrivateRoute from './Utils/PrivateRoute';
+import { BrowserRouter, Route, Link, Redirect } from 'react-router-dom';
+import Dashboard from './System/Dashboard';
 class App extends Component {
 
-  state = {
-    collapsed: false,
-  };
+  constructor(props) {
+      super(props);
+      this.state ={
+        archivo: {}
+      }
+    }
 
-  toggle = () => {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    });
+  onChange = (e) => {
+    let file =  e.target.files[0];
+    let formData = new FormData();
+    formData.append('file', file);
+    axios({
+      method: 'POST',
+      url: 'http://localhost:5000/archivos/upload', crossDomain: true, data: formData
+    })
+    .then(response => {
+      this.setState({...this.state, archivo: response.data});
+    })
+  }
+
+  subirOficinas = () => {
+    axios({
+      method: 'POST',
+      url: 'http://localhost:5000/oficinas/carga', crossDomain: true, data: this.state.archivo
+    })
+  }
+
+  subirVuelos = () => {
+    axios({
+      method: 'POST',
+      url: 'http://localhost:5000/vuelos/carga', crossDomain: true, data: this.state.archivo
+    })
+
   }
 
   render() {
     return (
-      <Layout>
-        <Sider
-          breakpoint="lg"
-          collapsedWidth="80"
-        >
-          <div className="logo" />
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-          <SubMenu key="sub1" title={<span><Icon type="mail" /><span>Navigation One</span></span>}>
-            <Menu.Item key="1">Option 1</Menu.Item>
-            <Menu.Item key="2">Option 2</Menu.Item>
-            <Menu.Item key="3">Option 3</Menu.Item>
-            <Menu.Item key="4">Option 4</Menu.Item>
-          </SubMenu>
-          <SubMenu key="sub2" title={<span><Icon type="appstore" /><span>Navigtion Two</span></span>}>
-            <Menu.Item key="5">Option 5</Menu.Item>
-            <Menu.Item key="6">Option 6</Menu.Item>
-            <SubMenu key="sub3" title="Submenu">
-              <Menu.Item key="7">Option 7</Menu.Item>
-              <Menu.Item key="8">Option 8</Menu.Item>
-            </SubMenu>
-          </SubMenu>
-          <SubMenu key="sub4" title={<span><Icon type="setting" /><span>Navigation Three</span></span>}>
-            <Menu.Item key="9">Option 9</Menu.Item>
-            <Menu.Item key="10">Option 10</Menu.Item>
-            <Menu.Item key="11">Option 11</Menu.Item>
-            <Menu.Item key="12">Option 12</Menu.Item>
-          </SubMenu>
-          </Menu>
-        </Sider>
-        <Layout>
-          <Header style={{ background: '#fff', padding: 0 }}>
-            hola header
-          </Header>
-          <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
-            Content
-          </Content>
-        </Layout>
-      </Layout>
+      <BrowserRouter>
+        <div>
+          <Route path='/' exact component={Login}/>
+          <PrivateRoute path="/system" exact component={System}/>
+        </div>
+      </BrowserRouter>
+      //<System></System>
+      /*<div className="App">
+        <header className="App-header">
+          <p>Hola mundo
+            <p>Esto va en azul</p>
+          </p>
+          <div>
+            <p>
+            Esto va en verde
+          </p>
+          </div>
+
+          <div>
+            <h5> @Oscar Cerna </h5>
+            <input type="file" onChange={this.onChange}/>
+            <div>
+              <span> id: { this.state.archivo.id } </span>
+            </div>
+            <div>
+              <span> nombre_original: { this.state.archivo.nombreOriginal } </span>
+
+            </div>
+            <div>
+              <span> nombre_servidor: { this.state.archivo.nombreServidor } </span>
+
+            </div>
+<div>
+  <button onClick={this.subirOficinas}> Subir oficinas </button>
+</div>
+<div>
+            <button onClick={this.subirVuelos}> Subir vuelos </button>
+          </div>
+          </div>
+          <p>
+            Edit <code>src/App.js</code> and save to reload.
+          </p>
+
+          <a
+            className="App-link"
+            href="https://reactjs.org"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Learn React
+          </a>
+        </header>
+      </div>*/
     );
   }
 }
