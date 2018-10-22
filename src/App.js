@@ -1,25 +1,37 @@
 import React, { Component } from 'react';
 import './App.scss';
-import { BrowserRouter, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Login from './Public/Login';
 import PrivateRoute from './Utils/PrivateRoute';
 import System from './System';
+import routes from './routes';
+
+
+import { SidebarLayout } from './components/layout';
+import _ from 'lodash';
+
+
 class App extends Component {
 
   constructor(props) {
       super(props);
     }
 
-  render() {
+    render() {
     return (
       <BrowserRouter>
-        <div>
-          <Route path="/" exact component={Login}></Route>
-          <PrivateRoute path="/system" exact component={System}/>
-        </div>
+        <Switch>
+          { _.map(routes, (route, key) => {
+            const { component, path } = route;
+            return (
+              <Route exact path={path} key={key}
+                render={ (route) => <SidebarLayout component={component} route={route} /> }/>
+            )
+          })}
+        </Switch>
       </BrowserRouter>
-    );
-  }
+    )
+}
 }
 
 export default App;
