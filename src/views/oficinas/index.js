@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { Layout } from 'antd';
+import { Row, Col, Layout, Button } from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
+import OficinasList from './OficinasList';
+import OficinasModal from './OficinasModal';
 
 export default class Oficinas extends React.Component {
   constructor(props) {
@@ -14,10 +16,15 @@ export default class Oficinas extends React.Component {
     return (
         <Layout>
           <TheHeader>
+            <Col span={12}>
               <h2> Oficinas </h2>
+            </Col>
+            <Col span={12} align="right">
+              <Button type="primary"> Nuevo </Button>
+            </Col>
           </TheHeader>
           <TheContent>
-              <span> adssa </span>
+              <OficinasList/>
           </TheContent>
         </Layout>
     )

@@ -11,7 +11,7 @@ export default class TheHeader extends React.Component {
 
   render() {
    return (
-     <Header style={{ background: '#fff', padding: 0 }}>
+     <Header style={{ background: '#fff', paddingLeft: '20px', paddingRight: '20px' }}>
        {this.props.children}
      </Header>
    );
