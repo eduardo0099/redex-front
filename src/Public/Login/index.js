@@ -18,7 +18,7 @@ class Login extends Component{
                     if(Roles[sessionInfo.role]){
                         sessionInfo.role = rol;
                         localStorage.setItem('u',btoa(JSON.stringify(sessionInfo)));
-                        //localStorage.setItem('a',JSON.stringify(sessionInfo));
+                        localStorage.setItem('a',JSON.stringify(sessionInfo));
                         this.setState({hasAuth:true});
                     }else{
                         //error, no existe el rol
@@ -35,7 +35,7 @@ class Login extends Component{
                     token: 'asdjhdshsadhjadkadsjjdska',
                 }
                 localStorage.setItem('u',btoa(JSON.stringify(response)));
-                //localStorage.setItem('a',JSON.stringify(response));
+                localStorage.setItem('a',JSON.stringify(response));
                 this.setState({hasAuth:true});
             }
             

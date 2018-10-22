@@ -1,8 +1,9 @@
 import Roles from './Roles';
-
-export default Routes = [
+let Routes = [
     {
         path:'/system',
-        access:[Roles.EMPLEADO]
-    }
+        access:[Roles.EMPLEADO,Roles.ADMIN]
+    },
+
 ]
+export default Routes;
