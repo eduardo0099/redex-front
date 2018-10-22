@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.scss';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Login from './Public/Login';
-import PrivateRoute from './Utils/PrivateRoute';
+import PrivateRoute from './utils/PrivateRoute';
 import System from './System';
 import routes from './routes';
 
@@ -21,6 +21,7 @@ class App extends Component {
     return (
       <BrowserRouter>
         <Switch>
+          <Route path="/" exact component={Login}></Route>
           { _.map(routes, (route, key) => {
             const { component, path } = route;
             return (
