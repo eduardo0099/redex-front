@@ -18,7 +18,7 @@ class App extends Component {
       <BrowserRouter>
         <Switch>
           <Route path="/" exact component={Login}></Route>
-          { _.map(routes, (route, key) => {
+          { routes.map((route, key) => {
             const { component, path } = route;
             return (
               <Route exact path={path} key={key}

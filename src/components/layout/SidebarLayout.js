@@ -2,7 +2,6 @@ import  React from 'react';
 import { Layout, Menu, Icon } from 'antd';
 import { Link } from "react-router-dom";
 import routes from '../../routes';
-import _ from 'lodash';
 
 const SubMenu = Menu.SubMenu;
 const { Header, Sider } = Layout;
@@ -22,7 +21,7 @@ export default class SidebarLayout extends React.Component {
           <Sider breakpoint="lg" collapsedWidth="80">
             <div className="logo"/>
             <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
-            { _.map(routes, (route, key) => {
+            { routes.map((route, key) => {
             const { component, path } = route;
             return (
               <Menu.Item key={key}>
