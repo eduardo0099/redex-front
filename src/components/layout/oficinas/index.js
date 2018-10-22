@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import { Layout } from 'antd';
-import { TheContent, TheHeader } from '../../components/layout';
+
+const Header = Layout.Header;
+const Content = Layout.Content;
 
 export default class Oficinas extends React.Component {
   constructor(props) {
@@ -12,14 +14,16 @@ export default class Oficinas extends React.Component {
 
   render() {
     return (
-        <Layout>
-          <TheHeader>
-              <h2> Oficinas </h2>
-          </TheHeader>
-          <TheContent>
+      <div>
+        <Header style={{ background: '#fff', padding: 0  }}>
+          <h2> Oficinas </h2>
+        </Header>
+        <Content>
+            <div>
               <span> adssa </span>
-          </TheContent>
-        </Layout>
+            </div>
+        </Content>
+      </div>
     )
   }
 }

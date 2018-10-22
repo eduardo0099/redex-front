@@ -40,9 +40,7 @@ export default class SidebarLayout extends React.Component {
             </SubMenu>
             </Menu>
           </Sider>
-          <Layout>
             <Component route={route}/>
-          </Layout>
         </Layout>
       </div>
    );

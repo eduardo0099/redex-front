@@ -42,8 +42,6 @@ class System extends Component {
 
     render(){
         return (
-            <Sidebar>
-                <Content style={{ margin: '24px 16px', padding: 24, background: '#fff', minHeight: 280 }}>
                   <div>
                     <h5> @Oscar Cerna </h5>
                     <input type="file" onChange={this.onChange}/>
@@ -65,8 +63,6 @@ class System extends Component {
                     <button onClick={this.subirVuelos}> Subir vuelos </button>
                   </div>
                 </div>
-                </Content>
-            </Sidebar>
         )
     }
 }

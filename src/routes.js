@@ -1,6 +1,7 @@
 import Oficinas from './views/oficinas';
 import PlanVuelo from './views/planvuelo';
 import Usuarios from './views/usuarios';
+import System from './views/system';
 
 const routes = {
   Oficinas: {
@@ -14,6 +15,10 @@ const routes = {
   Usuarios: {
    path: '/usuarios',
    component: Usuarios
+  },
+  Usuarios: {
+   path: '/system',
+   component: System
   },
 }
 
