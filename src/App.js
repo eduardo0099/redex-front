@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import './App.scss';
-import System from './System';
-import Login from './Public/Login';
-import PrivateRoute from './Utils/PrivateRoute';
-import { BrowserRouter, Route, Link, Redirect } from 'react-router-dom';
-import Dashboard from './System/Dashboard';
+
 class App extends Component {
 
   constructor(props) {
@@ -15,18 +11,18 @@ class App extends Component {
       }
     }
 
-  onChange = (e) => {
-    let file =  e.target.files[0];
-    let formData = new FormData();
-    formData.append('file', file);
-    axios({
-      method: 'POST',
-      url: 'http://localhost:5000/archivos/upload', crossDomain: true, data: formData
-    })
-    .then(response => {
-      this.setState({...this.state, archivo: response.data});
-    })
-  }
+    onChange = (e) => {
+        let file =  e.target.files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+        axios({
+          method: 'POST',
+          url: 'http://localhost:5000/archivos/upload', crossDomain: true, data: formData
+        })
+        .then(response => {
+          this.setState({...this.state, archivo: response.data});
+        })
+      }
 
   subirOficinas = () => {
     axios({
@@ -40,19 +36,11 @@ class App extends Component {
       method: 'POST',
       url: 'http://localhost:5000/vuelos/carga', crossDomain: true, data: this.state.archivo
     })
-
   }
 
   render() {
     return (
-      <BrowserRouter>
-        <div>
-          <Route path='/' exact component={Login}/>
-          <PrivateRoute path="/system" exact component={System}/>
-        </div>
-      </BrowserRouter>
-      //<System></System>
-      /*<div className="App">
+      <div className="App">
         <header className="App-header">
           <p>Hola mundo
             <p>Esto va en azul</p>
@@ -97,7 +85,7 @@ class App extends Component {
             Learn React
           </a>
         </header>
-      </div>*/
+      </div>
     );
   }
 }
