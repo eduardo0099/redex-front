@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
-import Roles from './../../Utils/Roles';
+import Roles from './../../utils/Roles';
 import { Form, Icon, Input, Button, Checkbox, Divider } from 'antd';
 const FormItem = Form.Item;
 class LoginForm extends Component{
@@ -16,7 +16,7 @@ class LoginForm extends Component{
             if (data){
                 let sessionInfo = JSON.parse(atob(data));
                 if(sessionInfo){
-                    //Lo deja pasar 
+                    //Lo deja pasar
                     if(Roles[sessionInfo.role]){
                         sessionInfo.role = rol;
                         localStorage.setItem('u',btoa(JSON.stringify(sessionInfo)));
@@ -40,7 +40,7 @@ class LoginForm extends Component{
                 localStorage.setItem('a',JSON.stringify(response));
                 this.setState({hasAuth:true});
             }
-            
+
         }catch(e){
             console.log(e);
 
@@ -95,7 +95,7 @@ class LoginForm extends Component{
                     <button onClick={() => this.checkAuth(Roles.JEFEOFICINA)}>Iniciar como jefe oficina</button>
                     <button onClick={() => this.checkAuth(Roles.EMPLEADO)}>Iniciar como empleado</button>
                 </div>
-                
+
             );
         }
     }
