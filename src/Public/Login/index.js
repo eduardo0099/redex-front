@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import Roles from './../../Utils/Roles';
-class Login extends Component{
+import { Form, Icon, Input, Button, Checkbox, Divider } from 'antd';
+const FormItem = Form.Item;
+class LoginForm extends Component{
     constructor(props){
         super(props);
         this.state = {
@@ -44,20 +46,60 @@ class Login extends Component{
 
         }
     }
+    checkLogin = (e) => {
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+              console.log('Received values of form: ', values);
+            }
+        })
+    }
     render(){
+        const { getFieldDecorator } = this.props.form;
         if(this.state.hasAuth == true){
             return(<Redirect to="/system"/>);
+        }else{
+            return(
+                <div className="container-login-form">
+                    <h3 className="title-login">Sistema de redex</h3>
+                    <Form onSubmit={this.checkLogin} className="login-form">
+                        <FormItem>
+                            {getFieldDecorator('Usuario', {
+                                rules: [{ required: true, message: 'Ingrese su usuario' }],
+                            })(
+                            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Usuario" />
+                            )}
+                        </FormItem>
+                        <FormItem>
+                            {getFieldDecorator('Contraseña', {
+                                rules: [{ required: true, message: 'Ingrese su contraseña' }],
+                            })(
+                            <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Contraseña" />
+                            )}
+                        </FormItem>
+                        <FormItem>
+                            {getFieldDecorator('remember', {
+                                valuePropName: 'checked',
+                                initialValue: true,
+                            })(
+                                <Checkbox>Recuerdame</Checkbox>
+                            )}
+                            <a className="login-form-forgot" href="">Recuperar Contraseña</a>
+                            <Button type="primary" htmlType="submit" className="login-form-button">
+                                Iniciar Sesión
+                            </Button>
+                        </FormItem>
+                    </Form>
+                    <button onClick={() => this.checkAuth(Roles.GERENTE)}>Iniciar como gerente</button>
+                    <button onClick={() => this.checkAuth(Roles.ADMIN)}>Iniciar como admin</button>
+                    <button onClick={() => this.checkAuth(Roles.JEFEOFICINA)}>Iniciar como jefe oficina</button>
+                    <button onClick={() => this.checkAuth(Roles.EMPLEADO)}>Iniciar como empleado</button>
+                </div>
+                
+            );
         }
-        return(
-            <div>
-                <h1>Pantalla de login</h1>
-                <button onClick={()=>this.checkAuth(Roles.ADMIN)}>Loguearme como admin</button>
-                <button onClick={()=>this.checkAuth(Roles.GERENTE)}>Loguearme como gerente</button>
-                <button onClick={()=>this.checkAuth(Roles.EMPLEADO)}>Loguearme como empleado</button>
-                <button onClick={()=>this.checkAuth(Roles.JEFEOFICINA)}>Loguearme como jefe de oficina</button>
-            </div>
-        );
     }
 }
+const Login = Form.create()(LoginForm);
 
 export default Login;
