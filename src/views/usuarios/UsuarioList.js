@@ -50,9 +50,9 @@ export default class UsuarioList extends React.Component {
               key="action"
               render={(text, record) => (
                 <span>
-                  <a href="javascript:;">Invite {record.lastName}</a>
+                  <a href="javascript:;">Modificar</a>
                   <Divider type="vertical" />
-                  <a href="javascript:;">Delete</a>
+                  <a href="javascript:;">Eliminar</a>
                 </span>
               )}
             />
