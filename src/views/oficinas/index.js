@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Row, Col, Layout, Button } from 'antd';
+import React from 'react';
+import { Col, Layout, Button } from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import OficinasList from './OficinasList';
 import OficinasForm from './OficinasForm';
