@@ -63,28 +63,48 @@ export default class UsuarioList extends React.Component {
             <Table dataSource={this.state.usuarios}>
               <Column
                 title="Nombres"
-                dataIndex="firstName"
-                key="firstName"
+                key="nombres"
+                render={record=>(
+                  <div>
+                  <span> { record.colaborador.persona.nombres } </span>
+                  </div>
+                )}
               />
               <Column
-                title="Last Name"
-                dataIndex="lastName"
+                title="Apellido"
                 key="lastName"
+                render={record=>(
+                  <div>
+                  <span> { record.colaborador.persona.paterno } </span>
+                  </div>
+                )}
               />
             <Column
               title="Doc Identidad"
-              dataIndex="docId"
               key="docId"
+              render={record=>(
+                <div>
+                <span> { record.colaborador.persona.numeroDocumentoIdentidad } </span>
+                </div>
+              )}
             />
             <Column
               title="Oficina"
-              dataIndex="office"
               key="office"
+              render={record=>(
+                <div>
+                <span> { record.colaborador.oficina.codigo } </span>
+                </div>
+              )}
             />
             <Column
               title="Email"
-              dataIndex="email"
               key="email"
+              render={record=>(
+                <div>
+                <span> { record.colaborador.persona.email } </span>
+                </div>
+              )}
             />
             <Column
               width="50px"
