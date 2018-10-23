@@ -1,35 +1,12 @@
 import React from 'react';
 import { Table, Tag, Menu, Dropdown, Icon,Modal} from 'antd';
+import MenuItem from 'antd/lib/menu/MenuItem';
 
 const { Column, ColumnGroup } = Table;
 
 const confirm = Modal.confirm;
 
-function showConfirmDesactivar() {
-  confirm({
-    title: 'Usted desea desactivar a este usuario?',
-    content: 'Si usted desactiva al usuario, este no tendra acceso al sistema',
-    onCancel() {
-      console.log('Cancelar');
-    },
-    onOk() {
-      console.log('OK');
-    },
-  });
-}
 
-function showConfirmActivar() {
-  confirm({
-    title: 'Usted desea activar a este usuario?',
-    content: 'Si usted activa al usuario, este tendra acceso al sistema',
-    onCancel() {
-      console.log('Cancelar');
-    },
-    onOk() {
-      console.log('OK');
-    },
-  });
-}
 
 const data = [{
     id: '1',
@@ -39,25 +16,43 @@ const data = [{
     office:'Madrid',
     email:'johnBrown@gmail.com',
     phone: '980456321',
+    estado: {name:'ACTIVO'}
   }];
 
 
-  const menu = (
-    <Menu>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">Editar</a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" onClick={showConfirmDesactivar}>Desactivar</a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" onClick={showConfirmActivar}>Activar</a>
-      </Menu.Item>
-    </Menu>
-  );
-
+  
 export default class UsuarioList extends React.Component {
-    
+
+  showConfirmDesactivar=(record)=> {
+    confirm({
+      title: 'Usted desea desactivar a este usuario?',
+      content: 'Si usted desactiva al usuario, este no tendra acceso al sistema',
+      onCancel() {
+        console.log('Cancelar');
+      },
+      onOk() {
+        console.log('OK');
+      },
+    });
+  }
+  
+  showConfirmActivar=(record)=> {
+    confirm({
+      title: 'Usted desea activar a este usuario?',
+      content: 'Si usted activa al usuario, este tendra acceso al sistema',
+      onCancel() {
+        console.log('Cancelar');
+      },
+      onOk() {
+        console.log('OK');
+      },
+    });
+  }
+
+  editarUsuario=(record)=>{
+
+  }
+
     render(){
         return (
             <Table dataSource={data}>
@@ -90,13 +85,31 @@ export default class UsuarioList extends React.Component {
               width="50px"
               title=""
               key="action"
-              render={(text, record) => (
-                <Dropdown overlay={menu}>
+              render={ record => { 
+                const menu = (
+                  <Menu>
+                    
+                    {
+                      record.estado.name === 'ACTIVO' ? 
+                      ( <div><Menu.Item>
+                        <a target="_blank" rel="noopener noreferrer" onClick={this.showConfirmDesactivar.bind(this, record)}> Desactivar</a> 
+                        </Menu.Item>
+                        <Menu.Item>
+                        <a target="_blank" rel="noopener noreferrer" onClick={this.editarUsuario.bind(this, record)}> Editar</a> 
+                        </Menu.Item></div>) :
+                      ( <Menu.Item>
+                        <a target="_blank" rel="noopener noreferrer" onClick={this.showConfirmActivar.bind(this, record)}> Activar</a> 
+                        </Menu.Item>)
+                    }
+                  </Menu>
+                );
+                return (
+                  <Dropdown overlay={menu}>
                   <a className="ant-dropdown-link" href="#">
                     <Icon type="setting" theme="outlined" />
                   </a>
                 </Dropdown>
-              )}
+              )}}
             />
           </Table>
         )
