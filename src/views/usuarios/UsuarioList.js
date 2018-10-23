@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Divider, Tag } from 'antd';
+import { Table, Tag, Menu, Dropdown, Icon } from 'antd';
 
 const { Column, ColumnGroup } = Table;
 
@@ -14,6 +14,20 @@ const data = [{
     phone: '980456321',
   }];
 
+
+  const menu = (
+    <Menu>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">Editar</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">Desactivar</a>
+      </Menu.Item>
+      <Menu.Item>
+        <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">Activar</a>
+      </Menu.Item>
+    </Menu>
+  );
 
 export default class UsuarioList extends React.Component {
     
@@ -46,14 +60,15 @@ export default class UsuarioList extends React.Component {
               key="email"
             />
             <Column
-              title="Action"
+              width="50px"
+              title=""
               key="action"
               render={(text, record) => (
-                <span>
-                  <a href="javascript:;">Modificar</a>
-                  <Divider type="vertical" />
-                  <a href="javascript:;">Eliminar</a>
-                </span>
+                <Dropdown overlay={menu}>
+                  <a className="ant-dropdown-link" href="#">
+                    <Icon type="setting" theme="outlined" />
+                  </a>
+                </Dropdown>
               )}
             />
           </Table>
