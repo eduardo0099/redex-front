@@ -1,9 +1,8 @@
 import React from 'react';
-import { Table, Tag, Menu, Dropdown, Icon,Modal} from 'antd';
-import MenuItem from 'antd/lib/menu/MenuItem';
+import { Table, Menu, Dropdown, Icon,Modal} from 'antd';
 import API from '../../Services/Api';
 
-const { Column, ColumnGroup } = Table;
+const { Column } = Table;
 
 const confirm = Modal.confirm;
   
