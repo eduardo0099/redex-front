@@ -3,10 +3,6 @@ import { Table, Tag, Menu, Dropdown, Icon } from 'antd';
 
 const { Column } = Table;
 
-const oficinas = [
-    {codigo: 'PER', pais: {nombre: "Peru"}, capacidadActual: 0, capacidadMaxima: 200}
-]
-
 const data = [
   {
     key: '1',
