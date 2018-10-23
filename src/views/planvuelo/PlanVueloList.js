@@ -1,196 +1,84 @@
 import React from 'react';
 import { Table, Tag, Menu, Dropdown, Icon } from 'antd';
+import API from '../../Services/Api';
 
 const { Column } = Table;
 
-const data = [
-  {
-    key: '1',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }, {
-    key: '2',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'ACTIVO',
-  }, {
-    key: '3',
-    origen: 'Lima, Peru',
-    destino: 'Paris, Francia',
-    inicio: '09:00 AM',
-    duracion: '8h 45m',
-    estado: 'INACTIVO',
-  }
-];
-
-  const menu = (
-    <Menu>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">Editar</a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">Desactivar</a>
-      </Menu.Item>
-      <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">Activar</a>
-      </Menu.Item>
-    </Menu>
-  );
-
 export default class PlanVueloList extends React.Component {
     
+    constructor(props){
+      super(props);
+
+      this.state = {
+        list: []
+      }
+    }
+
+    componentDidMount() {
+      this.list();
+    }
+
+    list = () => {
+      this.setState({...this.state, loading: true}, () => {
+        API.get('vuelos')
+        .then(response => {
+          this.setState({...this.state, list: response.data.vuelos}, () => {
+            this.setState({...this.state, loading: false});
+          });
+        })
+      })
+      
+    }
+
+    activar = (record) => {
+      API.post(`vuelos/vuelos/${record.id}/activar`)
+      .then(response => {
+        this.list();
+      })
+    }
+
+    desactivar = (record) => {
+      API.post(`vuelos/vuelos/${record.id}/desactivar`)
+      .then(response => {
+        this.list();
+      })
+    }
+
     render(){
         return (
-            <Table dataSource={data}>
+            <Table dataSource={this.state.list} loading={this.state.loading}>
               <Column
                 title="Origen"
-                dataIndex="origen"
-                key="firstName"
+                key="origen"
+                render={record => (
+                  <div>
+                    <div>
+                      <b> { record.oficinaOrigen.pais.nombre } </b>
+                  </div>
+                  <small> { record.oficinaOrigen.codigo } </small>
+                  </div>
+                )}
               />
               <Column
                 title="Destino"
-                dataIndex="destino"
-                key="lastName"
+                key="destino"
+                render={record => (
+                  <div>
+                    <div>
+                      <b> { record.oficinaDestino.pais.nombre } </b>
+                  </div>
+                  <small> { record.oficinaDestino.codigo } </small>
+                  </div>
+                )}
               />
             <Column
               title="Inicio"
-              dataIndex="inicio"
+              dataIndex="horaInicioString"
               key="age"
             />
             <Column
               title="Duración"
-              dataIndex="duracion"
+              dataIndex="horaFinString"
               key="address"
             />
             <Column
@@ -198,26 +86,40 @@ export default class PlanVueloList extends React.Component {
               dataIndex="estado"
               key="estado"
               render={estado => {
-                  switch(estado){
+                  switch(estado.name){
                     case 'ACTIVO':
                       return (<Tag color="green"> Activo </Tag>);
                     case 'INACTIVO':
                       return (<Tag color="red"> Inactivo </Tag>);
                   }
               }}
-
             />
             <Column
-              width="50px"
+              width="40px"
               title=""
               key="action"
-              render={(text, record) => (
-                <Dropdown overlay={menu}>
+              render={ record => { 
+                const menu = (
+                  <Menu>
+                    <Menu.Item>
+                      <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">Editar</a>
+                    </Menu.Item>
+                    <Menu.Item>
+                    {
+                      record.estado.name === 'ACTIVO' ? 
+                      ( <a target="_blank" rel="noopener noreferrer" onClick={this.desactivar.bind(this, record)}> Desactivar</a> ) :
+                      ( <a target="_blank" rel="noopener noreferrer" onClick={this.activar.bind(this, record)}> Activar</a> )
+                    }
+                    </Menu.Item>
+                  </Menu>
+                );
+                return (
+                  <Dropdown overlay={menu}>
                   <a className="ant-dropdown-link" href="#">
                     <Icon type="setting" theme="outlined" />
                   </a>
                 </Dropdown>
-              )}
+              )}}
             />
           </Table>
         )
