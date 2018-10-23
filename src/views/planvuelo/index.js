@@ -1,5 +1,8 @@
-import React, { Component } from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import React from 'react';
+import { Col, Layout, Button } from 'antd';
+import { TheContent, TheHeader } from '../../components/layout';
+import PlanVueloList from './PlanVueloList';
+import PlanVueloForm from './PlanVueloForm';
 
 export default class PlanVuelo extends React.Component {
   constructor(props) {
@@ -11,9 +14,20 @@ export default class PlanVuelo extends React.Component {
 
   render() {
     return (
-      <div>
-        <span> hola mundo </span>
-      </div>
+      <Layout>
+      <TheHeader>
+        <Col span={12}>
+          <h1> Plan de Vuelo </h1>
+        </Col>
+        <Col span={12} align="right">
+          <Button type="primary" onClick={this.showModal}> Cargar </Button>
+        </Col>
+      </TheHeader>
+      <TheContent>
+          <PlanVueloList/>
+          <PlanVueloForm visible={this.state.modalVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
+      </TheContent>
+    </Layout>
     )
   }
 }
