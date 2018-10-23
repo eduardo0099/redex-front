@@ -1,11 +1,38 @@
 import React from 'react';
-import { Table, Tag, Menu, Dropdown, Icon } from 'antd';
+import { Table, Tag, Menu, Dropdown, Icon,Modal} from 'antd';
 
 const { Column, ColumnGroup } = Table;
 
+const confirm = Modal.confirm;
+
+function showConfirmDesactivar() {
+  confirm({
+    title: 'Usted desea desactivar a este usuario?',
+    content: 'Si usted desactiva al usuario, este no tendra acceso al sistema',
+    onCancel() {
+      console.log('Cancelar');
+    },
+    onOk() {
+      console.log('OK');
+    },
+  });
+}
+
+function showConfirmActivar() {
+  confirm({
+    title: 'Usted desea activar a este usuario?',
+    content: 'Si usted activa al usuario, este tendra acceso al sistema',
+    onCancel() {
+      console.log('Cancelar');
+    },
+    onOk() {
+      console.log('OK');
+    },
+  });
+}
 
 const data = [{
-    key: '1',
+    id: '1',
     firstName: 'John',
     lastName: 'Brown',
     docId:'47945555',
@@ -21,10 +48,10 @@ const data = [{
         <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">Editar</a>
       </Menu.Item>
       <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="http://www.taobao.com/">Desactivar</a>
+        <a target="_blank" onClick={showConfirmDesactivar}>Desactivar</a>
       </Menu.Item>
       <Menu.Item>
-        <a target="_blank" rel="noopener noreferrer" href="http://www.tmall.com/">Activar</a>
+        <a target="_blank" onClick={showConfirmActivar}>Activar</a>
       </Menu.Item>
     </Menu>
   );
