@@ -48,8 +48,6 @@ export default class Oficinas extends React.Component {
       if (err) {
         return;
       }
-
-      console.log('Received values of form: ', values);
       form.resetFields();
       this.setState({ modalVisible: false });
     });
