@@ -91,16 +91,26 @@ export default class UsuarioList extends React.Component {
                     
                     {
                       record.estado.name === 'ACTIVO' ? 
-                      ( <div><Menu.Item>
+                      ( 
+                        <Menu.Item>
                         <a target="_blank" rel="noopener noreferrer" onClick={this.showConfirmDesactivar.bind(this, record)}> Desactivar</a> 
                         </Menu.Item>
-                        <Menu.Item>
-                        <a target="_blank" rel="noopener noreferrer" onClick={this.editarUsuario.bind(this, record)}> Editar</a> 
-                        </Menu.Item></div>) :
+                       ) :
                       ( <Menu.Item>
                         <a target="_blank" rel="noopener noreferrer" onClick={this.showConfirmActivar.bind(this, record)}> Activar</a> 
                         </Menu.Item>)
                     }
+
+                    {
+                      record.estado.name === 'ACTIVO' ? 
+                      ( 
+                        <Menu.Item>
+                        <a target="_blank" rel="noopener noreferrer" onClick={this.editarUsuario.bind(this, record)}> Editar</a> 
+                        </Menu.Item>
+                        ) :
+                      ( null )
+                    }
+
                   </Menu>
                 );
                 return (
