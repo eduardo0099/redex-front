@@ -32,12 +32,12 @@ export default class PersonasList extends React.Component {
             <Table dataSource={data}>
               <Column
                 title="Nombre"
-                dataIndex="nombre"
+                dataIndex="nombres"
                 key="nombres"
               />
               <Column
                 title="Apellido"
-                dataIndex="apellido"
+                dataIndex="paterno"
                 key="paterno"
               />
               <Column

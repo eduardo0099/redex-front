@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Tag, Menu, Dropdown, Icon,Modal} from 'antd';
 import MenuItem from 'antd/lib/menu/MenuItem';
+import API from '../../Services/Api';
 
 const { Column, ColumnGroup } = Table;
 
@@ -22,6 +23,21 @@ const data = [{
 
   
 export default class UsuarioList extends React.Component {
+
+  constructor(props){
+    super(props)
+    this.state = {
+      usuarios: []
+    }
+
+  }
+
+  list = () => {
+    API.get('usuarios')
+      .then(response => {
+        this.setState({...this.state, usuarios: response.data});
+    })
+  }
 
   showConfirmDesactivar=(record)=> {
     confirm({

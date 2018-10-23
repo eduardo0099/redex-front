@@ -17,7 +17,7 @@ export default class Personas extends React.Component {
           <Layout>
               <TheHeader>
                 <Col span={12}>
-                  <h2> Personas </h2>
+                  <h2> Usuarios </h2>
                 </Col>
               </TheHeader>
               <TheContent>
