@@ -6,21 +6,6 @@ import API from '../../Services/Api';
 const { Column, ColumnGroup } = Table;
 
 const confirm = Modal.confirm;
-
-
-
-const data = [{
-    id: '1',
-    firstName: 'John',
-    lastName: 'Brown',
-    docId:'47945555',
-    office:'Madrid',
-    email:'johnBrown@gmail.com',
-    phone: '980456321',
-    estado: {name:'ACTIVO'}
-  }];
-
-
   
 export default class UsuarioList extends React.Component {
 
@@ -30,6 +15,10 @@ export default class UsuarioList extends React.Component {
       usuarios: []
     }
 
+  }
+
+  componentDidMount() {
+    this.list();
   }
 
   list = () => {
@@ -71,9 +60,9 @@ export default class UsuarioList extends React.Component {
 
     render(){
         return (
-            <Table dataSource={data}>
+            <Table dataSource={this.state.usuarios}>
               <Column
-                title="First Name"
+                title="Nombres"
                 dataIndex="firstName"
                 key="firstName"
               />
@@ -104,7 +93,6 @@ export default class UsuarioList extends React.Component {
               render={ record => { 
                 const menu = (
                   <Menu>
-                    
                     {
                       record.estado.name === 'ACTIVO' ? 
                       ( 
