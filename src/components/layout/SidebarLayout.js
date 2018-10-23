@@ -1,10 +1,9 @@
 import  React from 'react';
-import { Layout, Menu, Icon } from 'antd';
+import { Layout, Menu } from 'antd';
 import { Link } from "react-router-dom";
 import routes from '../../routes';
 
-const SubMenu = Menu.SubMenu;
-const { Header, Sider } = Layout;
+const { Sider } = Layout;
 
 export default class SidebarLayout extends React.Component {
 

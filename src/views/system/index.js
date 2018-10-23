@@ -40,6 +40,13 @@ export default class System extends Component {
     })
   }
 
+  subirUsuarios = () => {
+    axios({
+      method: 'POST',
+      url: 'http://localhost:5000/usuarios/carga', crossDomain: true, data: this.state.archivo
+    })
+  }
+
   render(){
     return (
       <Layout>
@@ -59,6 +66,9 @@ export default class System extends Component {
           </div>
           <div>
             <button onClick={this.subirOficinas}> Subir oficinas </button>
+          </div>
+          <div>
+            <button onClick={this.subirUsuarios}> Subir usuarios </button>
           </div>
           <div>
           <button onClick={this.subirVuelos}> Subir vuelos </button>
