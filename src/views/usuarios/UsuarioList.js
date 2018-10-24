@@ -11,7 +11,8 @@ export default class UsuarioList extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      usuarios: []
+      usuarios: [],
+      loading: false,
     }
 
   }
@@ -21,10 +22,12 @@ export default class UsuarioList extends React.Component {
   }
 
   list = () => {
-    API.get('usuarios')
-      .then(response => {
-        this.setState({...this.state, usuarios: response.data});
-    })
+    this.setState({...this.state, loading: true}, () => {
+      API.get('usuarios')
+        .then(response => {
+          this.setState({...this.state, usuarios: response.data, loading: false});
+      });
+    });
   }
 
   showConfirmDesactivar=(record)=> {
@@ -59,7 +62,7 @@ export default class UsuarioList extends React.Component {
 
     render(){
         return (
-            <Table dataSource={this.state.usuarios}>
+            <Table dataSource={this.state.usuarios} loading={this.state.loading}>
               <Column
                 title="Nombres"
                 key="nombres"

@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 const API =  axios.create({
-    //baseURL: 'http://10.101.57.118:5000/',
-    baseURL: 'http://localhost:5000/',
+    //baseURL: 'http://localhost:5000/',
+    baseURL: 'https://redex-backend.herokuapp.com/',
     timeout: 10000,
     crossDomain: true,
     headers: {

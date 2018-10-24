@@ -20,7 +20,7 @@ export default class PlanVueloList extends React.Component {
 
     list = () => {
       this.setState({...this.state, loading: true}, () => {
-        API.get('vuelos')
+        API.get('planvuelo')
         .then(response => {
           this.setState({...this.state, list: response.data.vuelos}, () => {
             this.setState({...this.state, loading: false});
@@ -31,14 +31,14 @@ export default class PlanVueloList extends React.Component {
     }
 
     activar = (record) => {
-      API.post(`vuelos/vuelos/${record.id}/activar`)
+      API.post(`planvuelo/vuelos/${record.id}/activar`)
       .then(response => {
         this.list();
       })
     }
 
     desactivar = (record) => {
-      API.post(`vuelos/vuelos/${record.id}/desactivar`)
+      API.post(`planvuelo/vuelos/${record.id}/desactivar`)
       .then(response => {
         this.list();
       })
@@ -46,7 +46,7 @@ export default class PlanVueloList extends React.Component {
 
     render(){
         return (
-            <Table dataSource={this.state.list} loading={this.state.loading}>
+            <Table dataSource={this.state.list} loading={this.state.loading} rowKey="id" pagination={{pageSize: 8}}>
               <Column
                 title="Origen"
                 key="origen"

@@ -24,9 +24,7 @@ export default class PersonasList extends React.Component {
     this.setState({...this.state, loading: true}, () => {
       API.get('personas')
       .then(response => {
-        this.setState({...this.state, list: response.data}, () => {
-          this.setState({...this.state, loading: false});
-        });
+        this.setState({...this.state, list: response.data, loading: false});
       })
     })
     
@@ -38,7 +36,7 @@ export default class PersonasList extends React.Component {
 
     render(){
         return (
-            <Table dataSource={this.state.list}>
+            <Table dataSource={this.state.list} loading={this.state.loading}>
               <Column
                 title="Nombre"
                 key="nombres"

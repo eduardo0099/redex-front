@@ -9,6 +9,9 @@ export default class Oficinas extends React.Component {
 
   constructor(props) {
     super(props);
+
+    this.listRef = React.createRef();
+
     this.state = {
       archivo: '',
       modalVisible: false,
@@ -35,11 +38,10 @@ export default class Oficinas extends React.Component {
   }
    
   subir = () => {
-    API.post('oficinas/carga', this.state.archivo)
+    API.post('oficinas/carga', this.state.formData)
     .then(response => {
-      window.location.reload();
+      this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
     })
-   
   }
 
   handleCreate = () => {
@@ -68,17 +70,13 @@ export default class Oficinas extends React.Component {
 
     const props = {
       onRemove: (fileForm) => {
-        this.setState({...this.state, fileList: []});
+        this.setState({...this.state, fileList: [], formData: ''});
       },
       beforeUpload: (fileForm) => {
-        this.setState({...this.state, fileList: [fileForm]});
         let file =  fileForm;
         let formData = new FormData();
         formData.append('file', file);
-        API.post('archivos/upload', formData)
-        .then(response => {
-          this.setState({...this.state, archivo: response.data});
-        })
+        this.setState({...this.state, fileList: [fileForm], formData : formData});
         return false;
       },
       fileList: this.state.fileList
@@ -99,7 +97,7 @@ export default class Oficinas extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
-              <OficinasList/>
+              <OficinasList ref={this.listRef}/>
               <OficinasForm visible={this.state.modalVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
               <Modal
                 title="Cargar oficinas"

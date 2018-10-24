@@ -9,7 +9,8 @@ export default class OficinasList extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      oficinas: []
+      oficinas: [],
+      loading: false
     }
 
   }
@@ -19,10 +20,12 @@ export default class OficinasList extends React.Component {
   }
 
   list = () => {
-    API.get('oficinas')
-      .then(response => {
-        this.setState({...this.state, oficinas: response.data}, () => console.dir(this.state.oficinas));
-    })
+    this.setState({...this.state, loading: true}, () => {
+      API.get('oficinas')
+        .then(response => {
+          this.setState({...this.state, oficinas: response.data, loading: false});
+      });
+    });
   }
 
   activar = (record) => {
@@ -42,10 +45,11 @@ export default class OficinasList extends React.Component {
       
 
         return (
-            <Table dataSource={this.state.oficinas} rowKey="id">
+            <Table dataSource={this.state.oficinas} loading={this.state.loading} pagination={{pageSize: 9}} rowKey="id">
               <Column
-                title="Código"
+                title="País"
                 key="codigo"
+                width="30%"
                 render={record => (
                   <div>
                     <div>
@@ -58,6 +62,8 @@ export default class OficinasList extends React.Component {
               <Column
                 title="Capacidad"
                 key="capacidad"
+                align="center"
+                width="50%"
                 render={record => (
                   <span> {record.capacidadActual}/{record.capacidadMaxima}</span>
                 )}
@@ -66,6 +72,8 @@ export default class OficinasList extends React.Component {
               title="Estado"
               dataIndex="estado"
               key="estado"
+              width="20%"
+              align="center"
               render={estado => {
                   switch(estado.name){
                     case 'ACTIVO':
