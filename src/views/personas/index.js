@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Row, Col, Layout, Button } from 'antd';
+import React from 'react';
+import { Col, Layout } from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import PersonasList from './PersonasList';
 
@@ -17,7 +17,7 @@ export default class Personas extends React.Component {
           <Layout>
               <TheHeader>
                 <Col span={12}>
-                  <h2> Usuarios </h2>
+                  <h1> Personas </h1>
                 </Col>
               </TheHeader>
               <TheContent>

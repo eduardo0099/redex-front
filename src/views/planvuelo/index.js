@@ -10,7 +10,7 @@ export default class PlanVuelo extends React.Component {
     super(props);
     this.state = {
       archivo: '',
-      cargaVisible: true
+      cargaVisible: false
     }
   }
 
@@ -37,6 +37,7 @@ export default class PlanVuelo extends React.Component {
         this.setState({...this.state, fileList: []});
       },
       beforeUpload: (fileForm) => {
+        this.setState({...this.state, fileList: [fileForm]});
         let file =  fileForm;
         let formData = new FormData();
         formData.append('file', file);

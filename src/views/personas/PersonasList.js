@@ -1,27 +1,36 @@
 import React from 'react';
-import { Table, Tag, Menu, Dropdown, Icon,Modal} from 'antd';
-import MenuItem from 'antd/lib/menu/MenuItem';
+import { Table, Menu, Dropdown, Icon } from 'antd';
 
-const { Column, ColumnGroup } = Table;
+import API from '../../Services/Api';
 
-const confirm = Modal.confirm;
+const { Column } = Table;
 
-
-
-const data = [{
-    id: '1',
-    nombres: 'John',
-    paterno: 'Brown',
-    docId:'47945555',
-    tipoDoc: 'DNI',
-    pais:'Madrid',
-    email:'johnBrown@gmail.com',
-    telefono: '980456321',
-  }];
-
-
-  
 export default class PersonasList extends React.Component {
+
+  constructor(props){
+    super(props);
+
+    this.state = {
+      list: [],
+      loading: false
+    }
+  }
+
+  componentDidMount(){
+    this.list();
+  }
+
+  list = () => {
+    this.setState({...this.state, loading: true}, () => {
+      API.get('personas')
+      .then(response => {
+        this.setState({...this.state, list: response.data}, () => {
+          this.setState({...this.state, loading: false});
+        });
+      })
+    })
+    
+  }
 
   editarUsuario=(record)=>{
 
@@ -29,31 +38,30 @@ export default class PersonasList extends React.Component {
 
     render(){
         return (
-            <Table dataSource={data}>
+            <Table dataSource={this.state.list}>
               <Column
                 title="Nombre"
-                dataIndex="nombres"
                 key="nombres"
+                render={record => (
+                  <div>
+                    <div>
+                  <b> { record.nombres } { record.paterno } { record.materno } </b>
+                  </div>
+                  <small> { record.tipoDocumentoIdentidad.simbolo } { record.numeroDocumentoIdentidad } </small>
+                  </div>
+                )}
               />
-              <Column
-                title="Apellido"
-                dataIndex="paterno"
-                key="paterno"
-              />
-              <Column
-              title="Tipo Documento"
-              dataIndex="tipoDoc"
-              key="tipoDoc"
-            />
-            <Column
-              title="Doc Identidad"
-              dataIndex="docId"
-              key="docId"
-            />
             <Column
               title="Pais"
-              dataIndex="pais"
               key="pais"
+              render={record => (
+                <div>
+                  <div>
+                <b> { record.pais.nombre } </b>
+                </div>
+                <small> { record.pais.codigo } </small>
+                </div>
+              )}
             />
             <Column
               title="Email"

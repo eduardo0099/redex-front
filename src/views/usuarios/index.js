@@ -75,7 +75,7 @@ export default class Usuarios extends React.Component {
       <Layout>
           <TheHeader>
             <Col span={12}>
-              <h2> Usuarios </h2>
+              <h1> Usuarios </h1>
             </Col>
             <Col span={12} align="right">
             <Dropdown overlay={menu}>

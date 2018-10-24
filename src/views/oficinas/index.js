@@ -3,7 +3,6 @@ import { Col, Layout, Button, Menu, Dropdown, Icon, Modal, Upload} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import OficinasList from './OficinasList';
 import OficinasForm from './OficinasForm';
-import axios from 'axios';
 import API from '../../Services/Api';
 
 export default class Oficinas extends React.Component {
@@ -26,20 +25,21 @@ export default class Oficinas extends React.Component {
     this.setState({ cargaVisible: true });
   }
 
-  handleCancel = () => {
-    this.setState({ modalVisible: false });
-  }
 
   hideCarga = () => {
     this.setState({ cargaVisible: false });
   }
 
+  handleCancel = () => {
+    this.setState({ modalVisible: false });
+  }
+   
   subir = () => {
-    let file =  this.state.fileList[0];
-    console.log(file);
-    let formData = new FormData();
-    formData.append('file', file);
-    API.post('oficinas/carga', formData);
+    API.post('oficinas/carga', this.state.archivo)
+    .then(response => {
+      window.location.reload();
+    })
+   
   }
 
   handleCreate = () => {
@@ -72,6 +72,13 @@ export default class Oficinas extends React.Component {
       },
       beforeUpload: (fileForm) => {
         this.setState({...this.state, fileList: [fileForm]});
+        let file =  fileForm;
+        let formData = new FormData();
+        formData.append('file', file);
+        API.post('archivos/upload', formData)
+        .then(response => {
+          this.setState({...this.state, archivo: response.data});
+        })
         return false;
       },
       fileList: this.state.fileList

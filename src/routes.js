@@ -3,28 +3,45 @@ import PlanVuelo from './views/planvuelo';
 import Usuarios from './views/usuarios';
 import System from './views/system';
 import Personas from './views/personas';
+import Dashboard from './views/dashboard';
+import Simulacion from './views/simulacion';
 
 const routes = [
   {
+    path: '/dashboard',
+    component: Dashboard,
+    name: 'Dashboard'
+  },
+  {
+    path: '/personas',
+    component: Personas,
+    name: 'Personas'
+  },
+  {
    path: '/oficinas',
-   component: Oficinas
+   component: Oficinas,
+   name: 'Oficinas'
   },
   {
    path: '/planvuelo',
-   component: PlanVuelo
+   component: PlanVuelo,
+   name: 'Plan de vuelo'
   },
   {
-   path: '/usuarios',
-   component: Usuarios
+    path: '/simulacion',
+    component: Simulacion,
+    name: 'Simulación'
   },
   {
-   path: '/system',
-   component: System
+    path: '/usuarios',
+    component: Usuarios,
+    name: 'Usuarios'
   },
   {
-    path: '/Personas',
-    component: Personas
-  }
+    path: '/system',
+    component: System,
+    name: 'Pruebas'
+   },
 ]
 
 export default routes;

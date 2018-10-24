@@ -21,8 +21,8 @@ class OficinasForm extends React.Component {
   fetchPaises = () => {
     API.get('paises')
       .then(response => {
-        console.log(response.data);
-        this.setState({...this.state, dataSource: response.data, paises:response.data});
+        //console.log(response.data);
+        //this.setState({...this.state, dataSource: response.data, paises:response.data});
       })
   }
 

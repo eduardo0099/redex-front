@@ -7,24 +7,28 @@ const { Sider } = Layout;
 
 export default class SidebarLayout extends React.Component {
 
-  constructor(props){
-    super(props);
-  }
-
   render() {
-   const Component = this.props.component;
-   const route = this.props.route;
-   return (
+    let index = '1';
+    const currentPath = this.props.route.match.path;
+    routes.forEach((route, i) => {
+      if(currentPath.includes(route.path)){
+        index = i.toString();
+      }
+    });
+
+    const Component = this.props.component;
+    const route = this.props.route;
+    return (
       <div>
         <Layout>
           <Sider breakpoint="lg" collapsedWidth="80">
             <div className="logo"/>
-            <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+            <Menu theme="dark" mode="inline" defaultSelectedKeys={[index]}>
             { routes.map((route, key) => {
-            const { component, path } = route;
+            const { path, name } = route;
             return (
               <Menu.Item key={key}>
-                <Link to={path}> { path } </Link>
+                <Link to={path}> { name } </Link>
               </Menu.Item>
             )
           })}
