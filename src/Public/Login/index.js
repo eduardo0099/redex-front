@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Redirect } from 'react-router-dom';
 import Roles from './../../utils/Roles';
-import { Form, Icon, Input, Button, Checkbox, Divider } from 'antd';
+import { Form, Icon, Input, Button, Checkbox } from 'antd';
 const FormItem = Form.Item;
 class LoginForm extends Component{
     constructor(props){
@@ -56,7 +56,7 @@ class LoginForm extends Component{
     }
     render(){
         const { getFieldDecorator } = this.props.form;
-        if(this.state.hasAuth == true){
+        if(this.state.hasAuth === true){
             return(<Redirect to="/system"/>);
         }else{
             return(

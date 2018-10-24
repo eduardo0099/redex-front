@@ -91,6 +91,8 @@ export default class PlanVueloList extends React.Component {
                       return (<Tag color="green"> Activo </Tag>);
                     case 'INACTIVO':
                       return (<Tag color="red"> Inactivo </Tag>);
+                    default: 
+                      return null;
                   }
               }}
             />

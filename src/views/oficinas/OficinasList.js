@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, Tag, Dropdown, Menu, Icon} from 'antd';
 import API from '../../Services/Api';
 
-const { Column, ColumnGroup } = Table;
+const { Column } = Table;
 
 export default class OficinasList extends React.Component {
     
@@ -80,6 +80,8 @@ export default class OficinasList extends React.Component {
                       return (<Tag color="green"> Activo </Tag>);
                     case 'INACTIVO':
                       return (<Tag color="red"> Inactivo </Tag>);
+                    default:
+                      return null;
                   }
               }}
             />

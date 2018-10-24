@@ -1,5 +1,5 @@
-import React, { Component } from 'react';
-import { Row, Col, Layout, Button ,Menu,Dropdown,Icon,Modal, Upload} from 'antd';
+import React from 'react';
+import { Col, Layout, Button ,Menu,Dropdown,Icon,Modal, Upload} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import UsuarioList from './UsuarioList';
 import UsuarioForm from './UsuarioForm';
