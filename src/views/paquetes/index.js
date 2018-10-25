@@ -19,12 +19,6 @@ export default class Paquetes extends React.Component {
     }
   }
 
-
-  componentDidMount(){
-    console.log(this.props.history.push);
-
-  }
-
   showModalCarga = () => {
     this.setState({ cargaVisible: true });
   }
@@ -56,11 +50,14 @@ export default class Paquetes extends React.Component {
     this.formRef = formRef;
   }
 
+  gotoNuevo = () => {
+    this.props.route.history.push('/paquetes/Nuevo');
+  }
+
   render() {
-    const { match, history } = this.props;
     const menu = (
       <Menu>
-        <Menu.Item onClick={history.push('/paquetes/Nuevo')} key="1">Nuevo Paquete</Menu.Item>
+        <Menu.Item onClick={this.gotoNuevo} key="1">Nuevo Paquete</Menu.Item>
         <Menu.Item onClick={this.showModalCarga} key="2">Cargar datos</Menu.Item>
       </Menu>
     );

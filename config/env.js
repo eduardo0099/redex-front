@@ -7,8 +7,8 @@ const paths = require('./paths');
 var http = require("http");
 
 setInterval(function() {
-    http.get("https://redex-front.herokuapp.com");
-    http.get("https://redex-backend.herokuapp.com");
+    http.get("http://redex-front.herokuapp.com");
+    http.get("http://redex-backend.herokuapp.com");
 }, 300000); // every 5 minutes (300000)
 
 
