@@ -3,7 +3,7 @@ import { Modal, Form, Input, AutoComplete } from 'antd';
 import API from '../../Services/Api'
 const FormItem = Form.Item;
 
-class OficinasForm extends React.Component {
+class PaquetesForm extends React.Component {
  
   constructor(props){
     super(props);
@@ -19,11 +19,11 @@ class OficinasForm extends React.Component {
   }
 
   fetchPaises = () => {
-    API.get('paises')
-      .then(response => {
+    //API.get('paises')
+    //  .then(response => {
         //console.log(response.data);
         //this.setState({...this.state, dataSource: response.data, paises:response.data});
-      })
+    //  })
   }
 
   handleSearch = (value) => {
@@ -77,6 +77,6 @@ class OficinasForm extends React.Component {
     }
 }
 
-const WrappedForm = Form.create()(OficinasForm);
+const WrappedForm = Form.create()(PaquetesForm);
 
 export default WrappedForm;

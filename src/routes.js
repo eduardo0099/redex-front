@@ -5,6 +5,8 @@ import System from './views/system';
 import Personas from './views/personas';
 import Dashboard from './views/dashboard';
 import Simulacion from './views/simulacion';
+import Paquetes from './views/paquetes';
+import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
 
 const routes = [
   {
@@ -38,10 +40,21 @@ const routes = [
     name: 'Usuarios'
   },
   {
+    path: '/paquetes',
+    component: Paquetes,
+    name: 'Paquetes'
+   },
+   {
+    path: '/paquetes/Nuevo',
+    component: PaquetesNuevo,
+    name: 'PaquetesNuevo'
+   },
+  {
     path: '/system',
     component: System,
     name: 'Pruebas'
    },
+   
 ]
 
 export default routes;

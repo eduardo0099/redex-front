@@ -1,11 +1,11 @@
 import React from 'react';
 import { Col, Layout, Button, Menu, Dropdown, Icon, Modal, Upload} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
-import OficinasList from './OficinasList';
-import OficinasForm from './OficinasForm';
+import PaquetesList from './PaquetesList';
+import PaquetesForm from './PaquetesForm';
 import API from '../../Services/Api';
 
-export default class Oficinas extends React.Component {
+export default class Paquetes extends React.Component {
 
   constructor(props) {
     super(props);
@@ -14,14 +14,15 @@ export default class Oficinas extends React.Component {
 
     this.state = {
       archivo: '',
-      modalVisible: false,
       cargaVisible: false,
       fileList: []
     }
   }
 
-  showModal = () => {
-    this.setState({ modalVisible: true });
+
+  componentDidMount(){
+    console.log(this.props.history.push);
+
   }
 
   showModalCarga = () => {
@@ -33,15 +34,11 @@ export default class Oficinas extends React.Component {
     this.setState({ cargaVisible: false });
   }
 
-  handleCancel = () => {
-    this.setState({ modalVisible: false });
-  }
-   
   subir = () => {
-    API.post('oficinas/carga', this.state.formData)
-    .then(response => {
-      this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
-    })
+    //API.post('oficinas/carga', this.state.formData)
+    //.then(response => {
+    //  this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
+    //})
   }
 
   handleCreate = () => {
@@ -60,10 +57,10 @@ export default class Oficinas extends React.Component {
   }
 
   render() {
-
+    const { match, history } = this.props;
     const menu = (
       <Menu>
-        <Menu.Item onClick={this.showModal} key="1">Nueva Oficina</Menu.Item>
+        <Menu.Item onClick={history.push('/paquetes/Nuevo')} key="1">Nuevo Paquete</Menu.Item>
         <Menu.Item onClick={this.showModalCarga} key="2">Cargar datos</Menu.Item>
       </Menu>
     );
@@ -86,7 +83,7 @@ export default class Oficinas extends React.Component {
         <Layout>
           <TheHeader>
             <Col span={12}>
-              <h1> Oficinas </h1>
+              <h1> Paquetes </h1>
             </Col>
             <Col span={12} align="right">
             <Dropdown overlay={menu}>
@@ -97,10 +94,10 @@ export default class Oficinas extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
-              <OficinasList ref={this.listRef}/>
-              <OficinasForm visible={this.state.modalVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
+              <PaquetesList ref={this.listRef}/>
+              <PaquetesForm visible={this.state.modalVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
               <Modal
-                title="Cargar oficinas"
+                title="Cargar Paquetes"
                 visible={this.state.cargaVisible}
                 onOk={this.subir}
                 onCancel={this.hideCarga}
