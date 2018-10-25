@@ -4,6 +4,14 @@ const fs = require('fs');
 const path = require('path');
 const paths = require('./paths');
 
+var http = require("http");
+
+setInterval(function() {
+    http.get("https://redex-front.herokuapp.com");
+    http.get("https://redex-backend.herokuapp.com");
+}, 300000); // every 5 minutes (300000)
+
+
 // Make sure that including paths.js after env.js will read .env variables.
 delete require.cache[require.resolve('./paths')];
 
