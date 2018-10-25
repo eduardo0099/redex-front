@@ -1,100 +1,77 @@
 import React from 'react';
-import { Table, Tag, Menu, Dropdown, Icon } from 'antd';
+import { Table, Tag, Dropdown, Menu, Icon} from 'antd';
 import API from '../../Services/Api';
 
 const { Column } = Table;
 
-export default class PlanVueloList extends React.Component {
+export default class OficinasList extends React.Component {
     
-    constructor(props){
-      super(props);
-
-      this.state = {
-        list: []
-      }
+  constructor(props){
+    super(props)
+    this.state = {
+      oficinas: [],
+      loading: false
     }
+  }
 
-    componentDidMount() {
-      this.list();
-    }
+  componentDidMount() {
+    this.list();
+  }
 
-    list = () => {
-      this.setState({...this.state, loading: true}, () => {
-        API.get('planvuelo')
-          .then(response => {
-            this.setState({...this.state, list: response.data.vuelos, loading: false});
-          })
-      })
-      
-    }
+  list = () => {
+    this.setState({...this.state, loading: true}, () => {
+      API.get('oficinas')
+        .then(response => {
+          this.setState({...this.state, oficinas: response.data, loading: false});
+      });
+    });
+  }
 
-    pageChange = (pageNumber, pageSize) => {
-      console.log(pageNumber, pageSize);
-    }
-
-    activar = (record) => {
-      API.post(`planvuelo/vuelos/${record.id}/activar`)
+  activar = (record) => {
+    API.post(`oficinas/${record.id}/activar`)
       .then(response => {
         this.list();
-      })
-    }
+      });
+  }
 
-    desactivar = (record) => {
-      API.post(`planvuelo/vuelos/${record.id}/desactivar`)
+  desactivar = (record) => {
+    API.post(`oficinas/${record.id}/desactivar`)
       .then(response => {
         this.list();
-      })
-    }
-
+      });
+  }
     render(){
+      
+
         return (
-            <Table dataSource={this.state.list} loading={this.state.loading} rowKey="id" pagination={{pageSize: 8, onChange: this.pageChange}}>
+            <Table dataSource={this.state.oficinas} loading={this.state.loading} pagination={{pageSize: 9}} rowKey="id">
               <Column
-                title="Origen"
-                key="origen"
+                title="País"
+                key="codigo"
+                width="30%"
                 render={record => (
                   <div>
                     <div>
-                      <b> { record.oficinaOrigen.pais.nombre } </b>
+                  <b> { record.pais.nombre } </b>
                   </div>
-                  <small> { record.oficinaOrigen.codigo } </small>
+                  <small> { record.codigo } </small>
                   </div>
                 )}
               />
               <Column
-                title="Destino"
-                key="destino"
+                title="Capacidad"
+                key="capacidad"
+                align="center"
+                width="50%"
                 render={record => (
-                  <div>
-                    <div>
-                      <b> { record.oficinaDestino.pais.nombre } </b>
-                  </div>
-                  <small> { record.oficinaDestino.codigo } </small>
-                  </div>
+                  <span> {record.capacidadActual}/{record.capacidadMaxima}</span>
                 )}
               />
-            <Column
-              title="Salida"
-              dataIndex="horaInicioString"
-              key="salida"
-              align="center"
-            />
-            <Column
-              title="Llegada"
-              dataIndex="horaFinString"
-              key="llegada"
-              align="center"
-            />
-            <Column
-              title="Duración"
-              dataIndex="duracion"
-              key="duracion"
-              align="center"
-            />
             <Column
               title="Estado"
               dataIndex="estado"
               key="estado"
+              width="20%"
               align="center"
               render={estado => {
                   switch(estado.name){
@@ -102,13 +79,13 @@ export default class PlanVueloList extends React.Component {
                       return (<Tag color="green"> Activo </Tag>);
                     case 'INACTIVO':
                       return (<Tag color="red"> Inactivo </Tag>);
-                    default: 
+                    default:
                       return null;
                   }
               }}
             />
             <Column
-              width="40px"
+              width="50px"
               title=""
               key="action"
               render={ record => { 
