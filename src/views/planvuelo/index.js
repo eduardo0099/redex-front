@@ -4,6 +4,7 @@ import { TheContent, TheHeader } from '../../components/layout';
 import PlanVueloList from './PlanVueloList';
 import PlanVueloForm from './PlanVueloForm';
 import API from '../../Services/Api';
+import notify from '../../utils/notify';
 
 export default class PlanVuelo extends React.Component {
   constructor(props) {
@@ -29,6 +30,10 @@ export default class PlanVuelo extends React.Component {
   subir = () => {
     API.post('planvuelo/carga', this.state.formData)
     .then(response => {
+      notify.success({
+        message: 'Carga finalizada',
+        description: `${response.data.cantidadRegistros} vuelos registrados`
+      })
       this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
     })
   }
@@ -48,8 +53,6 @@ export default class PlanVuelo extends React.Component {
       },
       fileList: this.state.fileList
     };
-
-    
   
     return (
       <Layout>

@@ -1,8 +1,8 @@
-let Roles = {
-    JEFEOFICINA: 'JEFEOFICINA',
-    ADMIN: 'ADMIN',
+let roles = {
+    JEFE_OFICINA: 'JEFE_OFICINA',
+    ADMINISTRADOR: 'ADMINISTRADOR',
     EMPLEADO: 'EMPLEADO',
-    GERENTE: 'GERENTE',
+    GERENTE_GENERAL: 'GERENTE',
 }
 
-export default Roles; 
+export default roles; 
