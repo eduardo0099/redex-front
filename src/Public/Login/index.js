@@ -1,104 +1,106 @@
-import React, { Component } from 'react';
-import { Redirect } from 'react-router-dom';
-import Roles from './../../utils/Roles';
-import { Form, Icon, Input, Button, Checkbox } from 'antd';
+import React, { Component } from "react";
+import { Redirect } from "react-router-dom";
+import Roles from "./../../utils/Roles";
+import { Form, Icon, Input, Button, Checkbox } from "antd";
+import OpenAPI from "../../Services/OpenAPI";
+import API from "../../Services/Api";
+import notify from "../../utils/notify";
+
 const FormItem = Form.Item;
-class LoginForm extends Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            hasAuth: false,
-        }
+class LoginForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hasAuth: false
+    };
+  }
+
+  componentWillMount() {}
+
+  componentDidMount() {}
+  
+  login = values => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("datasession");
+    OpenAPI.post("/auth/signin", values)
+      .then(response => {
+        localStorage.setItem(
+          "token",
+          `${response.data.tokenType} ${response.data.accessToken}`
+        );
+
+        API.get("/usuarios/yo").then(response => {
+          localStorage.setItem("datasession", JSON.stringify(response.data));
+          this.props.history.push("/oficinas");
+        });
+      })
+      .catch(response => {
+        notify.error({
+          message: "Error",
+          description: "Credenciales incorrectos"
+        });
+      });
+  };
+
+  checkLogin = e => {
+    e.preventDefault();
+    this.props.form.validateFields((err, values) => {
+      if (!err) {
+        this.login(values);
+      }
+    });
+  };
+  render() {
+    const { getFieldDecorator } = this.props.form;
+    if (this.state.hasAuth === true) {
+      return <Redirect to="/oficinas" />;
+    } else {
+      return (
+        <div className="container-login-form">
+          <h3 className="title-login">Sistema de redex</h3>
+          <Form onSubmit={this.checkLogin} className="login-form">
+            <FormItem>
+              {getFieldDecorator("username", {
+                rules: [{ required: true, message: "Ingrese su usuario" }]
+              })(
+                <Input
+                  prefix={
+                    <Icon type="user" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                  placeholder="Usuario"
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              {getFieldDecorator("password", {
+                rules: [{ required: true, message: "Ingrese su contraseña" }]
+              })(
+                <Input
+                  prefix={
+                    <Icon type="lock" style={{ color: "rgba(0,0,0,.25)" }} />
+                  }
+                  type="password"
+                  placeholder="Contraseña"
+                />
+              )}
+            </FormItem>
+            <FormItem>
+              <a className="login-form-forgot" href="">
+                Recuperar contraseña
+              </a>
+              <Button
+                type="primary"
+                htmlType="submit"
+                className="login-form-button"
+              >
+                Iniciar Sesión
+              </Button>
+            </FormItem>
+          </Form>
+        </div>
+      );
     }
-    checkAuth = (rol) => {
-        try{
-            let data = localStorage.getItem('u');
-            if (data){
-                let sessionInfo = JSON.parse(atob(data));
-                if(sessionInfo){
-                    //Lo deja pasar
-                    if(Roles[sessionInfo.role]){
-                        sessionInfo.role = rol;
-                        localStorage.setItem('u',btoa(JSON.stringify(sessionInfo)));
-                        localStorage.setItem('a',JSON.stringify(sessionInfo));
-                        this.setState({hasAuth:true});
-                    }else{
-                        //error, no existe el rol
-
-                    }
-                }
-
-            }else{
-                //Manda servicio al backend para que lo loguee
-
-                //El backend lo loguea y guarda la info en el localStorage
-                let response = {
-                    role: rol,
-                    token: 'asdjhdshsadhjadkadsjjdska',
-                }
-                localStorage.setItem('u',btoa(JSON.stringify(response)));
-                localStorage.setItem('a',JSON.stringify(response));
-                this.setState({hasAuth:true});
-            }
-
-        }catch(e){
-            console.log(e);
-
-        }
-    }
-    checkLogin = (e) => {
-        e.preventDefault();
-        this.props.form.validateFields((err, values) => {
-            if (!err) {
-              console.log('Received values of form: ', values);
-            }
-        })
-    }
-    render(){
-        const { getFieldDecorator } = this.props.form;
-        if(this.state.hasAuth === true){
-            return(<Redirect to="/system"/>);
-        }else{
-            return(
-                <div className="container-login-form">
-                    <h3 className="title-login">Sistema de redex</h3>
-                    <Form onSubmit={this.checkLogin} className="login-form">
-                        <FormItem>
-                            {getFieldDecorator('Usuario', {
-                                rules: [{ required: true, message: 'Ingrese su usuario' }],
-                            })(
-                            <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Usuario" />
-                            )}
-                        </FormItem>
-                        <FormItem>
-                            {getFieldDecorator('Contraseña', {
-                                rules: [{ required: true, message: 'Ingrese su contraseña' }],
-                            })(
-                            <Input prefix={<Icon type="lock" style={{ color: 'rgba(0,0,0,.25)' }} />} type="password" placeholder="Contraseña" />
-                            )}
-                        </FormItem>
-                        <FormItem>
-                            {getFieldDecorator('remember', {
-                                valuePropName: 'checked',
-                                initialValue: true,
-                            })(
-                                <Checkbox>Recuerdame</Checkbox>
-                            )}
-                            <a className="login-form-forgot" href="">Recuperar Contraseña</a>
-                            <Button type="primary" htmlType="submit" className="login-form-button">
-                                Iniciar Sesión
-                            </Button>
-                        </FormItem>
-                    </Form>
-                    <button onClick={() => this.checkAuth(Roles.GERENTE)}>Iniciar como gerente</button>
-                    <button onClick={() => this.checkAuth(Roles.ADMIN)}>Iniciar como admin</button>
-                    <button onClick={() => this.checkAuth(Roles.JEFEOFICINA)}>Iniciar como jefe oficina</button>
-                    <button onClick={() => this.checkAuth(Roles.EMPLEADO)}>Iniciar como empleado</button>
-                </div>
-
-            );
-        }
-    }
+  }
 }
 const Login = Form.create()(LoginForm);
 

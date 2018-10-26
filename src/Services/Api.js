@@ -1,12 +1,14 @@
 import axios from 'axios';
+import backend from './backend';
+
 
 const API =  axios.create({
-    //baseURL: 'http://localhost:5000/',
-    baseURL: 'https://redex-backend.herokuapp.com/',
+    baseURL: backend,
     timeout: 10000,
     crossDomain: true,
     headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': localStorage.getItem('token')
     }
 });
 
