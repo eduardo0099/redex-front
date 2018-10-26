@@ -10,6 +10,7 @@ export default class PaquetesList extends React.Component {
     super(props)
     this.state = {
       paquetes: [{
+        "cliente":"johana",
         "codigo":"4555",
         "Origen":"Peru",
         "Destino":"España",
@@ -41,6 +42,11 @@ export default class PaquetesList extends React.Component {
         return (
             <Table dataSource={this.state.paquetes} loading={this.state.loading} pagination={{pageSize: 9}} rowKey="id">
               <Column
+                title="Cliente"
+                key="cliente"
+                width="16%"
+              />
+              <Column
                 title="Codigo"
                 key="codigo"
                 width="16%"
@@ -56,13 +62,8 @@ export default class PaquetesList extends React.Component {
                 width="16%"
               />
               <Column
-                title="Fecha Ingreso"
+                title="Fecha Registro"
                 key="fechaIngreso"
-                width="16%"
-              />
-              <Column
-                title="Fecha Salida"
-                key="fechaSalida"
                 width="16%"
               />
             <Column

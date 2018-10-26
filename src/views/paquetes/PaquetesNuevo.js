@@ -1,5 +1,5 @@
 import React from 'react';
-import { Divider ,Col, Layout, Button,Form, Input,AutoComplete,Dropdown,Icon,Menu,message,Popconfirm,Switch} from 'antd';
+import { Divider ,Col, Layout, Button,Form, Input,AutoComplete,Dropdown,Icon,Menu,message,Popconfirm,Switch,Tooltip} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 
 const FormItem = Form.Item;
@@ -87,14 +87,16 @@ export default class PaquetesNuevo extends React.Component {
                     </Col>
                     <Col span={1}>
                     <FormItem >
-                        
+                        <Tooltip placement="top" title={"Buscar cliente"}>
                         <Button type="primary" shape="circle" icon="search" />
-                        
+                        </Tooltip>
                     </FormItem>
                     </Col>
                     <Col span={1}>
                     <FormItem >
+                        <Tooltip placement="top" title={"Añadir nuevo cliente"}>
                         <Button type="primary" shape="circle" icon="plus" />
+                        </Tooltip>
                     </FormItem>
                     </Col>
                 </InputGroup>
@@ -147,14 +149,16 @@ export default class PaquetesNuevo extends React.Component {
                     </Col>
                     <Col span={1}>
                     <FormItem >
-                        
+                        <Tooltip placement="top" title={"Buscar cliente"}>
                         <Button type="primary" shape="circle" icon="search" />
-        
+                        </Tooltip>
                     </FormItem>
                     </Col>
                     <Col span={1}>
                     <FormItem >
+                        <Tooltip placement="top" title={"Añadir nuevo cliente"}>
                         <Button type="primary" shape="circle" icon="plus" />
+                        </Tooltip>
                     </FormItem>
                     </Col>
                 </InputGroup>

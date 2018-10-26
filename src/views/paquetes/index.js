@@ -1,9 +1,11 @@
 import React from 'react';
-import { Col, Layout, Button, Menu, Dropdown, Icon, Modal, Upload} from 'antd';
+import { Col, Layout, Button, Menu, Dropdown, Icon, Modal, Upload,Input} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import PaquetesList from './PaquetesList';
-import PaquetesForm from './PaquetesForm';
+import PaquetesDetail from './PaquetesDetail';
 import API from '../../Services/Api';
+
+const Search = Input.Search;
 
 export default class Paquetes extends React.Component {
 
@@ -15,8 +17,17 @@ export default class Paquetes extends React.Component {
     this.state = {
       archivo: '',
       cargaVisible: false,
+      detalleVisible:false,
       fileList: []
     }
+  }
+
+  showModal = () => {
+    this.setState({ detalleVisible: true });
+  }
+
+  handleCancel = () => {
+    this.setState({ detalleVisible: false });
   }
 
   showModalCarga = () => {
@@ -76,6 +87,13 @@ export default class Paquetes extends React.Component {
       fileList: this.state.fileList
     };
 
+    const docI = (
+            <Menu >
+              <Menu.Item key="1"><Icon type="user" />DNI</Menu.Item>
+              <Menu.Item key="2"><Icon type="user" />Pasaporte</Menu.Item>
+            </Menu>
+    );
+
     return (
         <Layout>
           <TheHeader>
@@ -91,8 +109,21 @@ export default class Paquetes extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
+              <Col span={5}>
+                <Dropdown.Button   overlay={docI}>
+                  Tipo de Documento
+                </Dropdown.Button>
+                </Col>
+              <Col span={6}>
+              <Search
+              placeholder="Ingresar documento del cliente"
+              onSearch={value => console.log(value)}
+              enterButton
+              />
+              </Col>
+              <br /><br />
               <PaquetesList ref={this.listRef}/>
-              <PaquetesForm visible={this.state.modalVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
+              <PaquetesDetail visible={this.state.detalleVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
               <Modal
                 title="Cargar Paquetes"
                 visible={this.state.cargaVisible}
