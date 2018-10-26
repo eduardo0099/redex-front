@@ -9,15 +9,7 @@ export default class PaquetesList extends React.Component {
   constructor(props){
     super(props)
     this.state = {
-      paquetes: [{
-        "cliente":"johana",
-        "codigo":"4555",
-        "Origen":"Peru",
-        "Destino":"España",
-        "fechaIngreso":"12/09/18",
-        "fecha Ingreso":"13/09/18",
-        "estado":"ACTIVO",
-      }],
+      paquetes: [],
       loading: false
     }
   }
@@ -27,16 +19,16 @@ export default class PaquetesList extends React.Component {
   }
 
   list = () => {
-    //this.setState({...this.state, loading: true}, () => {
-    //  API.get('oficinas')
-    //    .then(response => {
-    //      this.setState({...this.state, oficinas: response.data, loading: false});
-    //  });
-    //});
+    this.setState({...this.state, loading: true}, () => {
+      API.get('paquetes')
+        .then(response => {
+          this.setState({...this.state, paquetes: response.data, loading: false});
+      });
+    });
   }
 
   mostrarDetalle = (record) => {
-
+    
   }
     render(){
         return (
@@ -45,26 +37,51 @@ export default class PaquetesList extends React.Component {
                 title="Cliente"
                 key="cliente"
                 width="16%"
+                render={record=>(
+                  <div>
+                  <span> { record.personaOrigen.nombreCompleto } </span>
+                  </div>
+                )}
               />
               <Column
                 title="Codigo"
-                key="codigo"
+                key="codigoRastreo"
                 width="16%"
+                render={record=>(
+                  <div>
+                  <span> { record.codigoRastreo } </span>
+                  </div>
+                )}
               />
               <Column
                 title="Origen"
                 key="origen"
                 width="16%"
+                render={record=>(
+                  <div>
+                  <span> { record.oficinaOrigen.pais.nombre } </span>
+                  </div>
+                )}
               />
               <Column
                 title="Destino"
                 key="destino"
                 width="16%"
+                render={record=>(
+                  <div>
+                  <span> { record.oficinaDestino.pais.nombre } </span>
+                  </div>
+                )}
               />
               <Column
                 title="Fecha Registro"
-                key="fechaIngreso"
+                key="fechaIngresoString"
                 width="16%"
+                render={record=>(
+                  <div>
+                  <span> { record.fechaIngresoString } </span>
+                  </div>
+                )}
               />
             <Column
               title="Estado"
@@ -72,16 +89,11 @@ export default class PaquetesList extends React.Component {
               key="estado"
               width="20%"
               align="center"
-              render={estado => {
-                  switch(estado.name){
-                    case 'ACTIVO':
-                      return (<Tag color="green"> Activo </Tag>);
-                    case 'INACTIVO':
-                      return (<Tag color="red"> Inactivo </Tag>);
-                    default:
-                      return null;
-                  }
-              }}
+              render={record=>(
+                <div>
+                <span> { record.estado.name } </span>
+                </div>
+              )}
             />
             <Column
               width="50px"
