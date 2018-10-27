@@ -15,7 +15,7 @@ export default class CrimsonTable extends React.Component {
         total: 999,
         onChange: this.handlePageChange
       },
-      search: '',
+      search: "",
       loading: false,
       list: []
     };
@@ -45,7 +45,7 @@ export default class CrimsonTable extends React.Component {
 
   fetch() {
     let request = {
-      current: this.state.pagination.current -1,
+      current: this.state.pagination.current - 1,
       pageSize: this.state.pagination.pageSize,
       search: this.state.search
     };
@@ -58,7 +58,6 @@ export default class CrimsonTable extends React.Component {
           loading: false,
           pagination: {
             ...this.state.pagination,
-            current: response.data.current,
             total: response.data.total
           }
         });
@@ -66,11 +65,18 @@ export default class CrimsonTable extends React.Component {
     });
   }
 
-  handleSearch = (search) => {
-    this.setState({...this.state, search: search, pagination: {...this.state.pagination, current: 1}}, () => {
+  handleSearch = search => {
+    this.setState(
+      {
+        ...this.state,
+        search: search,
+        pagination: { ...this.state.pagination, current: 1 }
+      },
+      () => {
         this.fetch();
-    });
-  }
+      }
+    );
+  };
 
   render() {
     return (
@@ -79,7 +85,7 @@ export default class CrimsonTable extends React.Component {
           <Col span={6}>
             <Search
               placeholder="Buscar"
-              onSearch={ this.handleSearch }
+              onSearch={this.handleSearch}
               enterButton
             />
           </Col>
