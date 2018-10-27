@@ -1,6 +1,6 @@
 import React from "react";
 import API from "../../Services/Api";
-import { Table, Tag, Dropdown, Menu, Icon, Input, Col, Row } from "antd";
+import { Table, Input, Col, Row } from "antd";
 
 const Search = Input.Search;
 
@@ -9,20 +9,66 @@ export default class CrimsonTable extends React.Component {
     super(props);
 
     this.state = {
+      pagination: {
+        current: 1,
+        pageSize: 8,
+        total: 999,
+        onChange: this.handlePageChange
+      },
+      search: '',
       loading: false,
       list: []
     };
   }
 
-  componentDidMount(){
-      this.fetch();
+  handlePageChange = (page, size) => {
+    this.setState(
+      {
+        ...this.state,
+        pagination: {
+          ...this.state.pagination,
+          current: page,
+          pageSize: size
+        }
+      },
+      () => this.fetch()
+    );
+  };
+
+  componentDidMount() {
+    this.setState({
+      ...this.state,
+      pageSize: this.props.pageSize ? this.props.pageSize : 2
+    });
+    this.fetch();
   }
 
   fetch() {
+    let request = {
+      current: this.state.pagination.current -1,
+      pageSize: this.state.pagination.pageSize,
+      search: this.state.search
+    };
+
     this.setState({ ...this.state, loading: true }, () => {
-      API.get(this.props.url).then(response => {
-        this.setState({ ...this.state, list: response.data, loading: false });
+      API.get(this.props.url, { params: request }).then(response => {
+        this.setState({
+          ...this.state,
+          list: response.data.data,
+          loading: false,
+          pagination: {
+            ...this.state.pagination,
+            current: response.data.current,
+            total: response.data.total
+          }
+        });
       });
+    });
+  }
+
+  handleSearch = (search) => {
+    this.setState({...this.state, search: search, pagination: {...this.state.pagination, current: 1}}, () => {
+        this.fetch();
     });
   }
 
@@ -33,7 +79,7 @@ export default class CrimsonTable extends React.Component {
           <Col span={6}>
             <Search
               placeholder="Buscar"
-              onSearch={value => console.log(value)}
+              onSearch={ this.handleSearch }
               enterButton
             />
           </Col>
@@ -41,7 +87,7 @@ export default class CrimsonTable extends React.Component {
         <Table
           dataSource={this.state.list}
           loading={this.state.loading}
-          pagination={{ pageSize: 9 }}
+          pagination={this.state.pagination}
           rowKey="id"
         >
           {this.props.children}
