@@ -1,8 +1,9 @@
 import React from 'react';
-import { Table, Tag, Dropdown, Menu, Icon} from 'antd';
+import { Table, Tag, Dropdown, Menu, Icon, Col, Input } from 'antd';
 import API from '../../Services/Api';
 
 const { Column } = Table;
+const Search = Input.Search;
 
 export default class PaquetesList extends React.Component {
     
@@ -32,6 +33,14 @@ export default class PaquetesList extends React.Component {
   }
     render(){
         return (
+          <div>
+            <Col span={6}>
+              <Search
+              placeholder="Ingresar documento del cliente"
+              onSearch={value => console.log(value)}
+              enterButton
+              />
+              </Col>
             <Table dataSource={this.state.paquetes} loading={this.state.loading} pagination={{pageSize: 9}} rowKey="id">
               <Column
                 title="Cliente"
@@ -116,6 +125,7 @@ export default class PaquetesList extends React.Component {
               )}}
             />
           </Table>
+          </div>
         )
     }
 }

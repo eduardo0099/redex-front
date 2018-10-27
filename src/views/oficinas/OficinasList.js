@@ -1,33 +1,17 @@
 import React from "react";
-import { Table, Tag, Dropdown, Menu, Icon } from "antd";
+import { Table, Tag, Dropdown, Menu, Icon, Input, Col, Row } from "antd";
 import API from "../../Services/Api";
+import CrimsonTable from "../../components/CrimsonTable";
 
 const { Column } = Table;
+const Search = Input.Search;
 
 export default class OficinasList extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      oficinas: [],
-      loading: false
-    };
   }
 
-  componentDidMount() {
-    this.list();
-  }
-
-  list = () => {
-    this.setState({ ...this.state, loading: true }, () => {
-      API.get("oficinas").then(response => {
-        this.setState({
-          ...this.state,
-          oficinas: response.data,
-          loading: false
-        });
-      });
-    });
-  };
+  list = () => {};
 
   activar = record => {
     API.post(`oficinas/${record.id}/activar`).then(response => {
@@ -40,15 +24,10 @@ export default class OficinasList extends React.Component {
       this.list();
     });
   };
-  
+
   render() {
     return (
-      <Table
-        dataSource={this.state.oficinas}
-        loading={this.state.loading}
-        pagination={{ pageSize: 9 }}
-        rowKey="id"
-      >
+      <CrimsonTable url="/oficinas">
         <Column
           title="País"
           key="codigo"
@@ -139,7 +118,7 @@ export default class OficinasList extends React.Component {
             );
           }}
         />
-      </Table>
+      </CrimsonTable>
     );
   }
 }

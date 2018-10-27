@@ -17,8 +17,10 @@ class LoginForm extends Component {
 
   componentWillMount() {}
 
-  componentDidMount() {}
-  
+  componentDidMount() {
+      this.setState({hasAuth: localStorage.getItem('token') !== null});
+  }
+
   login = values => {
     localStorage.removeItem("token");
     localStorage.removeItem("datasession");
@@ -50,6 +52,7 @@ class LoginForm extends Component {
       }
     });
   };
+
   render() {
     const { getFieldDecorator } = this.props.form;
     if (this.state.hasAuth === true) {
