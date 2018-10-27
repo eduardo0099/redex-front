@@ -1,37 +1,12 @@
 import React from 'react';
 import { Table, Tag, Menu, Dropdown, Icon } from 'antd';
 import API from '../../Services/Api';
+import CrimsonTable from '../../components/CrimsonTable';
 
 const { Column } = Table;
 
 export default class PlanVueloList extends React.Component {
     
-    constructor(props){
-      super(props);
-
-      this.state = {
-        list: []
-      }
-    }
-
-    componentDidMount() {
-      this.list();
-    }
-
-    list = () => {
-      this.setState({...this.state, loading: true}, () => {
-        API.get('planvuelo')
-          .then(response => {
-            this.setState({...this.state, list: response.data.vuelos, loading: false});
-          })
-      })
-      
-    }
-
-    pageChange = (pageNumber, pageSize) => {
-      console.log(pageNumber, pageSize);
-    }
-
     activar = (record) => {
       API.post(`planvuelo/vuelos/${record.id}/activar`)
       .then(response => {
@@ -48,7 +23,7 @@ export default class PlanVueloList extends React.Component {
 
     render(){
         return (
-            <Table dataSource={this.state.list} loading={this.state.loading} rowKey="id" pagination={{pageSize: 8, onChange: this.pageChange}}>
+            <CrimsonTable url="/planvuelo">
               <Column
                 title="Origen"
                 key="origen"
@@ -134,7 +109,7 @@ export default class PlanVueloList extends React.Component {
                 </Dropdown>
               )}}
             />
-          </Table>
+          </CrimsonTable>
         )
     }
 }

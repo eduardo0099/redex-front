@@ -7,6 +7,7 @@ import Dashboard from './views/dashboard';
 import Simulacion from './views/simulacion';
 import Paquetes from './views/paquetes';
 import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
+import Roles from './views/roles';
 
 const routes = [
   {
@@ -48,6 +49,11 @@ const routes = [
     path: '/paquetes/Nuevo',
     component: PaquetesNuevo,
     name: 'PaquetesNuevo'
+   },
+   {
+    path: '/roles',
+    component: Roles,
+    name: 'Roles'
    },
   {
     path: '/system',
