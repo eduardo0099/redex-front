@@ -38,7 +38,7 @@ export default class System extends Component {
     return (
       <Layout>
         <TheHeader>
-          <h2> @Oscar Cerna </h2>
+          <h1> Pruebas </h1>
         </TheHeader>
         <TheContent>
           <input type="file" onChange={this.onChange} />

@@ -19,14 +19,14 @@ export default class PlanVueloList extends React.Component {
     activar = (record) => {
       API.post(`planvuelo/vuelos/${record.id}/activar`)
       .then(response => {
-        this.list();
+        this.fetch();
       })
     }
 
     desactivar = (record) => {
       API.post(`planvuelo/vuelos/${record.id}/desactivar`)
       .then(response => {
-        this.list();
+        this.fetch();
       })
     }
 
