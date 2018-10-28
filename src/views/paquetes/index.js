@@ -17,50 +17,24 @@ export default class Paquetes extends React.Component {
     this.state = {
       archivo: '',
       cargaVisible: false,
-      detalleVisible:false,
+      modalDetail:false,
       fileList: []
     }
   }
-
-  showModal = () => {
-    this.setState({ detalleVisible: true });
-  }
-
-  handleCancel = () => {
-    this.setState({ detalleVisible: false });
-  }
-
+  
+  //Modal
   showModalCarga = () => {
     this.setState({ cargaVisible: true });
   }
-
-
   hideCarga = () => {
     this.setState({ cargaVisible: false });
   }
-
   subir = () => {
     //API.post('oficinas/carga', this.state.formData)
     //.then(response => {
     //  this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
     //})
   }
-
-  handleCreate = () => {
-    const form = this.formRef.props.form;
-    form.validateFields((err, values) => {
-      if (err) {
-        return;
-      }
-      form.resetFields();
-      this.setState({ modalVisible: false });
-    });
-  }
-
-  saveFormRef = (formRef) => {
-    this.formRef = formRef;
-  }
-
   gotoNuevo = () => {
     this.props.route.history.push('/paquetes/Nuevo');
   }
@@ -123,7 +97,6 @@ export default class Paquetes extends React.Component {
               </Col>
               <br /><br />
               <PaquetesList ref={this.listRef}/>
-              <PaquetesDetail visible={this.state.detalleVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
               <Modal
                 title="Cargar Paquetes"
                 visible={this.state.cargaVisible}
@@ -132,13 +105,13 @@ export default class Paquetes extends React.Component {
                 okText="Subir"
                 cancelText="Cancelar"
               >
-                 <Upload {...props}>
+                <Upload {...props}>
                   <Button>
                     Seleccionar archivo
                   </Button>
                 </Upload>
               </Modal>
-      
+            
           </TheContent>
         </Layout>
     )

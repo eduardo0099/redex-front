@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table, Tag, Dropdown, Menu, Icon, Col, Input } from 'antd';
 import API from '../../Services/Api';
+import PaquetesDetail from './PaquetesDetail';
 
 const { Column } = Table;
 const Search = Input.Search;
@@ -11,7 +12,8 @@ export default class PaquetesList extends React.Component {
     super(props)
     this.state = {
       paquetes: [],
-      loading: false
+      loading: false,
+      modalDetail:false
     }
   }
 
@@ -28,19 +30,30 @@ export default class PaquetesList extends React.Component {
     });
   }
 
-  mostrarDetalle = (record) => {
-    
+  //MODAL DETAIL
+  showModal = () => {
+    this.setState({ modalDetail: true });
   }
+  handleCancel = () => {
+    this.setState({ modalDetail: false });
+  }
+  handleCreate = () => {
+    const form = this.formRef.props.form;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+      form.resetFields();
+      this.setState({ modalDetail: false });
+    });
+  }
+  saveFormRef = (formRef) => {
+    this.formRef = formRef;
+  }
+
     render(){
         return (
           <div>
-            <Col span={6}>
-              <Search
-              placeholder="Ingresar documento del cliente"
-              onSearch={value => console.log(value)}
-              enterButton
-              />
-              </Col>
             <Table dataSource={this.state.paquetes} loading={this.state.loading} pagination={{pageSize: 9}} rowKey="id">
               <Column
                 title="Cliente"
@@ -100,7 +113,7 @@ export default class PaquetesList extends React.Component {
               align="center"
               render={record=>(
                 <div>
-                <span> { record.estado.name } </span>
+                <span> { record.name } </span>
                 </div>
               )}
             />
@@ -112,7 +125,7 @@ export default class PaquetesList extends React.Component {
                 const menu = (
                   <Menu>
                     <Menu.Item>
-                      <a target="_blank" rel="noopener noreferrer" onClick={this.mostrarDetalle.bind(this,record)}>Detalle</a>
+                      <a target="_blank" rel="noopener noreferrer" onClick={this.showModal}>Detalle</a>
                     </Menu.Item>
                   </Menu>
                 );
@@ -125,7 +138,13 @@ export default class PaquetesList extends React.Component {
               )}}
             />
           </Table>
-          </div>
+          <PaquetesDetail
+          visible={this.state.modalDetail}
+          onCancel={this.handleCancel}
+          onOk={this.handleCreate}
+          wrappedComponentRef={this.saveFormRef}
+          />
+        </div>
         )
     }
 }
