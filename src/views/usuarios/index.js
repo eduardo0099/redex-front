@@ -87,7 +87,6 @@ export default class Usuarios extends React.Component {
           </TheHeader>
           <TheContent>
             <UsuarioList/>
-            <UsuarioForm visible={this.state.modalVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
             <Modal
                 title="Cargar Usuarios"
                 visible={this.state.cargaVisible}
@@ -101,7 +100,7 @@ export default class Usuarios extends React.Component {
                     Seleccionar archivo
                   </Button>
                 </Upload>
-              </Modal>
+            </Modal>
           </TheContent>
         </Layout>
     )

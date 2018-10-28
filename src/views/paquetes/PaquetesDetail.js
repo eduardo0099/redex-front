@@ -1,8 +1,8 @@
 import React from 'react';
-import { Modal, Form, Input, AutoComplete } from 'antd';
+import { Modal, Form, Input, AutoComplete, Table,Divider } from 'antd';
 import API from '../../Services/Api'
 const FormItem = Form.Item;
-
+const { Column } = Table;
 class PaquetesDetail extends React.Component {
  
   constructor(props){
@@ -19,37 +19,63 @@ class PaquetesDetail extends React.Component {
   }
 
 
-  handleSearch = (value) => {
-    this.setState({...this.state,
-      dataSource: !value ? [] : [
-        value,
-        value + value,
-        value + value + value,
-      ],
-    });
-  }
-
   onSelect = (el) =>  {
 
   }
 
     render() {
-      const { visible, onCancel, onCreate, form } = this.props;
-      const { getFieldDecorator } = form;
+      const { visible, onCancel, onOk, form } = this.props;
+      
       
       return (
           <Modal
           visible={visible}
           title="Detalle de paquete"
           okText="Ok"
+          cancelText="Cancelar"
           onCancel={onCancel}
-          onCreate={onCreate}
+          onOk={onOk}
         >
           <Form layout="vertical">
+          <Divider orientation="left">Origen</Divider>
             <FormItem label="Cliente">
             </FormItem>
-            <FormItem label="Capacidad">
+            <FormItem label="Oficina">
             </FormItem>
+            <FormItem label="Fecha">
+            </FormItem>
+          <Divider orientation="left">Destino</Divider>
+            <FormItem label="Cliente">
+            </FormItem>
+            <FormItem label="Oficina">
+            </FormItem>
+            <FormItem label="Fecha">
+            </FormItem>
+          <Divider orientation="left">Ruta</Divider>
+          <FormItem label="Estado">
+            </FormItem>
+          <Table>
+              <Column
+                title="Ciudad Partida"
+                key="cliente"
+                width="16%"
+              />
+              <Column
+                    title="Tiempo Partida"
+                    key="cliente"
+                    width="16%"
+              />
+              <Column
+                    title="Ciudad Llegada"
+                    key="cliente"
+                    width="16%"
+              />
+              <Column
+                title="Tiempo Llegada"
+                key="cliente"
+                width="16%"
+              />
+          </Table>
           </Form>
         </Modal>
         );
