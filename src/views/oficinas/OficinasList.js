@@ -6,6 +6,7 @@ import CrimsonTable from "../../components/CrimsonTable";
 const { Column } = Table;
 
 export default class OficinasList extends React.Component {
+  
   constructor(props) {
     super(props);
     this.listRef = React.createRef();

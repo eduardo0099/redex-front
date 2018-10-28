@@ -83,6 +83,7 @@ export default class OficinasForm extends React.PureComponent {
 
   nuevo = () => {
     this.setState({visible : true, title: 'Nueva oficina', action: 'Guardar'}, () => {
+      this.formRef.props.form.resetFields();
     });
   }
 
@@ -90,7 +91,6 @@ export default class OficinasForm extends React.PureComponent {
     API.get(`/oficinas/${id}`).then(response => {
       let data = response.data;
       this.setState({visible : true, title: 'Editar oficina', action: 'Actualizar'}, () => {
-        console.log(this.formRef);
         this.formRef.props.form.setFields({
           pais: { value: data.pais },
           codigo: { value: data.codigo },
@@ -115,12 +115,12 @@ export default class OficinasForm extends React.PureComponent {
   render() {
     return (
       <WrappedForm
-      wrappedComponentRef={this.saveFormRef}
-      visible={this.state.visible}
-      onCancel={this.close}
-      onCreate={this.save}
-      title={this.state.title}
-      action={this.state.action}
+        wrappedComponentRef={this.saveFormRef}
+        visible={this.state.visible}
+        onCancel={this.close}
+        onCreate={this.save}
+        title={this.state.title}
+        action={this.state.action}
       />
     )
   }

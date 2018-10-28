@@ -36,7 +36,7 @@ export default class Oficinas extends React.Component {
   render() {
     const menu = (
       <Menu>
-        <Menu.Item onClick={this.nuevo}> Nueva Oficina </Menu.Item>
+        <Menu.Item onClick={this.nuevo}> Nueva  oficina </Menu.Item>
         <Menu.Item onClick={this.subir}> Cargar datos </Menu.Item>
       </Menu>
     );

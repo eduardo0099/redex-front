@@ -7,6 +7,15 @@ const { Column } = Table;
 
 export default class PlanVueloList extends React.Component {
     
+  constructor(props) {
+    super(props);
+    this.listRef = React.createRef();
+  }
+
+  fetch = () => {
+    this.listRef.current.fetch();
+  };
+
     activar = (record) => {
       API.post(`planvuelo/vuelos/${record.id}/activar`)
       .then(response => {
@@ -22,8 +31,9 @@ export default class PlanVueloList extends React.Component {
     }
 
     render(){
+        const { updateAction } = this.props;
         return (
-            <CrimsonTable url="/planvuelo">
+            <CrimsonTable url="/planvuelo" ref={this.listRef}>
               <Column
                 title="Origen"
                 key="origen"
@@ -89,16 +99,14 @@ export default class PlanVueloList extends React.Component {
               render={ record => { 
                 const menu = (
                   <Menu>
-                    <Menu.Item>
-                      <a target="_blank" rel="noopener noreferrer" href="http://www.alipay.com/">Editar</a>
+                    <Menu.Item onClick={updateAction.bind(this, record.id)}>
+                      Editar
                     </Menu.Item>
-                    <Menu.Item>
                     {
                       record.estado.name === 'ACTIVO' ? 
-                      ( <a target="_blank" rel="noopener noreferrer" onClick={this.desactivar.bind(this, record)}> Desactivar</a> ) :
-                      ( <a target="_blank" rel="noopener noreferrer" onClick={this.activar.bind(this, record)}> Activar</a> )
+                      ( <Menu.Item onClick={this.desactivar.bind(this, record)}> Desactivar</Menu.Item> ) :
+                      ( <Menu.Item onClick={this.activar.bind(this, record)}> Activar</Menu.Item> )
                     }
-                    </Menu.Item>
                   </Menu>
                 );
                 return (
