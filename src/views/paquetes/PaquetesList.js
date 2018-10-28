@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Tag, Dropdown, Menu, Icon} from 'antd';
 import API from '../../Services/Api';
 import PaquetesDetail from './PaquetesDetail';
+import Axios from 'axios';
 
 const { Column } = Table;
 
@@ -31,11 +32,13 @@ export default class PaquetesList extends React.Component {
   }
 
   detail = (id) =>{
+    console.log(id)
     this.setState({...this.state, loading: true}, () => {
-      API.get('paquetes/${id}')
+      API.get(`paquetes/${id}`)
         .then(response => {
           this.setState({detalle: response.data});
       });
+      console.log("Detalle de paquete",this.detalle)
     });
   }
   //MODAL DETAIL
@@ -136,7 +139,7 @@ export default class PaquetesList extends React.Component {
                 const menu = (
                   <Menu>
                     <Menu.Item>
-                      <a target="_blank" rel="noopener noreferrer" onClick={this.showModal(record.id)}>Detalle</a>
+                      <a target="_blank" rel="noopener noreferrer" onClick={()=>this.showModal(record.id)}>Detalle</a>
                     </Menu.Item>
                   </Menu>
                 );
