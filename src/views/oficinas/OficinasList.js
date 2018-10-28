@@ -1,33 +1,36 @@
 import React from "react";
-import { Table, Tag, Dropdown, Menu, Icon, Input, Col, Row } from "antd";
+import { Table, Tag, Dropdown, Menu, Icon} from "antd";
 import API from "../../Services/Api";
 import CrimsonTable from "../../components/CrimsonTable";
 
 const { Column } = Table;
-const Search = Input.Search;
 
 export default class OficinasList extends React.Component {
   constructor(props) {
     super(props);
+    this.listRef = React.createRef();
   }
 
-  list = () => {};
+  fetch = () => {
+    this.listRef.current.fetch();
+  };
 
   activar = record => {
     API.post(`oficinas/${record.id}/activar`).then(response => {
-      this.list();
+      this.fetch();
     });
   };
 
   desactivar = record => {
     API.post(`oficinas/${record.id}/desactivar`).then(response => {
-      this.list();
+      this.fetch();
     });
   };
 
   render() {
+    const { updateAction } = this.props;
     return (
-      <CrimsonTable url="/oficinas">
+      <CrimsonTable url="/oficinas" ref={this.listRef}>
         <Column
           title="País"
           key="codigo"
@@ -81,7 +84,7 @@ export default class OficinasList extends React.Component {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="http://www.alipay.com/"
+                    onClick={updateAction.bind(this, record.id)}
                   >
                     Editar
                   </a>
@@ -93,7 +96,6 @@ export default class OficinasList extends React.Component {
                       rel="noopener noreferrer"
                       onClick={this.desactivar.bind(this, record)}
                     >
-                      {" "}
                       Desactivar
                     </a>
                   ) : (
@@ -102,7 +104,6 @@ export default class OficinasList extends React.Component {
                       rel="noopener noreferrer"
                       onClick={this.activar.bind(this, record)}
                     >
-                      {" "}
                       Activar
                     </a>
                   )}

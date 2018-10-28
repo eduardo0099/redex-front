@@ -1,5 +1,5 @@
 import React from "react";
-import { Col, Layout, Button, Menu, Dropdown, Icon, Modal, Upload } from "antd";
+import { Layout } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import API from "../../Services/Api";
 import notify from '../../utils/notify';

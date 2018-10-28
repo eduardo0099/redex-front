@@ -3,8 +3,6 @@ import { Layout } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import API from "../../Services/Api";
 
-import axios from "axios";
-
 export default class System extends Component {
   constructor(props) {
     super(props);
