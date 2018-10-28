@@ -81,7 +81,7 @@ export default class CrimsonTable extends React.Component {
   render() {
     return (
       <div>
-        <Row>
+        <Row style={{marginBottom: '20px'}}>
           <Col span={6}>
             <Search
               placeholder="Buscar"
