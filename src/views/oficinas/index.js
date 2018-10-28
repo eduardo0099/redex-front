@@ -21,6 +21,12 @@ export default class Oficinas extends React.Component {
   }
 
   showModal = () => {
+    console.dir(this.formRef);
+
+    //JOHANA!!! con esta linea inicializo el modal con algunos datos
+    //lo idea seria llamar a un servicio del backend que te devuelva los datos e inicializar el modal con ellos
+    this.formRef.props.form.setFields({pais: {value: 1}, capacidad: {value: 20 }});
+
     this.setState({ modalVisible: true });
   };
 
