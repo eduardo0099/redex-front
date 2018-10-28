@@ -1,10 +1,9 @@
 import React from 'react';
-import { Table, Tag, Dropdown, Menu, Icon, Col, Input } from 'antd';
+import { Table, Tag, Dropdown, Menu, Icon} from 'antd';
 import API from '../../Services/Api';
 import PaquetesDetail from './PaquetesDetail';
 
 const { Column } = Table;
-const Search = Input.Search;
 
 export default class PaquetesList extends React.Component {
     
@@ -12,6 +11,7 @@ export default class PaquetesList extends React.Component {
     super(props)
     this.state = {
       paquetes: [],
+      detalle:[],
       loading: false,
       modalDetail:false
     }
@@ -30,8 +30,19 @@ export default class PaquetesList extends React.Component {
     });
   }
 
+  detail = (id) =>{
+    this.setState({...this.state, loading: true}, () => {
+      API.get('paquetes/${id}')
+        .then(response => {
+          this.setState({detalle: response.data});
+      });
+    });
+  }
   //MODAL DETAIL
-  showModal = () => {
+  showModal = (id) => {
+    this.detail(id)
+    console.log(this.detalle)
+    this.formRef.props.form.setFields(this.detalle);
     this.setState({ modalDetail: true });
   }
   handleCancel = () => {
@@ -125,7 +136,7 @@ export default class PaquetesList extends React.Component {
                 const menu = (
                   <Menu>
                     <Menu.Item>
-                      <a target="_blank" rel="noopener noreferrer" onClick={this.showModal}>Detalle</a>
+                      <a target="_blank" rel="noopener noreferrer" onClick={this.showModal(record.id)}>Detalle</a>
                     </Menu.Item>
                   </Menu>
                 );

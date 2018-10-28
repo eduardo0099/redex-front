@@ -2,7 +2,7 @@ import React from 'react';
 import { Col, Layout, Button, Menu, Dropdown, Icon, Modal, Upload,Input} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import PaquetesList from './PaquetesList';
-import PaquetesDetail from './PaquetesDetail';
+
 import API from '../../Services/Api';
 
 const Search = Input.Search;

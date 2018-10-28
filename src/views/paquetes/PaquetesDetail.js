@@ -9,8 +9,7 @@ class PaquetesDetail extends React.Component {
     super(props);
 
     this.state = {
-      paises: [],
-      dataSource: []
+      detalle: []
     }
   }
 
@@ -38,7 +37,8 @@ class PaquetesDetail extends React.Component {
         >
           <Form layout="vertical">
           <Divider orientation="left">Origen</Divider>
-            <FormItem label="Cliente">
+            <FormItem >
+            
             </FormItem>
             <FormItem label="Oficina">
             </FormItem>
