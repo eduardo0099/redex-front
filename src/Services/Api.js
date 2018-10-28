@@ -1,7 +1,6 @@
 import axios from 'axios';
 import backend from './backend';
 
-
 const API =  axios.create({
     baseURL: backend,
     timeout: 10000,
@@ -13,15 +12,3 @@ const API =  axios.create({
 });
 
 export default API;
-
- /* 
-export default class Api {
-    constructor(){
-        this.url = "http://localhost:5000/"
-    }
-    
-    login(cb){
-        console.log(">>",this.url);
-        cb();
-    }
-}*/
