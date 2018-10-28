@@ -15,9 +15,9 @@ export default class Oficinas extends React.Component {
   }
 
   nuevo = () => {
-    console.log(this.formRef);
-    this.formRef.current.formRef.current.resetFields();
-    //this.formRef.current.nuevo();
+    this.formRef.current.nuevo();
+    console.log(this.formRef.current);
+
   }
 
   editar = (id) => {

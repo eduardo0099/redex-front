@@ -25,11 +25,19 @@ class InnerForm extends React.Component {
 
   render (){
 
-    const { form } = this.props;
+    const { visible, onCancel, onCreate, title, action, form } = this.props;
     const { getFieldDecorator } = form;
     const { paises } = this.state; 
 
     return (
+      <Modal
+          visible={visible}
+          title={ title }
+          okText={ action }
+          cancelText="Cancelar"
+          onCancel={onCancel}
+          onOk={onCreate}
+        >
       <Form layout="vertical">
           <FormItem style={{display: 'none'}}>
             {getFieldDecorator("id")(<div></div>)}
@@ -40,7 +48,6 @@ class InnerForm extends React.Component {
             })(
               <Select
                 onSearch={this.handleSearch}
-                placeholder="input here"
                 labelInValue={false}
               >
                 {paises.map(pais => {
@@ -56,13 +63,14 @@ class InnerForm extends React.Component {
             {getFieldDecorator("codigo")(<Input type="textarea" />)}
           </FormItem>
         </Form>
+        </Modal>
     )
   }
 }
 
 const WrappedForm = Form.create()(InnerForm);
 
-export default class OficinasForm extends React.Component {
+export default class OficinasForm extends React.PureComponent {
   
   constructor(props) {
     super(props);
@@ -75,7 +83,6 @@ export default class OficinasForm extends React.Component {
 
   nuevo = () => {
     this.setState({visible : true, title: 'Nueva oficina', action: 'Guardar'}, () => {
-      console.log(this.formRef);
     });
   }
 
@@ -84,7 +91,7 @@ export default class OficinasForm extends React.Component {
       let data = response.data;
       this.setState({visible : true, title: 'Editar oficina', action: 'Actualizar'}, () => {
         console.log(this.formRef);
-        this.formRef.setFields({
+        this.formRef.props.form.setFields({
           pais: { value: data.pais },
           codigo: { value: data.codigo },
           capacidad: { value: data.capacidad }
@@ -101,22 +108,22 @@ export default class OficinasForm extends React.Component {
 
   }
 
-  saveFormRef = formRef => {
+ 
+  saveFormRef = (formRef) => {
     this.formRef = formRef;
-  };
+  }
+
 
   render() {
     return (
-      <Modal
-        visible={ this.state.visible }
-        title={ this.state.title }
-        okText={ this.state.action }
-        cancelText="Cancelar"
-        onOk={ this.save }
-        onCancel={this.close}
-      >
-        <WrappedForm ref={this.saveFormRef}/>
-      </Modal>
-    );
+      <WrappedForm
+      wrappedComponentRef={this.saveFormRef}
+      visible={this.state.visible}
+      onCancel={this.close}
+      onCreate={this.save}
+      title={this.state.title}
+      action={this.state.action}
+      />
+    )
   }
 }
