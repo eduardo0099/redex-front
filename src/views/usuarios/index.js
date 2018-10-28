@@ -32,7 +32,7 @@ export default class Usuarios extends React.Component {
       console.log('Received values of form: ', values);
       form.resetFields();
       this.setState({ modalVisible: false });
-    });
+    }); 
   }
 
   saveFormRef = (formRef) => {

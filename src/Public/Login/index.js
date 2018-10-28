@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import { Redirect } from "react-router-dom";
-import Roles from "./../../utils/Roles";
-import { Form, Icon, Input, Button, Checkbox } from "antd";
+import { Form, Icon, Input, Button } from "antd";
 import OpenAPI from "../../Services/OpenAPI";
 import API from "../../Services/Api";
 import notify from "../../utils/notify";

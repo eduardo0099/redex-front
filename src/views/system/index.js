@@ -3,8 +3,6 @@ import { Layout } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import API from "../../Services/Api";
 
-import axios from "axios";
-
 export default class System extends Component {
   constructor(props) {
     super(props);
@@ -40,7 +38,7 @@ export default class System extends Component {
     return (
       <Layout>
         <TheHeader>
-          <h2> @Oscar Cerna </h2>
+          <h1> Pruebas </h1>
         </TheHeader>
         <TheContent>
           <input type="file" onChange={this.onChange} />

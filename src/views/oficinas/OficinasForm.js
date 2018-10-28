@@ -1,75 +1,127 @@
 import React from "react";
-import { Modal, Form, Input, AutoComplete, Select } from "antd";
+import { Modal, Form, Input, Select } from "antd";
 import API from "../../Services/Api";
 const FormItem = Form.Item;
 const Option = Select.Option;
 
-class OficinasForm extends React.Component {
+class InnerForm extends React.Component {
+
   constructor(props) {
     super(props);
-
     this.state = {
       paises: [],
-      dataSource: []
     };
   }
 
   componentDidMount() {
-    this.fetchPaises();
+    this.allPaises();
   }
 
-  fetchPaises = (query) => {
-    API.get("paises/search", { params: { q: query } })
-      .then(response => {
-        console.log(response.data);
-        this.setState({ ...this.state, paises: response.data });
-      });
+  allPaises = () => {
+    API.get("paises").then(response => {
+      this.setState({ ...this.state, paises: response.data });
+    });
   };
 
-  onSelect = el => {};
+  render (){
 
-  render() {
-    const { visible, onCancel, onCreate, form } = this.props;
+    const { visible, onCancel, onCreate, title, action, form } = this.props;
     const { getFieldDecorator } = form;
+    const { paises } = this.state; 
 
     return (
       <Modal
-        visible={visible}
-        title="Nueva oficina"
-        okText="Crear"
-        cancelText="Cancelar"
-        onCancel={onCancel}
-        onCreate={onCreate}
-      >
-        <Form layout="vertical">
-          <FormItem label="Pais">
+          visible={visible}
+          title={ title }
+          okText={ action }
+          cancelText="Cancelar"
+          onCancel={onCancel}
+          onOk={onCreate}
+        >
+      <Form layout="vertical">
+          <FormItem style={{display: 'none'}}>
+            {getFieldDecorator("id")(<div></div>)}
+          </FormItem>
+          <FormItem label="País">
             {getFieldDecorator("pais", {
               rules: [{ required: true, message: "Selecciona el pais" }]
             })(
               <Select
-                showSearch
-                showArrow={true}
-                filterOption={false}
-                onSearch={this.fetchPaises}
-                notFoundContent={null}
+                onSearch={this.handleSearch}
+                labelInValue={false}
               >
-              {this.state.paises.map(pais => {
-                return (
-                  <Option key={pais.id} value={pais.id} title={pais.codigo} obj={pais}> {pais.nombre} </Option>
-                ) 
-              })}
+                {paises.map(pais => {
+                  return <Option key={pais.id}>{pais.nombre}</Option>;
+                })}
               </Select>
             )}
           </FormItem>
           <FormItem label="Capacidad">
             {getFieldDecorator("capacidad")(<Input type="textarea" />)}
           </FormItem>
+          <FormItem label="Código">
+            {getFieldDecorator("codigo")(<Input type="textarea" />)}
+          </FormItem>
         </Form>
-      </Modal>
-    );
+        </Modal>
+    )
   }
 }
 
-const WrappedForm = Form.create()(OficinasForm);
+const WrappedForm = Form.create()(InnerForm);
 
-export default WrappedForm;
+export default class OficinasForm extends React.PureComponent {
+  
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      title: '',
+      action: '',
+    }
+  }
+
+  nuevo = () => {
+    this.setState({visible : true, title: 'Nueva oficina', action: 'Guardar'}, () => {
+      this.formRef.props.form.resetFields();
+    });
+  }
+
+  editar = (id) => {
+    API.get(`/oficinas/${id}`).then(response => {
+      let data = response.data;
+      this.setState({visible : true, title: 'Editar oficina', action: 'Actualizar'}, () => {
+        this.formRef.props.form.setFields({
+          pais: { value: data.pais },
+          codigo: { value: data.codigo },
+          capacidad: { value: data.capacidad }
+        });
+      });
+    });
+  }
+
+  close = () => {
+    this.setState({visible : false});
+  }
+
+  save = () => {
+    // enviar al API la data para guardar
+  }
+
+  saveFormRef = (formRef) => {
+    this.formRef = formRef;
+  }
+
+  render() {
+    return (
+      <WrappedForm
+        wrappedComponentRef={this.saveFormRef}
+        visible={this.state.visible}
+        onCancel={this.close}
+        onCreate={this.save}
+        title={this.state.title}
+        action={this.state.action}
+      />
+    )
+  }
+}

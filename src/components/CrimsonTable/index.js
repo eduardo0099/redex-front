@@ -12,7 +12,7 @@ export default class CrimsonTable extends React.Component {
       pagination: {
         current: 1,
         pageSize: 8,
-        total: 999,
+        total: 0,
         onChange: this.handlePageChange
       },
       search: "",

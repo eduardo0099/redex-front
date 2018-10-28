@@ -1,59 +1,37 @@
 import React from 'react';
-import { Col, Layout, Button, Modal, Upload} from 'antd';
+import { Col, Layout, Button, Menu, Dropdown, Icon } from "antd";
 import { TheContent, TheHeader } from '../../components/layout';
+import CrimsonUpload from '../../components/CrimsonUpload';
 import PlanVueloList from './PlanVueloList';
 import PlanVueloForm from './PlanVueloForm';
-import API from '../../Services/Api';
-import notify from '../../utils/notify';
+
 
 export default class PlanVuelo extends React.Component {
+
   constructor(props) {
     super(props);
-
     this.listRef = React.createRef();
-
-    this.state = {
-      fileList: [],
-      cargaVisible: false,
-      formData: '',
-    }
+    this.formRef =  React.createRef();
+    this.uploadRef = React.createRef();
   }
 
-  showModalCarga = () => {
-    this.setState({ cargaVisible: true });
-  }
+  nuevo = () => this.formRef.current.nuevo();
 
-  hideCarga = () => {
-    this.setState({ cargaVisible: false });
-  }
-  
-  subir = () => {
-    API.post('planvuelo/carga', this.state.formData)
-    .then(response => {
-      notify.success({
-        message: 'Carga finalizada',
-        description: `${response.data.cantidadRegistros} vuelos registrados`
-      })
-      this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
-    })
-  }
+  editar = (id) => this.formRef.current.editar(id);
+
+  subir = () => this.uploadRef.current.open();
+
+  fetch = () => this.listRef.current.fetch();
 
   render() {
-
-    const props = {
-      onRemove: (fileForm) => {
-        this.setState({...this.state, fileList: []});
-      },
-      beforeUpload: (fileForm) => {
-        let file =  fileForm;
-        let formData = new FormData();
-        formData.append('file', file);
-        this.setState({...this.state, fileList: [fileForm], formData : formData});
-        return false;
-      },
-      fileList: this.state.fileList
-    };
   
+    const menu = (
+      <Menu>
+        <Menu.Item onClick={this.nuevo}> Nuevo vuelo </Menu.Item>
+        <Menu.Item onClick={this.subir}> Cargar datos </Menu.Item>
+      </Menu>
+    );
+
     return (
       <Layout>
       <TheHeader>
@@ -61,27 +39,18 @@ export default class PlanVuelo extends React.Component {
           <h1> Plan de Vuelo </h1>
         </Col>
         <Col span={12} align="right">
-          <Button type="primary" onClick={this.showModalCarga}> Cargar Archivo </Button>
-        </Col>
+            <Dropdown overlay={menu}>
+              <Button type="primary">
+                Acciones <Icon type="down" />
+              </Button>
+            </Dropdown>
+          </Col>
       </TheHeader>
       <TheContent>
-          <PlanVueloList ref={this.listRef}/>
-          <PlanVueloForm visible={this.state.modalVisible} onCancel={this.handleCancel} onCreate={this.handleCreate} wrappedComponentRef={this.saveFormRef}/>
+          <PlanVueloList ref={this.listRef} updateAction={this.editar}/>
+          <PlanVueloForm ref={this.formRef} fetch={ this.fetch }/>
+          <CrimsonUpload ref={this.uploadRef} url="/planvuelo/carga" title="Cargar vuelos"/>
       </TheContent>
-      <Modal
-                title="Cargar plan de vuelo"
-                visible={this.state.cargaVisible}
-                onOk={this.subir}
-                onCancel={this.hideCarga}
-                okText="Subir"
-                cancelText="Cancelar"
-              >
-                 <Upload {...props}>
-                  <Button>
-                    Seleccionar archivo
-                  </Button>
-                </Upload>
-              </Modal>
     </Layout>
     )
   }
