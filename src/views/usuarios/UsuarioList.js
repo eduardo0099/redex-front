@@ -1,6 +1,7 @@
 import React from 'react';
-import { Table, Menu, Dropdown, Icon,Modal} from 'antd';
+import { Table, Menu, Dropdown, Icon,Modal, Tag} from 'antd';
 import API from '../../Services/Api';
+import CrimsonTable from '../../components/CrimsonTable';
 
 const { Column } = Table;
 
@@ -33,7 +34,7 @@ export default class UsuarioList extends React.Component {
   showConfirmDesactivar=(record)=> {
     confirm({
       title: 'Usted desea desactivar a este usuario?',
-      content: 'Si usted desactiva al usuario, este no tendra acceso al sistema',
+      content: 'Si usted desactiva al usuario, este no tendrá acceso al sistema',
       onCancel() {
         console.log('Cancelar');
       },
@@ -62,32 +63,24 @@ export default class UsuarioList extends React.Component {
 
     render(){
         return (
-            <Table dataSource={this.state.usuarios} loading={this.state.loading}>
+            <CrimsonTable url="/usuarios">
               <Column
-                title="Nombres"
+                title="Persona"
                 key="nombres"
                 render={record=>(
                   <div>
-                  <span> { record.colaborador.persona.nombres } </span>
-                  </div>
-                )}
-              />
-              <Column
-                title="Apellido"
-                key="lastName"
-                render={record=>(
                   <div>
-                  <span> { record.colaborador.persona.paterno } </span>
+                  <b> { record.colaborador.persona.nombreCompleto } </b>
+                  </div>
+                  <small> { record.colaborador.persona.tipoDocumentoIdentidad.simbolo } { record.colaborador.persona.numeroDocumentoIdentidad } </small>
                   </div>
                 )}
               />
-            <Column
-              title="Doc Identidad"
-              key="docId"
+               <Column
+              title="Rol"
+              key="rol"
               render={record=>(
-                <div>
-                <span> { record.colaborador.persona.numeroDocumentoIdentidad } </span>
-                </div>
+                <span> { record.rol.nombre } </span>
               )}
             />
             <Column
@@ -95,7 +88,10 @@ export default class UsuarioList extends React.Component {
               key="office"
               render={record=>(
                 <div>
-                <span> { record.colaborador.oficina.codigo } </span>
+                <div>
+                <b> { record.colaborador.oficina.pais.nombre } </b>
+                </div>
+                <small> { record.colaborador.oficina.codigo }</small>
                 </div>
               )}
             />
@@ -107,6 +103,21 @@ export default class UsuarioList extends React.Component {
                 <span> { record.colaborador.persona.email } </span>
                 </div>
               )}
+            />
+               <Column
+              title="Estado"
+              key="estado"
+              render={record=>{
+                switch (record.estado.name) {
+                  case "ACTIVO":
+                    return <Tag color="green"> Activo </Tag>;
+                  case "INACTIVO":
+                    return <Tag color="red"> Inactivo </Tag>;
+                  default:
+                    return null;
+                }
+                }
+              }
             />
             <Column
               width="50px"
@@ -147,7 +158,7 @@ export default class UsuarioList extends React.Component {
                 </Dropdown>
               )}}
             />
-          </Table>
+          </CrimsonTable>
         )
     }
 }

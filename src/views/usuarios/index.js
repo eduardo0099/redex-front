@@ -3,16 +3,26 @@ import { Col, Layout, Button ,Menu,Dropdown,Icon,Modal, Upload} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import UsuarioList from './UsuarioList';
 import UsuarioForm from './UsuarioForm';
+import CrimsonUpload from '../../components/CrimsonUpload';
 
 export default class Usuarios extends React.Component {
   constructor(props) {
     super(props);
+    this.listRef = React.createRef();
+    this.formRef =  React.createRef();
+    this.uploadRef = React.createRef();
     this.state = {
       modalVisible: false,
-      cargaVisible:false
-
     }
   }
+
+  nuevo = () => this.formRef.current.nuevo();
+
+  editar = (id) => this.formRef.current.editar(id);
+
+  subir = () => this.uploadRef.current.open();
+
+  fetch = () => this.listRef.current.fetch();
 
   showModal = () => {
     this.setState({ modalVisible: true });
@@ -39,37 +49,13 @@ export default class Usuarios extends React.Component {
     this.formRef = formRef;
   }
 
-  hideCarga = () => {
-    this.setState({ cargaVisible: false });
-  }
-
-  subir =() =>{
-
-  }
-
-  showModalCarga = () => {
-    this.setState({ cargaVisible: true });
-  }
-
   render() {
     const menu = (
       <Menu>
         <Menu.Item onClick={this.showModal} key="1">Nuevo Usuario</Menu.Item>
-        <Menu.Item onClick={this.showModalCarga} key="2">Cargar datos</Menu.Item>
+        <Menu.Item onClick={this.subir} key="2">Cargar datos</Menu.Item>
       </Menu>
     );
-
-    const props = {
-      onRemove: (fileForm) => {
-        this.setState({...this.state, fileList: []});
-      },
-      beforeUpload: (fileForm) => {
-        this.setState({...this.state, fileList: [fileForm]});
-        return false;
-      },
-      fileList: this.state.fileList
-    };
-
 
     return (
       <Layout>
@@ -87,20 +73,7 @@ export default class Usuarios extends React.Component {
           </TheHeader>
           <TheContent>
             <UsuarioList/>
-            <Modal
-                title="Cargar Usuarios"
-                visible={this.state.cargaVisible}
-                onOk={this.subir}
-                onCancel={this.hideCarga}
-                okText="Subir"
-                cancelText="Cancelar"
-              >
-                 <Upload {...props}>
-                  <Button>
-                    Seleccionar archivo
-                  </Button>
-                </Upload>
-            </Modal>
+            <CrimsonUpload ref={this.uploadRef} url="/usuarios/carga" title="Cargar usuarios"/>
           </TheContent>
         </Layout>
     )

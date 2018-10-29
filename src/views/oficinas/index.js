@@ -14,24 +14,13 @@ export default class Oficinas extends React.Component {
     this.uploadRef = React.createRef();
   }
 
-  nuevo = () => {
-    this.formRef.current.nuevo();
-    console.log(this.formRef.current);
- 
-  }
+  nuevo = () => this.formRef.current.nuevo();
 
-  editar = (id) => {
-    this.formRef.current.editar(id);
-  }
+  editar = (id) => this.formRef.current.editar(id);
 
-  subir = () => {
-    this.uploadRef.current.open();
-  }
+  subir = () => this.uploadRef.current.open();
 
-
-  fetch() {
-    this.listRef.current.fetch();
-  }
+  fetch = () => this.listRef.current.fetch();
 
   render() {
     const menu = (
