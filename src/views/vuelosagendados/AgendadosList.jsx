@@ -18,7 +18,7 @@ export default class OficinasList extends React.Component {
   render() {
     const { updateAction } = this.props;
     return (
-      <CrimsonTable url="/vuelosagendados" ref={this.listRef} pageSize={5}>
+      <CrimsonTable url="/vuelosagendados" ref={this.listRef} pageSize={6}>
         <Column
           title="Origen"
           key="origen"
