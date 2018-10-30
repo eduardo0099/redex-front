@@ -24,16 +24,12 @@ export default class SidebarLayout extends React.Component {
 
     const Component = this.props.component;
     const route = this.props.route;
-    const usuario = JSON.parse(localStorage.getItem('datasession'));
     return (
       <div>
         <Layout>
           <Sider breakpoint="lg" collapsedWidth="80">
             <div className="logo" />
             <div>
-              <span style={{color: 'white', display:'block'}}> {usuario.persona.nombreCorto} </span>
-              <small style={{color: 'white'}}> {usuario.rol.nombre} </small>
-
             </div>
             <Menu theme="dark" mode="inline" defaultSelectedKeys={[index]}>
               {routes.map((route, key) => {

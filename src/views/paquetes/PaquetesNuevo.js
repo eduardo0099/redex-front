@@ -51,6 +51,12 @@ class InnerForm extends React.Component{
 
         return(
             <Form layout="vertical">
+                <FormItem style={{ display: "none" }}>
+                {getFieldDecorator("personaOrigen.id")(<div />)}
+                </FormItem>
+                <FormItem style={{ display: "none" }}>
+                {getFieldDecorator("personaDestino.id")(<div />)}
+                </FormItem>
                 <Divider orientation="left">Origen</Divider>
                 <InputGroup size="large"> 
                     <Col span={4}>
@@ -59,6 +65,7 @@ class InnerForm extends React.Component{
                     </Col>
                     <Col span={5}>
                     <FormItem>
+                    {getFieldDecorator("oficinaOrigen")(
                     <Select 
                     showSearch
                     defaultActiveFirstOption={false}
@@ -73,7 +80,7 @@ class InnerForm extends React.Component{
                             </Option>
                         ))}
                     </Select>
-                    </FormItem>
+                    )}</FormItem>
                     </Col>
                 </InputGroup>
                 <InputGroup size="large"> 
@@ -131,6 +138,7 @@ class InnerForm extends React.Component{
                     </Col>
                     <Col span={5}>
                     <FormItem>
+                    {getFieldDecorator("oficinaDestino")(
                     <Select 
                     showSearch
                     defaultActiveFirstOption={false}
@@ -141,11 +149,11 @@ class InnerForm extends React.Component{
                     >
                         {this.state.oficinasDestino.map(i=>(
                             <Option key={i.id} value={i.id}>
-                            {i.oficinas.nombre}
+                            {i.pais.nombre}
                             </Option>
                         ))}
                     </Select>
-                    </FormItem>
+                    )}</FormItem>
                     </Col>
                     <Col span={5}>
                     <FormItem >
@@ -159,6 +167,8 @@ class InnerForm extends React.Component{
                     </FormItem>
                     </Col>
                     <Col span={5}>
+                    <FormItem >
+                    {getFieldDecorator("tipoDocumentoIdentidadDestino")(
                     <Select>
                         {this.state.tipoDoc.map(i=>(
                             <Option key={i.id} value={i.id}>
@@ -166,10 +176,11 @@ class InnerForm extends React.Component{
                             </Option>
                         ))}
                     </Select>
+                    )}</FormItem>
                     </Col>
                     <Col span={5}>
                     <FormItem>
-                        <Input placeholder="N° Documento"></Input>
+                    {getFieldDecorator("numeroDocumentoDestino")(<Input type="textarea" />)}
                     </FormItem>
                     </Col>
                     <Col span={1}>
@@ -198,18 +209,25 @@ class InnerForm extends React.Component{
                 </InputGroup>
                 <Divider orientation="left">Opciones de Notificaciones</Divider>
                     <InputGroup size="large">
-                        <Col span={2}><Switch  checkedChildren="Si" unCheckedChildren="No"/></Col>
+                    <Col span={2}><FormItem>
+                    {getFieldDecorator("notiRegistro")(
+                        <Switch  checkedChildren="Si" unCheckedChildren="No"/>
+                    )}</FormItem></Col>
                         <Col span={10}><FormItem label="Notificar registro del paquete"></FormItem></Col>
-                        <Col span={2}><Switch checkedChildren="Si" unCheckedChildren="No"/></Col>
+                        <Col span={2}><FormItem>
+                    {getFieldDecorator("notiAbordados")(
+                        <Switch checkedChildren="Si" unCheckedChildren="No"/>
+                    )}</FormItem></Col>
                         <Col span={10}><FormItem label="Notificar llegada a destino del paquete"></FormItem></Col>
                     </InputGroup>
                     <InputGroup size="large">
-                        <Col span={2}><Switch checkedChildren="Si" unCheckedChildren="No"/></Col>
+                        <Col span={2}><FormItem>
+                        {getFieldDecorator("notiLlegada")(
+                            <Switch checkedChildren="Si" unCheckedChildren="No"/>
+                        )}</FormItem></Col>
                         <Col span={10}><FormItem label="Notificar vuelos abordados por el paquete"></FormItem></Col>
                     </InputGroup>
-                <Divider ></Divider>
-                <Col span={2} align="right"><Button type="primary" onClick={this.showModalResumen}>Guardar</Button></Col>
-                <Col span={-2} align="right"><Button >Cancelar</Button></Col>
+               
             </Form>
 
         )
@@ -256,6 +274,41 @@ export default class PaquetesNuevo extends React.Component {
           this.setState({ modalRegistro: false });
         });
     };
+
+    save = () => {
+        const form = this.formRef.props.form;
+        form.validateFields((err, values) => {
+          console.log('Formulario: ', values);
+    
+          if (err) {
+            return;
+          }
+          //el bloque que se manda al back
+          let envelope = {
+            personaOrigen:{id:values.personaOrigen.id},
+            personaDestino:{id:values.personaDestino.id},
+            oficinaOrigen:{id:values.oficinaOrigen.id},
+            oficinaDestino:{id:values.oficinaDestino.id},
+            "notiRegistro":values.notiRegistro,
+            "notiAbordados":values.notiAbordados,
+            "notiLlegada":values.notiLlegada
+          }
+
+          //falta el api 
+    /*
+          API.post('vuelos/save', envelope)
+            .then(response => {
+              Notify.success({
+                message: 'Vuelo actualizado'
+              });
+              form.resetFields();
+              this.props.fetch();
+              this.close();
+            })*/
+          
+        }); 
+    };
+
     saveFormRef = formRef => {
         this.formRef = formRef;
     };
@@ -286,10 +339,13 @@ export default class PaquetesNuevo extends React.Component {
             <WrappedForm
             wrappedComponentRef = {this.saveFormRef}
             />
+            <Divider ></Divider>
+            <Col span={2} align="right"><Button type="primary" onClick={this.showModalResumen}>Guardar</Button></Col>
+            <Col span={-2} align="right"><Button >Cancelar</Button></Col>
             <Modal
             visible = {this.state.modalResumen}
             onCancel={this.handleCancelResumen}
-            onOk={this.handleCreateResumen}
+            onOk={this.save}
             title="Resumen de Registro de paquete"
             okText="ok"
             cancelText="Cancelar"
