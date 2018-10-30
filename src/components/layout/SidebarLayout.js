@@ -24,7 +24,6 @@ export default class SidebarLayout extends React.Component {
 
     const Component = this.props.component;
     const route = this.props.route;
-
     return (
       <div>
         <Layout>
