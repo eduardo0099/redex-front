@@ -15,15 +15,17 @@ class InnerForm extends React.Component {
   }
 
   fetchOficinasDestino = q => {
-    API.get("oficinas/search", { params: { q: q } }).then(response => {
-      this.setState({ ...this.state, oficinasDestino: response.data });
-    });
+    API.get("oficinas/search", { params: { q: q } })
+      .then( response => {
+        this.setState({ ...this.state, oficinasDestino: response.data });
+      });
   };
 
   fetchOficinasOrigen = q => {
-    API.get("oficinas/search", { params: { q: q } }).then(response => {
-      this.setState({ ...this.state, oficinasOrigen: response.data });
-    });
+    API.get("oficinas/search", { params: { q: q } })
+      .then(response => {
+        this.setState({ ...this.state, oficinasOrigen: response.data });
+      });
   };
 
   render() {
@@ -106,7 +108,7 @@ class InnerForm extends React.Component {
 
 const WrappedForm = Form.create()(InnerForm);
 
-export default class OficinasForm extends React.PureComponent {
+export default class PlanVueloForm extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -177,16 +179,16 @@ export default class OficinasForm extends React.PureComponent {
         oficinaDestino: {id: values.oficinaDestino.key},
         oficinaOrigen: {id: values.oficinaOrigen.key},
       }
-
+/*
       API.post('vuelos/save', envelope)
         .then(response => {
           Notify.success({
-            message: 'Oficina actualizada'
+            message: 'Vuelo actualizado'
           });
           form.resetFields();
           this.props.fetch();
           this.close();
-        })
+        })*/
       
     }); 
   };

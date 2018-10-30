@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Tag, Dropdown, Menu, Icon} from "antd";
+import { Table, Tag, Dropdown, Menu, Icon } from "antd";
 import API from "../../Services/Api";
 import CrimsonTable from "../../components/CrimsonTable";
 
@@ -15,32 +15,35 @@ export default class OficinasList extends React.Component {
     this.listRef.current.fetch();
   };
 
-  activar = record => {
-    API.post(`oficinas/${record.id}/activar`).then(response => {
-      this.fetch();
-    });
-  };
-
-  desactivar = record => {
-    API.post(`oficinas/${record.id}/desactivar`).then(response => {
-      this.fetch();
-    });
-  };
-
   render() {
     const { updateAction } = this.props;
     return (
-      <CrimsonTable url="/oficinas" ref={this.listRef}>
+      <CrimsonTable url="/vuelosagendados" ref={this.listRef} pageSize={6}>
         <Column
-          title="País"
-          key="codigo"
-          width="30%"
+          title="Origen"
+          key="origen"
+          width="25%"
           render={record => (
             <div>
+              <span> {record.fechaInicioString} </span>
               <div>
-                <b> {record.pais.nombre} </b>
+                <b> {record.vuelo.oficinaOrigen.pais.nombre} </b>
               </div>
-              <small> {record.codigo} </small>
+              <small> {record.vuelo.oficinaOrigen.codigo} </small>
+            </div>
+          )}
+        />
+         <Column
+          title="Destino"
+          key="destino"
+          width="25%"
+          render={record => (
+            <div>
+              <span> {record.fechaFinString} </span>
+              <div>
+                <b> {record.vuelo.oficinaDestino.pais.nombre} </b>
+              </div>
+              <small> {record.vuelo.oficinaDestino.codigo} </small>
             </div>
           )}
         />
@@ -48,10 +51,9 @@ export default class OficinasList extends React.Component {
           title="Capacidad"
           key="capacidad"
           align="center"
-          width="50%"
+          width="30%"
           render={record => (
             <span>
-              {" "}
               {record.capacidadActual}/{record.capacidadMaxima}
             </span>
           )}
@@ -64,8 +66,8 @@ export default class OficinasList extends React.Component {
           align="center"
           render={estado => {
             switch (estado.name) {
-              case "ACTIVO":
-                return <Tag color="green"> Activo </Tag>;
+              case "CREADO":
+                return <Tag color="geekblue"> Creado </Tag>;
               case "INACTIVO":
                 return <Tag color="red"> Inactivo </Tag>;
               default:
@@ -86,27 +88,8 @@ export default class OficinasList extends React.Component {
                     rel="noopener noreferrer"
                     onClick={updateAction.bind(this, record.id)}
                   >
-                    Editar
+                    Paquetes
                   </a>
-                </Menu.Item>
-                <Menu.Item>
-                  {record.estado.name === "ACTIVO" ? (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={this.desactivar.bind(this, record)}
-                    >
-                      Desactivar
-                    </a>
-                  ) : (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={this.activar.bind(this, record)}
-                    >
-                      Activar
-                    </a>
-                  )}
                 </Menu.Item>
               </Menu>
             );

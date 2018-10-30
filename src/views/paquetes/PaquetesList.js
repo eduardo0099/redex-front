@@ -15,7 +15,7 @@ export default class PaquetesList extends React.Component {
       paquetes: [],
       detalle:[],
       loading: false,
-      modalDetail:false
+      modalDetail:false,
     }
   }
 

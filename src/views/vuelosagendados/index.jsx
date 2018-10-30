@@ -1,16 +1,13 @@
 import React from "react";
 import { Col, Layout, Button, Menu, Dropdown, Icon } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
-import OficinasList from "./OficinasList";
-import OficinasForm from "./OficinasForm";
-import CrimsonUpload from '../../components/CrimsonUpload';
+import AgendadosList from "./AgendadosList";
 
 export default class Oficinas extends React.Component {
 
   constructor(props) {
     super(props);
     this.listRef = React.createRef();
-    this.formRef =  React.createRef();
     this.uploadRef = React.createRef();
   }
 
@@ -25,8 +22,7 @@ export default class Oficinas extends React.Component {
   render() {
     const menu = (
       <Menu>
-        <Menu.Item onClick={this.nuevo}> Nueva  oficina </Menu.Item>
-        <Menu.Item onClick={this.subir}> Cargar datos </Menu.Item>
+        <Menu.Item onClick={this.nuevo}> Eliminar </Menu.Item>
       </Menu>
     );
 
@@ -34,7 +30,7 @@ export default class Oficinas extends React.Component {
       <Layout>
         <TheHeader>
           <Col span={12}>
-            <h1> Oficinas </h1>
+            <h1> Vuelos Agendados </h1>
           </Col>
           <Col span={12} align="right">
             <Dropdown overlay={menu}>
@@ -45,9 +41,7 @@ export default class Oficinas extends React.Component {
           </Col>
         </TheHeader>
         <TheContent>
-          <OficinasList ref={this.listRef} updateAction={this.editar}/>
-          <OficinasForm ref={this.formRef} fetch={this.fetch}/>
-          <CrimsonUpload ref={this.uploadRef} url="/oficinas/carga" title="Cargar oficinas"/>
+          <AgendadosList ref={this.listRef} updateAction={this.editar}/>
         </TheContent>
       </Layout>
     );

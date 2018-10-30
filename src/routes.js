@@ -6,6 +6,7 @@ import Personas from './views/personas';
 import Dashboard from './views/dashboard';
 import Simulacion from './views/simulacion';
 import Paquetes from './views/paquetes';
+import VuelosAgendados from './views/vuelosagendados';
 import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
 import Roles from './views/roles';
 
@@ -30,6 +31,11 @@ const routes = [
    component: PlanVuelo,
    name: 'Plan de vuelo'
   },
+  {
+    path: '/vuelosagendados',
+    component: VuelosAgendados,
+    name: 'Vuelos agendados'
+   },
   {
     path: '/simulacion',
     component: Simulacion,
