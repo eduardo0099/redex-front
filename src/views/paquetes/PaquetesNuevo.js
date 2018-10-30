@@ -141,7 +141,7 @@ class InnerForm extends React.Component{
                     >
                         {this.state.oficinasDestino.map(i=>(
                             <Option key={i.id} value={i.id}>
-                            {i.oficinas.nombre}
+                            {i.pais.nombre}
                             </Option>
                         ))}
                     </Select>
