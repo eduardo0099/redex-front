@@ -29,6 +29,8 @@ export default class SidebarLayout extends React.Component {
         <Layout>
           <Sider breakpoint="lg" collapsedWidth="80">
             <div className="logo" />
+            <div>
+            </div>
             <Menu theme="dark" mode="inline" defaultSelectedKeys={[index]}>
               {routes.map((route, key) => {
                 const { path, name } = route;

@@ -11,21 +11,26 @@ class InnerForm extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      paises: [],
+      continentes: [],
     };
   }
 
-  fetchPaises = q => {
-    API.get("paises/search", { params: { q: q } }).then(response => {
-      this.setState({ ...this.state, paises: response.data });
-    });
-  };
+  componentDidMount() {
+      this.allContinentes();
+  }
+
+  allContinentes = () => {
+    API.get('/continentes')
+        .then(response => {
+            this.setState({...this.state, continentes: response.data});
+        })
+  }
 
   render (){
 
     const { visible, onCancel, onCreate, title, action, form } = this.props;
     const { getFieldDecorator } = form;
-    const { paises } = this.state; 
+    const { continentes } = this.state; 
 
     return (
       <Modal
@@ -40,29 +45,27 @@ class InnerForm extends React.Component {
           <FormItem style={{display: 'none'}}>
             {getFieldDecorator("id")(<div></div>)}
           </FormItem>
-          <FormItem label="País">
-            {getFieldDecorator("pais", {
+          <FormItem label="Continente">
+            {getFieldDecorator("continente", {
               rules: [{ required: true, message: "Selecciona el pais" }]
             })(
               <Select
-                showSearch
-                defaultActiveFirstOption={false}
-                filterOption={false}
-                onSearch={this.fetchPaises}
-                notFoundContent={null}
                 labelInValue={true}
               >
-                {paises.map(pais => {
-                  return <Option key={pais.id}>{pais.nombre}</Option>;
+                {continentes.map(item => {
+                  return <Option key={item.id}>{item.nombre}</Option>;
                 })}
               </Select>
             )}
           </FormItem>
-          <FormItem label="Capacidad">
-            {getFieldDecorator("capacidadMaxima")(<Input type="textarea" />)}
+          <FormItem label="Nombre">
+            {getFieldDecorator("nombre")(<Input type="textarea" />)}
           </FormItem>
           <FormItem label="Código">
             {getFieldDecorator("codigo")(<Input type="textarea" />)}
+          </FormItem>
+          <FormItem label="ISO">
+            {getFieldDecorator("codigoIso")(<Input type="textarea" />)}
           </FormItem>
         </Form>
         </Modal>
@@ -84,20 +87,21 @@ export default class OficinasForm extends React.PureComponent {
   }
 
   nuevo = () => {
-    this.setState({visible : true, title: 'Nueva oficina', action: 'Guardar'}, () => {
+    this.setState({visible : true, title: 'Nuevo país', action: 'Guardar'}, () => {
       this.formRef.props.form.resetFields();
     });
   }
 
   editar = (id) => {
-    API.get(`/oficinas/${id}`).then(response => {
+    API.get(`/paises/${id}`).then(response => {
       let data = response.data;
-      this.setState({visible : true, title: 'Editar oficina', action: 'Actualizar'}, () => {
+      this.setState({visible : true, title: 'Editar país', action: 'Actualizar'}, () => {
         this.formRef.props.form.setFields({
           id: { value: data.id },
-          pais: { value: { key: data.pais.id, label: data.pais.nombre }},
+          continente: { value: { key: data.continente.id, label: data.continente.nombre }},
+          nombre: { value: data.nombre },
           codigo: { value: data.codigo },
-          capacidadMaxima: { value: data.capacidadMaxima }
+          codigoIso: { value: data.codigoIso }
         });
       });
     });
@@ -119,10 +123,10 @@ export default class OficinasForm extends React.PureComponent {
         pais: {id: values.pais.key},
       }
 
-      API.post('vuelos/save', envelope)
+      API.post('paises/save', envelope)
         .then(response => {
           Notify.success({
-            message: 'Oficina actualizada'
+            message: 'País actualizado'
           });
           form.resetFields();
           this.props.fetch();

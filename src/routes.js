@@ -6,8 +6,10 @@ import Personas from './views/personas';
 import Dashboard from './views/dashboard';
 import Simulacion from './views/simulacion';
 import Paquetes from './views/paquetes';
+import VuelosAgendados from './views/vuelosagendados';
 import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
 import Roles from './views/roles';
+import Paises from './views/paises';
 
 const routes = [
   {
@@ -21,6 +23,11 @@ const routes = [
     name: 'Personas'
   },
   {
+    path: '/paises',
+    component: Paises,
+    name: 'Países'
+   },
+  {
    path: '/oficinas',
    component: Oficinas,
    name: 'Oficinas'
@@ -30,6 +37,11 @@ const routes = [
    component: PlanVuelo,
    name: 'Plan de vuelo'
   },
+  {
+    path: '/vuelosagendados',
+    component: VuelosAgendados,
+    name: 'Vuelos agendados'
+   },
   {
     path: '/simulacion',
     component: Simulacion,
@@ -46,7 +58,7 @@ const routes = [
     name: 'Paquetes'
    },
    {
-    path: '/paquetes/Nuevo',
+    path: '/paquetes/nuevo',
     component: PaquetesNuevo,
     name: 'PaquetesNuevo'
    },

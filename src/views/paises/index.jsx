@@ -1,11 +1,11 @@
 import React from "react";
 import { Col, Layout, Button, Menu, Dropdown, Icon } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
-import OficinasList from "./OficinasList";
-import OficinasForm from "./OficinasForm";
+import PaisesList from "./PaisesList";
+import PaisesForm from "./PaisesForm";
 import CrimsonUpload from '../../components/CrimsonUpload';
 
-export default class Oficinas extends React.Component {
+export default class Piases extends React.Component {
 
   constructor(props) {
     super(props);
@@ -25,7 +25,7 @@ export default class Oficinas extends React.Component {
   render() {
     const menu = (
       <Menu>
-        <Menu.Item onClick={this.nuevo}> Nueva  oficina </Menu.Item>
+        <Menu.Item onClick={this.nuevo}> Nuevo país </Menu.Item>
         <Menu.Item onClick={this.subir}> Cargar datos </Menu.Item>
       </Menu>
     );
@@ -34,7 +34,7 @@ export default class Oficinas extends React.Component {
       <Layout>
         <TheHeader>
           <Col span={12}>
-            <h1> Oficinas </h1>
+            <h1> Países </h1>
           </Col>
           <Col span={12} align="right">
             <Dropdown overlay={menu}>
@@ -45,9 +45,9 @@ export default class Oficinas extends React.Component {
           </Col>
         </TheHeader>
         <TheContent>
-          <OficinasList ref={this.listRef} updateAction={this.editar}/>
-          <OficinasForm ref={this.formRef} fetch={this.fetch}/>
-          <CrimsonUpload ref={this.uploadRef} url="/oficinas/carga" title="Cargar oficinas"/>
+          <PaisesList ref={this.listRef} updateAction={this.editar}/>
+          <PaisesForm ref={this.formRef} fetch={this.fetch}/>
+          <CrimsonUpload ref={this.uploadRef} url="/paises/carga" title="Cargar paises"/>
         </TheContent>
       </Layout>
     );

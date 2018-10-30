@@ -27,8 +27,7 @@ export default class CrimsonTable extends React.Component {
         ...this.state,
         pagination: {
           ...this.state.pagination,
-          current: page,
-          pageSize: size
+          current: page
         }
       },
       () => this.fetch()
@@ -58,6 +57,7 @@ export default class CrimsonTable extends React.Component {
           loading: false,
           pagination: {
             ...this.state.pagination,
+            pageSize: this.props.pageSize,
             total: response.data.total
           }
         });
@@ -101,4 +101,8 @@ export default class CrimsonTable extends React.Component {
       </div>
     );
   }
+}
+
+CrimsonTable.defaultProps = {
+  pageSize : 8
 }

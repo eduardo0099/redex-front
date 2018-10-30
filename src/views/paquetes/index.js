@@ -1,9 +1,9 @@
 import React from 'react';
-import { Col, Layout, Button, Menu, Dropdown, Icon, Modal, Upload,Input} from 'antd';
+import { Col, Row, Layout, Button, Menu, Dropdown, Icon, Modal, Upload,Input} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import PaquetesList from './PaquetesList';
 import PaquetesDetail from './PaquetesDetail';
-import API from '../../Services/Api';
+import CrimsonUpload from '../../components/CrimsonUpload';
 
 const Search = Input.Search;
 
@@ -11,55 +11,28 @@ export default class Paquetes extends React.Component {
 
   constructor(props) {
     super(props);
-
     this.listRef = React.createRef();
-
-    this.state = {
-      archivo: '',
-      cargaVisible: false,
-      modalDetail:false,
-      fileList: []
-    }
+    this.detailRef = React.createRef();
+    this.uploadRef = React.createRef();
   }
   
-  //Modal
-  showModalCarga = () => {
-    this.setState({ cargaVisible: true });
-  }
-  hideCarga = () => {
-    this.setState({ cargaVisible: false });
-  }
-  subir = () => {
-    //API.post('oficinas/carga', this.state.formData)
-    //.then(response => {
-    //  this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
-    //})
-  }
+  upload = () => this.uploadRef.current.open();
+
   gotoNuevo = () => {
-    this.props.route.history.push('/paquetes/Nuevo');
+    this.props.route.history.push('/paquetes/nuevo');
+  }
+
+  findDetalle = (id) => {
+    this.detailRef.current.detail(id);
   }
 
   render() {
     const menu = (
       <Menu>
         <Menu.Item onClick={this.gotoNuevo} key="1">Nuevo Paquete</Menu.Item>
-        <Menu.Item onClick={this.showModalCarga} key="2">Cargar datos</Menu.Item>
+        <Menu.Item onClick={this.upload} key="2">Cargar datos</Menu.Item>
       </Menu>
     );
-
-    const props = {
-      onRemove: (fileForm) => {
-        this.setState({...this.state, fileList: [], formData: ''});
-      },
-      beforeUpload: (fileForm) => {
-        let file =  fileForm;
-        let formData = new FormData();
-        formData.append('file', file);
-        this.setState({...this.state, fileList: [fileForm], formData : formData});
-        return false;
-      },
-      fileList: this.state.fileList
-    };
 
     const docI = (
             <Menu >
@@ -83,35 +56,23 @@ export default class Paquetes extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
+            <Row>
               <Col span={5}>
                 <Dropdown.Button   overlay={docI}>
                   Tipo de Documento
                 </Dropdown.Button>
                 </Col>
               <Col span={6}>
-              <Search
-              placeholder="Ingresar documento del cliente"
-              onSearch={value => console.log(value)}
-              enterButton
-              />
+                <Search
+                  placeholder="Ingresar documento del cliente"
+                  onSearch={value => console.log(value)}
+                  enterButton
+                />
               </Col>
-              <br /><br />
-              <PaquetesList ref={this.listRef}/>
-              <Modal
-                title="Cargar Paquetes"
-                visible={this.state.cargaVisible}
-                onOk={this.subir}
-                onCancel={this.hideCarga}
-                okText="Subir"
-                cancelText="Cancelar"
-              >
-                <Upload {...props}>
-                  <Button>
-                    Seleccionar archivo
-                  </Button>
-                </Upload>
-              </Modal>
-            
+            </Row>
+            <PaquetesList ref={ this.listRef } onDetalle = { this.findDetalle } />
+            <CrimsonUpload ref={ this.uploadRef } url="/paquetes/carga" title="Cargar paquetes"/>
+            <PaquetesDetail ref= { this.detailRef }/>
           </TheContent>
         </Layout>
     )
