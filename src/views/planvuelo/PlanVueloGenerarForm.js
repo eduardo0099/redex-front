@@ -52,6 +52,10 @@ export default class GenerarForm extends React.Component {
     });
   };
 
+  saveFormRef = formRef => {
+    this.formRef = formRef;
+  };
+  
   render() {
     return (
       <Modal
@@ -64,7 +68,7 @@ export default class GenerarForm extends React.Component {
       >
         <RangePicker
           style={{ width: "100%" }}
-          format="DD/MM/YYYY"
+            format="DD/MM/YYYY"
           onChange={this.choose}
         />
       </Modal>

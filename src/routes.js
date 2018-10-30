@@ -58,7 +58,7 @@ const routes = [
     name: 'Paquetes'
    },
    {
-    path: '/paquetes/Nuevo',
+    path: '/paquetes/nuevo',
     component: PaquetesNuevo,
     name: 'PaquetesNuevo'
    },

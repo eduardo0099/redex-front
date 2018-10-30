@@ -1,8 +1,6 @@
 import React from 'react';
 import { Table, Tag, Dropdown, Menu, Icon} from 'antd';
 import API from '../../Services/Api';
-import PaquetesDetail from './PaquetesDetail';
-import Axios from 'axios';
 
 const { Column } = Table;
 
@@ -13,9 +11,7 @@ export default class PaquetesList extends React.Component {
     this.formRef =  React.createRef();
     this.state = {
       paquetes: [],
-      detalle:[],
       loading: false,
-      modalDetail:false,
     }
   }
 
@@ -31,39 +27,14 @@ export default class PaquetesList extends React.Component {
       });
     });
   }
-
-  detail = (id) =>{
-    console.log(id)
-      API.get(`paquetes/${id}`)
-        .then(response => {
-          this.setState({...this.state,detalle: response.data});
-          console.log("Detalle de paquete",this.detalle)
-      });
-  }
-  //MODAL DETAIL
-  showModal = (id) => {
-    this.detail(id)
-    this.formRef.props.form.setFields(this.detalle);
-    this.setState({ modalDetail: true });
-  }
-  handleCancel = () => {
-    this.setState({ modalDetail: false });
-  }
-  handleCreate = () => {
-    const form = this.formRef.props.form;
-    form.validateFields((err, values) => {
-      if (err) {
-        return;
-      }
-      form.resetFields();
-      this.setState({ modalDetail: false });
-    });
-  }
+  
   saveFormRef = (formRef) => {
     this.formRef = formRef;
   }
 
     render(){
+      const { onDetalle } = this.props;
+
         return (
           <div>
             <Table dataSource={this.state.paquetes} loading={this.state.loading} pagination={{pageSize: 9}} rowKey="id">
@@ -136,8 +107,8 @@ export default class PaquetesList extends React.Component {
               render={ record => { 
                 const menu = (
                   <Menu>
-                    <Menu.Item>
-                      <a target="_blank" rel="noopener noreferrer" onClick={()=>this.showModal(record.id)}>Detalle</a>
+                    <Menu.Item  onClick={ () => onDetalle(record.id) }>
+                      Detalle
                     </Menu.Item>
                   </Menu>
                 );
@@ -150,13 +121,6 @@ export default class PaquetesList extends React.Component {
               )}}
             />
           </Table>
-          <PaquetesDetail
-          visible={this.state.modalDetail}
-          onCancel={this.handleCancel}
-          onOk={this.handleCreate}
-          wrappedComponentRef={this.saveFormRef}
-          detalle={this.state.detalle}
-          />
         </div>
         )
     }

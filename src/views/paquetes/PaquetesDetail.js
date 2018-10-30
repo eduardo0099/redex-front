@@ -1,20 +1,14 @@
 import React from 'react';
-import { Modal, Form, Input, AutoComplete, Table,Divider } from 'antd';
+import { Modal, Form, Table,Divider } from 'antd';
 import API from '../../Services/Api'
 const FormItem = Form.Item;
 const { Column } = Table;
 
 
-class PaquetesDetail extends React.Component {
+class InnerForm extends React.Component {
  
   constructor(props){
     super(props);
-
-    
-  }
-
-  componentDidMount(){
-
   }
 
 
@@ -23,26 +17,25 @@ class PaquetesDetail extends React.Component {
   }
 
     render() {
-      const { visible, onCancel, onOk, form,detalle} = this.props;
-      
+      const { visible, close, title, form, paquete, ruta} = this.props;
       
       return (
           <Modal
           visible={visible}
-          title="Detalle de paquete"
-          okText="Ok"
-          cancelText="Cancelar"
-          onCancel={onCancel}
-          onOk={onOk}
+          title={title}
+          onCancel={ close }
+          footer={ null }
         >
           <Form layout="vertical">
           <Divider orientation="left">Origen</Divider>
             <FormItem label={this.props.id}>
-            
             </FormItem>
             <FormItem label="Oficina">
+            <span>  { paquete.id ? paquete.oficinaOrigen.codigo : '' } </span>
             </FormItem>
             <FormItem label="Fecha">
+            <span>  { paquete.id ? paquete.fechaIngresoString : '' } </span>
+
             </FormItem>
           <Divider orientation="left">Destino</Divider>
             <FormItem label="Cliente">
@@ -54,11 +47,14 @@ class PaquetesDetail extends React.Component {
           <Divider orientation="left">Ruta</Divider>
           <FormItem label="Estado">
             </FormItem>
-          <Table>
+          <Table size="small" dataSource={paquete.paqueteRutas}>
               <Column
                 title="Ciudad Partida"
                 key="cliente"
                 width="16%"
+                render = {r => (
+                  <span> ohla </span>
+                )}
               />
               <Column
                     title="Tiempo Partida"
@@ -83,6 +79,43 @@ class PaquetesDetail extends React.Component {
     }
 }
 
-const WrappedForm = Form.create()(PaquetesDetail);
+const WrappedForm = Form.create()(InnerForm);
 
-export default WrappedForm;
+export default class PaquetesDetail extends React.Component {
+
+  constructor(props){
+    super(props);
+    this.state = {
+      visible: false,
+      paquete: { paqueteRutas: [] }
+    }
+  }
+  
+  detail = (id) => {
+    API.get(`paquetes/${id}`)
+      .then(response => {
+        this.setState({...this.state, paquete: response.data, visible: true, title: `Paquete ${response.data.codigoRastreo}`})
+      })
+  }
+
+  close = () => {
+    this.setState({...this.state, visible: false})
+  }
+
+  saveFormRef = formRef => {
+    this.formRef = formRef;
+  };
+
+  render(){
+    return (
+      <WrappedForm 
+        wrappedComponentRef={this.saveFormRef}
+        visible={this.state.visible}
+        close={this.close}
+        title={this.state.title}
+        action={this.state.action}
+        paquete = { this.state.paquete }
+      />
+    )
+  }
+}
