@@ -9,6 +9,7 @@ import Paquetes from './views/paquetes';
 import VuelosAgendados from './views/vuelosagendados';
 import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
 import Roles from './views/roles';
+import Paises from './views/paises';
 
 const routes = [
   {
@@ -21,6 +22,11 @@ const routes = [
     component: Personas,
     name: 'Personas'
   },
+  {
+    path: '/paises',
+    component: Paises,
+    name: 'Países'
+   },
   {
    path: '/oficinas',
    component: Oficinas,

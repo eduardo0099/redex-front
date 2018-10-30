@@ -168,7 +168,6 @@ export default class PlanVueloForm extends React.PureComponent {
   save = () => {
     const form = this.formRef.props.form;
     form.validateFields((err, values) => {
-      console.log('Formulario: ', values);
 
       if (err) {
         return;
@@ -179,7 +178,7 @@ export default class PlanVueloForm extends React.PureComponent {
         oficinaDestino: {id: values.oficinaDestino.key},
         oficinaOrigen: {id: values.oficinaOrigen.key},
       }
-/*
+
       API.post('vuelos/save', envelope)
         .then(response => {
           Notify.success({
@@ -188,7 +187,7 @@ export default class PlanVueloForm extends React.PureComponent {
           form.resetFields();
           this.props.fetch();
           this.close();
-        })*/
+        })
       
     }); 
   };
