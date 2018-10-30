@@ -4,7 +4,7 @@ import { TheContent, TheHeader } from '../../components/layout';
 import CrimsonUpload from '../../components/CrimsonUpload';
 import PlanVueloList from './PlanVueloList';
 import PlanVueloForm from './PlanVueloForm';
-
+import PlanVueloGenerarForm from './PlanVueloGenerarForm';
 
 export default class PlanVuelo extends React.Component {
 
@@ -13,6 +13,7 @@ export default class PlanVuelo extends React.Component {
     this.listRef = React.createRef();
     this.formRef =  React.createRef();
     this.uploadRef = React.createRef();
+    this.generarRef = React.createRef();
   }
 
   nuevo = () => this.formRef.current.nuevo();
@@ -23,12 +24,15 @@ export default class PlanVuelo extends React.Component {
 
   fetch = () => this.listRef.current.fetch();
 
+  generar = () => this.generarRef.current.open();
+
   render() {
   
     const menu = (
       <Menu>
         <Menu.Item onClick={this.nuevo}> Nuevo vuelo </Menu.Item>
         <Menu.Item onClick={this.subir}> Cargar datos </Menu.Item>
+        <Menu.Item onClick={this.generar}> Generar </Menu.Item>
       </Menu>
     );
 
@@ -50,6 +54,7 @@ export default class PlanVuelo extends React.Component {
           <PlanVueloList ref={this.listRef} updateAction={this.editar}/>
           <PlanVueloForm ref={this.formRef} fetch={ this.fetch }/>
           <CrimsonUpload ref={this.uploadRef} url="/planvuelo/carga" title="Cargar vuelos"/>
+          <PlanVueloGenerarForm ref={this.generarRef}/>
       </TheContent>
     </Layout>
     )

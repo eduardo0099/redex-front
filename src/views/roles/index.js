@@ -67,7 +67,7 @@ export default class Roles extends React.Component {
     return (
       <Layout>
         <TheHeader>
-            <h1> Oficinas </h1>
+            <h1> Roles </h1>
         </TheHeader>
         <TheContent>
           <RolesList ref={this.listRef} />
