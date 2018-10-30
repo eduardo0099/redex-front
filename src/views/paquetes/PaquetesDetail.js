@@ -3,14 +3,14 @@ import { Modal, Form, Input, AutoComplete, Table,Divider } from 'antd';
 import API from '../../Services/Api'
 const FormItem = Form.Item;
 const { Column } = Table;
+
+
 class PaquetesDetail extends React.Component {
  
   constructor(props){
     super(props);
 
-    this.state = {
-      detalle: []
-    }
+    
   }
 
   componentDidMount(){
@@ -23,7 +23,7 @@ class PaquetesDetail extends React.Component {
   }
 
     render() {
-      const { visible, onCancel, onOk, form } = this.props;
+      const { visible, onCancel, onOk, form,detalle} = this.props;
       
       
       return (
@@ -37,7 +37,7 @@ class PaquetesDetail extends React.Component {
         >
           <Form layout="vertical">
           <Divider orientation="left">Origen</Divider>
-            <FormItem >
+            <FormItem label={this.props.id}>
             
             </FormItem>
             <FormItem label="Oficina">

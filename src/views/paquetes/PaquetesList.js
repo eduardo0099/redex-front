@@ -10,6 +10,7 @@ export default class PaquetesList extends React.Component {
     
   constructor(props){
     super(props)
+    this.formRef =  React.createRef();
     this.state = {
       paquetes: [],
       detalle:[],
@@ -33,18 +34,15 @@ export default class PaquetesList extends React.Component {
 
   detail = (id) =>{
     console.log(id)
-    this.setState({...this.state, loading: true}, () => {
       API.get(`paquetes/${id}`)
         .then(response => {
-          this.setState({detalle: response.data});
+          this.setState({...this.state,detalle: response.data});
+          console.log("Detalle de paquete",this.detalle)
       });
-      console.log("Detalle de paquete",this.detalle)
-    });
   }
   //MODAL DETAIL
   showModal = (id) => {
     this.detail(id)
-    console.log(this.detalle)
     this.formRef.props.form.setFields(this.detalle);
     this.setState({ modalDetail: true });
   }
@@ -157,6 +155,7 @@ export default class PaquetesList extends React.Component {
           onCancel={this.handleCancel}
           onOk={this.handleCreate}
           wrappedComponentRef={this.saveFormRef}
+          detalle={this.state.detalle}
           />
         </div>
         )
