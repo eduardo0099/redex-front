@@ -34,6 +34,12 @@ export default class System extends Component {
     API.post('/paquetes/carga', this.state.archivo);
   };
 
+  subirSimuOficinas = () => API.post('/simulaciones/1/oficinas/carga', this.state.archivo);
+
+  subirSimuVuelos = () => API.post('/simulaciones/1/vuelos/carga', this.state.archivo);
+
+  subirSimuPaquetes = () => API.post('/simulaciones/1/paquetes/carga', this.state.archivo);
+
   render() {
     return (
       <Layout>
@@ -53,6 +59,15 @@ export default class System extends Component {
           </div>
           <div>
             <button onClick={this.subirPaquetes}> Subir paquetes </button>
+          </div>
+          <div>
+            <button onClick={this.subirSimuOficinas}> Subir simu oficinas </button>
+          </div>
+          <div>
+            <button onClick={this.subirSimuVuelos}> Subir simu vuelos </button>
+          </div>
+          <div>
+            <button onClick={this.subirSimuPaquetes}> Subir simu paquetes </button>
           </div>
         </TheContent>
       </Layout>
