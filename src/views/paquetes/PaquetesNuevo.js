@@ -274,29 +274,28 @@ export default class PaquetesNuevo extends React.Component {
         });
     };
 
-    //find
-    findPersonaOrigen = ()=>{
+    findPersonaOrigen = () => {
         const form = this.formRef.props.form;
         form.validateFields((err, values) => {
-            API.post(`/personas/find`,
-                {
-                tipoDocumentoIdentidad:{id:values.tipoDocumentoIdentidadOrigen.key},
-                numeroDocumentoIdentidad:values.numeroDocumentoOrigen
-            })
-        .then(response => {
-            let data = response.data;
-                this.formRef.props.form.setFields({
-                    nombreClienteOrigen:{
-                        value:data.nombreCompleto
-                    },
-                    "personaOrigen.id":{
-                        value:data.id
-                    }
-                });
-                console.log("Persona origen:",data)
-              }
-            )
-          })
+            let envelope =  {
+                tipoDocumentoIdentidad: {
+                    id: values.tipoDocumentoIdentidadOrigen.key
+                },
+                numeroDocumentoIdentidad: values.numeroDocumentoOrigen
+            }
+            API.post(`/personas/find`, envelope)
+                .then(response => {
+                    let data = response.data;
+                    this.formRef.props.form.setFields({
+                        nombreClienteOrigen: {
+                            value:data.nombreCompleto
+                        },
+                        "personaOrigen.id": {
+                            value:data.id
+                        }
+                    });
+                })
+        })
     }
     
     findPersonaDestino = ()=>{

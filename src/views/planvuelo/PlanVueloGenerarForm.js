@@ -64,7 +64,6 @@ export default class GenerarForm extends React.Component {
       >
         <RangePicker
           style={{ width: "100%" }}
-          disabledDate={disabledDate}
           format="DD/MM/YYYY"
           onChange={this.choose}
         />
