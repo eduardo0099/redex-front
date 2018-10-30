@@ -3,6 +3,7 @@ import { Divider ,Col, Layout, Button,Form, Input,AutoComplete,Select,Icon,Menu,
 import { TheContent, TheHeader } from '../../components/layout';
 import PaquetesCliente from './PaquetesCliente';
 import API from '../../Services/Api';
+import Notify from "../../utils/notify";
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -29,7 +30,8 @@ class InnerForm extends React.Component{
             tipoDoc:[{id:"1",nombre:"DNI"},{id:"2",nombre:"Pasaporte"}],
             paises:[{id:"1",nombre:"Peru"},{id:"2",nombre:"Dinamarca"}],
             oficinasOrigen:[],
-            oficinasDestino:[]
+            oficinasDestino:[],
+
         }
     }
 
@@ -46,7 +48,7 @@ class InnerForm extends React.Component{
    };
 
     render(){
-        const {form}=this.props;
+        const {form, findPersonaDestino,findPersonaOrigen}=this.props;
         const  {getFieldDecorator} = form;
 
         return(
@@ -67,6 +69,7 @@ class InnerForm extends React.Component{
                     <FormItem>
                     {getFieldDecorator("oficinaOrigen")(
                     <Select 
+                    style={{width:"100%"}}
                     showSearch
                     defaultActiveFirstOption={false}
                     filterOption={false}
@@ -91,7 +94,7 @@ class InnerForm extends React.Component{
                     <Col span={5}>
                     <FormItem >
                     {getFieldDecorator("tipoDocumentoIdentidadOrigen")(
-                    <Select labelInValue={true}>
+                    <Select labelInValue={true} style={{width:"100%"}}>
                         {this.state.tipoDoc.map(i=>(
                             <Option key={i.id} value={i.id}>
                             {i.nombre}
@@ -103,13 +106,13 @@ class InnerForm extends React.Component{
                     </Col>
                     <Col span={5}>
                     <FormItem>
-                    {getFieldDecorator("numeroDocumentoIdentidadOrigen")(<Input type="textarea" />)}
+                    {getFieldDecorator("numeroDocumentoOrigen")(<Input type="textarea" />)}
                     </FormItem>
                     </Col>
                     <Col span={1}>
                     <FormItem >
                         <Tooltip placement="top" title={"Buscar cliente"}>
-                        <Button type="primary" shape="circle" icon="search" />
+                        <Button type="primary" shape="circle" icon="search" onClick={findPersonaOrigen} />
                         </Tooltip>
                     </FormItem>
                     </Col>
@@ -126,7 +129,7 @@ class InnerForm extends React.Component{
                     </Col>
                     <Col span={10}>
                     <FormItem >
-                        <Input disabled={true}></Input>
+                    {getFieldDecorator("nombreClienteOrigen")(<Input type="textarea" disabled={true} />)}
                     </FormItem>
                     </Col>
                 </InputGroup>
@@ -140,6 +143,7 @@ class InnerForm extends React.Component{
                     <FormItem>
                     {getFieldDecorator("oficinaDestino")(
                     <Select 
+                    style={{width:"100%"}}
                     showSearch
                     defaultActiveFirstOption={false}
                     filterOption={false}
@@ -155,11 +159,6 @@ class InnerForm extends React.Component{
                     </Select>
                     )}</FormItem>
                     </Col>
-                    <Col span={5}>
-                    <FormItem >
-                        <Input disabled={true}></Input>
-                    </FormItem>
-                    </Col>
                 </InputGroup>
                 <InputGroup size="large"> 
                     <Col span={4}>
@@ -169,7 +168,7 @@ class InnerForm extends React.Component{
                     <Col span={5}>
                     <FormItem >
                     {getFieldDecorator("tipoDocumentoIdentidadDestino")(
-                    <Select>
+                    <Select labelInValue={true} style={{width:"100%"}}>
                         {this.state.tipoDoc.map(i=>(
                             <Option key={i.id} value={i.id}>
                             {i.nombre}
@@ -186,7 +185,7 @@ class InnerForm extends React.Component{
                     <Col span={1}>
                     <FormItem >
                         <Tooltip placement="top" title={"Buscar cliente"}>
-                        <Button type="primary" shape="circle" icon="search" />
+                        <Button type="primary" shape="circle" icon="search" onClick={findPersonaDestino}/>
                         </Tooltip>
                     </FormItem>
                     </Col>
@@ -203,7 +202,7 @@ class InnerForm extends React.Component{
                     </Col>
                     <Col span={10}>
                     <FormItem >
-                        <Input disabled={true}></Input>
+                    {getFieldDecorator("nombreClienteDestino")(<Input type="textarea" disabled={true} />)}
                     </FormItem>
                     </Col>
                 </InputGroup>
@@ -275,11 +274,59 @@ export default class PaquetesNuevo extends React.Component {
         });
     };
 
+    //find
+    findPersonaOrigen = ()=>{
+        const form = this.formRef.props.form;
+        form.validateFields((err, values) => {
+            API.post(`/personas/find`,
+                {
+                tipoDocumentoIdentidad:{id:values.tipoDocumentoIdentidadOrigen.key},
+                numeroDocumentoIdentidad:values.numeroDocumentoOrigen
+            })
+        .then(response => {
+            let data = response.data;
+                this.formRef.props.form.setFields({
+                    nombreClienteOrigen:{
+                        value:data.nombreCompleto
+                    },
+                    "personaOrigen.id":{
+                        value:data.id
+                    }
+                });
+                console.log("Persona origen:",data)
+              }
+            )
+          })
+    }
+    
+    findPersonaDestino = ()=>{
+        const form = this.formRef.props.form;
+        form.validateFields((err, values) => {
+            console.log(values)
+            API.post(`/personas/find`,
+                {
+                tipoDocumentoIdentidad:{id:values.tipoDocumentoIdentidadDestino.key},
+                numeroDocumentoIdentidad:values.numeroDocumentoDestino
+            })
+        .then(response => {
+            let data = response.data;
+                this.formRef.props.form.setFields({
+                    nombreClienteDestino:{
+                        value:data.nombreCompleto
+                    },
+                    "personaDestino.id":{
+                        value:data.id
+                    }
+                });
+              }
+            )
+          })
+    }
+
     save = () => {
         const form = this.formRef.props.form;
         form.validateFields((err, values) => {
           console.log('Formulario: ', values);
-    
           if (err) {
             return;
           }
@@ -287,25 +334,23 @@ export default class PaquetesNuevo extends React.Component {
           let envelope = {
             personaOrigen:{id:values.personaOrigen.id},
             personaDestino:{id:values.personaDestino.id},
-            oficinaOrigen:{id:values.oficinaOrigen.id},
-            oficinaDestino:{id:values.oficinaDestino.id},
+            oficinaOrigen:{id:values.oficinaOrigen.key},
+            oficinaDestino:{id:values.oficinaDestino.key},
             "notiRegistro":values.notiRegistro,
             "notiAbordados":values.notiAbordados,
             "notiLlegada":values.notiLlegada
           }
-
-          //falta el api 
-    /*
-          API.post('vuelos/save', envelope)
+          API.post('paquetes/save', envelope)
             .then(response => {
+                console.log('Formulario final',envelope)
               Notify.success({
-                message: 'Vuelo actualizado'
+                message: 'Paquete registrado'
               });
               form.resetFields();
-              this.props.fetch();
-              this.close();
-            })*/
-          
+              //this.props.fetch();
+              this.handleCancel();
+            })
+            this.setState({ modalResumen: false });
         }); 
     };
 
@@ -337,7 +382,9 @@ export default class PaquetesNuevo extends React.Component {
             wrappedComponentRef={this.saveFormRef}
             />
             <WrappedForm
-            wrappedComponentRef = {this.saveFormRef}
+            wrappedComponentRef = {this.saveFormRef} 
+            findPersonaDestino = {this.findPersonaDestino}
+            findPersonaOrigen = {this.findPersonaOrigen}
             />
             <Divider ></Divider>
             <Col span={2} align="right"><Button type="primary" onClick={this.showModalResumen}>Guardar</Button></Col>
@@ -349,7 +396,18 @@ export default class PaquetesNuevo extends React.Component {
             title="Resumen de Registro de paquete"
             okText="ok"
             cancelText="Cancelar"
-            ></Modal>
+            >
+            <Divider orientation="left">Origen</Divider>
+            <span>Cliente:</span>
+            <span>Pais:</span>
+            <Divider orientation="left">Destino</Divider>
+            <span>Cliente:</span>
+            <span>Pais:</span>
+            <Divider orientation="left">Notificaciones</Divider>
+            <span>Notificacion Registro:</span>
+            <span>Notificacion LLegada:</span>
+            <span>Notificacion Abordados:</span>
+            </Modal>
             </TheContent>
             </Layout>
         )
