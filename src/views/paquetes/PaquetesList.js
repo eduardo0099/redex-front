@@ -13,7 +13,7 @@ export default class PaquetesList extends React.Component {
     this.state = {
       paquetes: [],
       loading: false,
-      modalDetail:false
+      modalDetail:false,
     }
   }
 

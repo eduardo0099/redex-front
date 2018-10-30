@@ -46,7 +46,7 @@ export default class Oficinas extends React.Component {
         </TheHeader>
         <TheContent>
           <OficinasList ref={this.listRef} updateAction={this.editar}/>
-          <OficinasForm ref={this.formRef}/>
+          <OficinasForm ref={this.formRef} fetch={this.fetch}/>
           <CrimsonUpload ref={this.uploadRef} url="/oficinas/carga" title="Cargar oficinas"/>
         </TheContent>
       </Layout>

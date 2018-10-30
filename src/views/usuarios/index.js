@@ -4,6 +4,8 @@ import { TheContent, TheHeader } from '../../components/layout';
 import UsuarioList from './UsuarioList';
 import UsuarioForm from './UsuarioForm';
 import CrimsonUpload from '../../components/CrimsonUpload';
+import API from '../../Services/Api';
+import notify from '../../utils/notify';
 
 export default class Usuarios extends React.Component {
   constructor(props) {
@@ -39,7 +41,6 @@ export default class Usuarios extends React.Component {
         return;
       }
 
-      console.log('Received values of form: ', values);
       form.resetFields();
       this.setState({ modalVisible: false });
     }); 

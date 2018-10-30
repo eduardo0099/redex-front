@@ -1,6 +1,8 @@
 import React from "react";
 import { Modal, Form, Input, Select } from "antd";
 import API from "../../Services/Api";
+import Notify from '../../utils/notify';
+
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -13,12 +15,8 @@ class InnerForm extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.allPaises();
-  }
-
-  allPaises = () => {
-    API.get("paises").then(response => {
+  fetchPaises = q => {
+    API.get("paises/search", { params: { q: q } }).then(response => {
       this.setState({ ...this.state, paises: response.data });
     });
   };
@@ -47,8 +45,12 @@ class InnerForm extends React.Component {
               rules: [{ required: true, message: "Selecciona el pais" }]
             })(
               <Select
-                onSearch={this.handleSearch}
-                labelInValue={false}
+                showSearch
+                defaultActiveFirstOption={false}
+                filterOption={false}
+                onSearch={this.fetchPaises}
+                notFoundContent={null}
+                labelInValue={true}
               >
                 {paises.map(pais => {
                   return <Option key={pais.id}>{pais.nombre}</Option>;
@@ -57,7 +59,7 @@ class InnerForm extends React.Component {
             )}
           </FormItem>
           <FormItem label="Capacidad">
-            {getFieldDecorator("capacidad")(<Input type="textarea" />)}
+            {getFieldDecorator("capacidadMaxima")(<Input type="textarea" />)}
           </FormItem>
           <FormItem label="Código">
             {getFieldDecorator("codigo")(<Input type="textarea" />)}
@@ -92,9 +94,10 @@ export default class OficinasForm extends React.PureComponent {
       let data = response.data;
       this.setState({visible : true, title: 'Editar oficina', action: 'Actualizar'}, () => {
         this.formRef.props.form.setFields({
-          pais: { value: data.pais },
+          id: { value: data.id },
+          pais: { value: { key: data.pais.id, label: data.pais.nombre }},
           codigo: { value: data.codigo },
-          capacidad: { value: data.capacidad }
+          capacidadMaxima: { value: data.capacidadMaxima }
         });
       });
     });
@@ -105,7 +108,28 @@ export default class OficinasForm extends React.PureComponent {
   }
 
   save = () => {
-    // enviar al API la data para guardar
+    const form = this.formRef.props.form;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+
+      let envelope = {
+        ...values,
+        pais: {id: values.pais.key},
+      }
+
+      API.post('vuelos/save', envelope)
+        .then(response => {
+          Notify.success({
+            message: 'Oficina actualizada'
+          });
+          form.resetFields();
+          this.props.fetch();
+          this.close();
+        })
+      
+    }); 
   }
 
   saveFormRef = (formRef) => {

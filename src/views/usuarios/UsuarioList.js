@@ -2,6 +2,7 @@ import React from 'react';
 import { Table, Menu, Dropdown, Icon,Modal, Tag} from 'antd';
 import API from '../../Services/Api';
 import CrimsonTable from '../../components/CrimsonTable';
+import notify from '../../utils/notify';
 
 const { Column } = Table;
 
@@ -11,35 +12,18 @@ export default class UsuarioList extends React.Component {
 
   constructor(props){
     super(props)
-    this.state = {
-      usuarios: [],
-      loading: false,
-    }
-
+    this.listRef = React.createRef();
   }
 
-  componentDidMount() {
-    this.list();
-  }
-
-  list = () => {
-    this.setState({...this.state, loading: true}, () => {
-      API.get('usuarios')
-        .then(response => {
-          this.setState({...this.state, usuarios: response.data, loading: false});
-      });
-    });
-  }
+  fetch = () => this.listRef.current.fetch();
 
   showConfirmDesactivar=(record)=> {
     confirm({
       title: 'Usted desea desactivar a este usuario?',
       content: 'Si usted desactiva al usuario, este no tendrá acceso al sistema',
-      onCancel() {
-        console.log('Cancelar');
-      },
-      onOk() {
-        console.log('OK');
+      onCancel() {},
+      onOk: () => {
+        this.desactivar(record.id);
       },
     });
   }
@@ -47,15 +31,23 @@ export default class UsuarioList extends React.Component {
   showConfirmActivar=(record)=> {
     confirm({
       title: 'Usted desea activar a este usuario?',
-      content: 'Si usted activa al usuario, este tendra acceso al sistema',
-      onCancel() {
-        console.log('Cancelar');
-      },
-      onOk() {
-        console.log('OK');
+      content: 'Si usted activa al usuario, este tendrá acceso al sistema',
+      onCancel() {},
+      onOk: () => {
+        this.activar(record.id);
       },
     });
   }
+
+  activar = (id) => API.post(`/usuarios/${id}/activar`).then((response) => {
+    notify.success({message: response.data.msg})
+    this.fetch()
+  });
+
+  desactivar = (id) => API.post(`/usuarios/${id}/desactivar`).then((response) => {
+    notify.success({message: response.data.msg})
+    this.fetch()
+  });
 
   editarUsuario=(record)=>{
 
@@ -63,7 +55,7 @@ export default class UsuarioList extends React.Component {
 
     render(){
         return (
-            <CrimsonTable url="/usuarios">
+            <CrimsonTable url="/usuarios" ref={this.listRef}>
               <Column
                 title="Persona"
                 key="nombres"
