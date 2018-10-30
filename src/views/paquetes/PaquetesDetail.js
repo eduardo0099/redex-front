@@ -27,49 +27,67 @@ class InnerForm extends React.Component {
           footer={ null }
         >
           <Form layout="vertical">
+          <FormItem label="Estado del Paquete">
+          <span> { paquete.id ? paquete.estado.name : '' } </span>
+          </FormItem>
           <Divider orientation="left">Origen</Divider>
             <FormItem label={this.props.id}>
             </FormItem>
+            <FormItem label="Cliente">
+            <span> { paquete.id ? paquete.personaOrigen.nombreCompleto : '' } </span>
+            </FormItem>
             <FormItem label="Oficina">
-            <span>  { paquete.id ? paquete.oficinaOrigen.codigo : '' } </span>
-            </FormItem>
-            <FormItem label="Fecha">
-            <span>  { paquete.id ? paquete.fechaIngresoString : '' } </span>
-
-            </FormItem>
+            <span>  { paquete.id ? paquete.oficinaOrigen.codigo : '' } - {paquete.id ? paquete.oficinaOrigen.pais.nombre: ''}</span></FormItem>
+            <FormItem label="Fecha de Registro">
+            <span>  { paquete.id ? paquete.fechaIngresoString : '' } </span></FormItem>
           <Divider orientation="left">Destino</Divider>
             <FormItem label="Cliente">
+            <span> { paquete.id ? paquete.personaDestino.nombreCompleto : '' } </span>
             </FormItem>
             <FormItem label="Oficina">
-            </FormItem>
-            <FormItem label="Fecha">
+            <span>  { paquete.id ? paquete.oficinaOrigen.codigo : '' } - {paquete.id ? paquete.oficinaOrigen.pais.nombre: ''}</span>
             </FormItem>
           <Divider orientation="left">Ruta</Divider>
-          <FormItem label="Estado">
-            </FormItem>
           <Table size="small" dataSource={paquete.paqueteRutas}>
               <Column
                 title="Ciudad Partida"
                 key="cliente"
                 width="16%"
                 render = {r => (
-                  <span> ohla </span>
+                  <span> {r.vueloAgendado.oficinaOrigen.pais.nombre} </span>
                 )}
               />
               <Column
                     title="Tiempo Partida"
                     key="cliente"
                     width="16%"
+                    render = {r => (
+                      <span> {r.vueloAgendado.fechaInicioString} </span>
+                    )}
               />
               <Column
                     title="Ciudad Llegada"
                     key="cliente"
                     width="16%"
+                    render = {r => (
+                      <span> {r.vueloAgendado.oficinaDestino.pais.nombre} </span>
+                    )}
               />
               <Column
                 title="Tiempo Llegada"
                 key="cliente"
                 width="16%"
+                render = {r => (
+                  <span> {r.vueloAgendado.fechaFinString} </span>
+                )}
+              />
+              <Column
+                title="Estado"
+                key="cliente"
+                width="16%"
+                render = {r => (
+                  <span> {r.estado.name} </span>
+                )}
               />
           </Table>
           </Form>
@@ -95,6 +113,7 @@ export default class PaquetesDetail extends React.Component {
     API.get(`paquetes/${id}`)
       .then(response => {
         this.setState({...this.state, paquete: response.data, visible: true, title: `Paquete ${response.data.codigoRastreo}`})
+        console.log(this.state.paquete);
       })
   }
 
