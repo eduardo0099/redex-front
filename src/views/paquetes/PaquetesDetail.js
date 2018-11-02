@@ -45,7 +45,7 @@ class InnerForm extends React.Component {
             <span> { paquete.id ? paquete.personaDestino.nombreCompleto : '' } </span>
             </FormItem>
             <FormItem label="Oficina">
-            <span>  { paquete.id ? paquete.oficinaOrigen.codigo : '' } - {paquete.id ? paquete.oficinaOrigen.pais.nombre: ''}</span>
+            <span>  { paquete.id ? paquete.oficinaDestino.codigo : '' } - {paquete.id ? paquete.oficinaDestino.pais.nombre: ''}</span>
             </FormItem>
           <Divider orientation="left">Ruta</Divider>
           <Table size="small" dataSource={paquete.paqueteRutas}>
