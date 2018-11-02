@@ -345,11 +345,12 @@ export default class PaquetesNuevo extends React.Component {
               Notify.success({
                 message: 'Paquete registrado'
               });
+            this.setState({ modalResumen: false });
+
               form.resetFields();
               //this.props.fetch();
               this.handleCancel();
             })
-            this.setState({ modalResumen: false });
         }); 
     };
 
