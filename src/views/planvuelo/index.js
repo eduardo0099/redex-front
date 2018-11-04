@@ -53,7 +53,7 @@ export default class PlanVuelo extends React.Component {
       <TheContent>
           <PlanVueloList ref={this.listRef} updateAction={this.editar}/>
           <PlanVueloForm ref={this.formRef} fetch={ this.fetch }/>
-          <CrimsonUpload ref={this.uploadRef} url="/planvuelo/carga" title="Cargar vuelos"/>
+          <CrimsonUpload ref={this.uploadRef} fetch={this.fetch} url="/planvuelo/carga" title="Cargar vuelos"/>
           <PlanVueloGenerarForm ref={this.generarRef}/>
       </TheContent>
     </Layout>

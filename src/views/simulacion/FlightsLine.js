@@ -20,23 +20,27 @@ class FlightsLine extends Component{
     }
 
     render(){
-        const {infoVuelos} = this.props;
-        return(
+        //const {infoVuelos} = this.props;
+        return(<div>
             <Lines>
                 <Line
                     className="world-map-arc"
                     line={{
-                        coordinates: {
-                            start: [-77.02824, -12.04318],
-                            end: [-3.70256, 40.4165]
-                        }
-                     }}
+                            coordinates: {
+                                start: [-58.3712,-34.6083],
+                                end: [-3.70256, 40.4165]
+                            }
+                    }}
                     preserveMarkerAspect={false}
                     buildPath={this.buildCurves}
-                    strokeWidth={1}
-                    stroke-width="1"
+                    style={{
+                        default: { stroke: "#666" },
+                        hover:   { stroke: "#999" },
+                        pressed: { stroke: "#000" },
+                      }}
                 />
-                </Lines>
+            </Lines>
+            </div> 
         )
     }
 }

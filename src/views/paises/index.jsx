@@ -47,7 +47,7 @@ export default class Piases extends React.Component {
         <TheContent>
           <PaisesList ref={this.listRef} updateAction={this.editar}/>
           <PaisesForm ref={this.formRef} fetch={this.fetch}/>
-          <CrimsonUpload ref={this.uploadRef} url="/paises/carga" title="Cargar paises"/>
+          <CrimsonUpload ref={this.uploadRef} fetch={this.fetch} url="/paises/carga" title="Cargar paises"/>
         </TheContent>
       </Layout>
     );
