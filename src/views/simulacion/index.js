@@ -185,11 +185,7 @@ class Simulacion extends Component{
             <div >
                 <Select labelInValue={true} style={{width:"50%"}} onChange={this.handleCitySelection}>
                         {this.locationInfo.map(i=>(
-<<<<<<< HEAD
-                            <Option key={i.codigoIso} value={i} >
-=======
                             <Option key={i.idContinente} value={i.city} >
->>>>>>> ee9f862376708d4b3d3a437d7e7a05ee6c4b91c4
                             {i.city}
                             </Option>
                         ))}
