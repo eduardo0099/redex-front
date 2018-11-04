@@ -93,6 +93,7 @@ class Simulacion extends Component{
         //Tooltip handmade
         this.disableDiv = this.disableDiv.bind(this);
         this.enableDiv = this.enableDiv.bind(this);
+        this.handleModalContent = this.handleModalContent.bind(this);
     }
 
     componentDidMount(){
@@ -166,7 +167,10 @@ class Simulacion extends Component{
     handleMouseUpMarker(geo,e){
         console.log(">>u",geo,e);
     }
-
+    handleModalContent(geo){
+        console.log("rererere",geo);
+        return <h1>{geo.properties.NAME}</h1>;
+    }
     render(){
         const { tooltipConfig } = this.state;
         var divStyle = {
@@ -181,7 +185,11 @@ class Simulacion extends Component{
             <div >
                 <Select labelInValue={true} style={{width:"50%"}} onChange={this.handleCitySelection}>
                         {this.locationInfo.map(i=>(
+<<<<<<< HEAD
                             <Option key={i.codigoIso} value={i} >
+=======
+                            <Option key={i.idContinente} value={i.city} >
+>>>>>>> ee9f862376708d4b3d3a437d7e7a05ee6c4b91c4
                             {i.city}
                             </Option>
                         ))}
@@ -204,7 +212,8 @@ class Simulacion extends Component{
                         key={index}
                         geography={geography}
                         projection={projection}
-                        data-tip = {geography.properties.NAME}
+                        data-for='modal-city'
+                        data-tip={JSON.stringify(geography)}
                         style={{
                         default: {
                             fill: "#ECEFF1",
@@ -235,6 +244,7 @@ class Simulacion extends Component{
                                     <Marker key={i} 
                                             marker={{ coordinates: [ item.longitude, item.latitude ] }}
                                             preserveMarkerAspect={false}
+                                            
                                             style={{
                                                 default: { fill: "#000" },
                                                 hover:   { fill: "#999" },
@@ -250,7 +260,20 @@ class Simulacion extends Component{
                 </Markers>        
                 </ZoomableGroup>
             </ComposableMap>
-            <ReactTooltip />
+            <ReactTooltip id='modal-city'
+                getContent={function(item){
+                        if(item){
+                            let elem = JSON.parse(item);
+                            console.log(elem);
+                            
+                            return (
+                                <div>{elem.properties.ISO_A3}<div>Capacidad: 500</div></div>
+                                )
+                        }
+                            
+                    } 
+                }
+            />
             </TheContent>
             </Layout>
         );
