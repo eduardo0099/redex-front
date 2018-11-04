@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Layout } from 'antd';
+import { Layout ,Select,Button} from 'antd';
+import Tooltip from "react-simple-tooltip"
 import { TheContent, TheHeader } from '../../components/layout';
 import { ComposableMap,ZoomableGroup,Geographies,Geography,
        Markers,
@@ -7,12 +8,12 @@ import { ComposableMap,ZoomableGroup,Geographies,Geography,
        Line,
        Lines
          } from 'react-simple-maps';
-import ReactTooltip from 'react-tooltip'
+import ReactTooltip from 'react-tooltip';
 //Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
 import locAlm from './../../utils/files/locations.json';
 import Modal from './Modal';
-
+const Option = Select.Option;
 class Simulacion extends Component{
     constructor(props) {
         super(props);
@@ -24,7 +25,9 @@ class Simulacion extends Component{
                 "code":"SABE",
                 "isoCode":"ARG",
                 "longitude":-58.3712,
-                "latitude":-34.6083
+                "latitude":-34.6083,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             },
             {
                 "idContinente":2,
@@ -33,7 +36,9 @@ class Simulacion extends Component{
                 "code":"SPIM",
                 "isoCode":"PER",
                 "longitude":-77.02824,
-                "latitude":-12.04318
+                "latitude":-12.04318,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+               
             },
             {
                 "idContinente":2,
@@ -42,7 +47,9 @@ class Simulacion extends Component{
                 "code":"SLLP",
                 "isoCode":"BOL",
                 "longitude":-68.1500015,
-                "latitude":-16.5
+                "latitude":-16.5,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             },
             {
                 "idContinente":2,
@@ -51,7 +58,9 @@ class Simulacion extends Component{
                 "code":"SBBR",
                 "isoCode":"BRA",
                 "longitude":-47.9292,
-                "latitude":-15.7801
+                "latitude":-15.7801,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             },
             {
                 "idContinente":4,
@@ -60,7 +69,9 @@ class Simulacion extends Component{
                 "code":"LEMD",
                 "isoCode":"ESP",
                 "longitude":-3.70256,
-                "latitude":40.4165
+                "latitude":40.4165,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             }  
         ];
         
@@ -79,12 +90,32 @@ class Simulacion extends Component{
         //Zoom the city
         this.handleCitySelection = this.handleCitySelection.bind(this)
         this.handleReset = this.handleReset.bind(this)
+        //Tooltip handmade
+        this.disableDiv = this.disableDiv.bind(this);
+        this.enableDiv = this.enableDiv.bind(this);
     }
-    //ZOOM the city
-    handleCitySelection=(evt)=> {
-        console.log("Para hacer zoom",evt)
+
+    componentDidMount(){
+        setTimeout(()=>{
+            ReactTooltip.rebuild()
+        },100)
+    }
+    //Tooltip handmade
+    disableDiv() {
         this.setState({
-          center: [evt.longitude,evt.latitude],
+           detalle:'none'
+        });
+    }
+    
+    enableDiv=(item) =>{
+        
+    }
+
+    //ZOOM the city
+    handleCitySelection=(e)=> {
+        console.log("Para hacer zoom",e)
+        this.setState({
+          center: [e.key.longitude,e.key.latitude],
           zoom: 2,
         })
       }
@@ -138,11 +169,9 @@ class Simulacion extends Component{
 
     render(){
         const { tooltipConfig } = this.state;
-        const tooltip = (
-            <ReactTooltip id="tooltip" offset={{top:-58.3712,left:-34.6083}}>
-              <strong>Holy guacamole!</strong>
-            </ReactTooltip>
-          );
+        var divStyle = {
+            display:this.state.disableDiv?'block':'none'
+        };
         return(
             <Layout>
             <TheHeader>
@@ -150,22 +179,19 @@ class Simulacion extends Component{
             </TheHeader>
             <TheContent>
             <div >
-            {
-                this.locationInfo.map((item, i) => (
-                <button
-                    key={item}
-                    className="btn px1"
-                    data-city={item}
-                    onClick={()=>this.handleCitySelection(item)}
-                    >
-                    { item.city }
-                </button>
-                ))
-            }
-            <button onClick={this.handleReset}>
+                <Select labelInValue={true} style={{width:"50%"}} onChange={this.handleCitySelection}>
+                        {this.locationInfo.map(i=>(
+                            <Option key={i.idContinente} value={i} >
+                            {i.city}
+                            </Option>
+                        ))}
+                </Select>
+            <Button onClick={this.handleReset}>
                 { "Reset" }
-            </button>
+            </Button>
             </div>
+            <Button>Vuelos</Button>
+            <Button>Almacenes</Button>
             <ComposableMap
                         projectionConfig={{
                             scale: 165,
@@ -178,8 +204,7 @@ class Simulacion extends Component{
                         key={index}
                         geography={geography}
                         projection={projection}
-                        onMouseMove={this.handleMove}
-                        onMouseLeave={this.handleLeave}
+                        data-tip = {geography.properties.NAME}
                         style={{
                         default: {
                             fill: "#ECEFF1",
@@ -206,7 +231,8 @@ class Simulacion extends Component{
                 </Geographies>
                 <Markers>
                         {this.locationInfo.map((item, i) => { 
-                            return (<Marker key={i} 
+                            return (
+                                    <Marker key={i} 
                                             marker={{ coordinates: [ item.longitude, item.latitude ] }}
                                             preserveMarkerAspect={false}
                                             style={{
@@ -214,13 +240,17 @@ class Simulacion extends Component{
                                                 hover:   { fill: "#999" },
                                                 pressed: { fill: "#000" },
                                               }}
+                                              
                                             >
+                                        
                                         <circle cx={ 0 } cy={ 0 } r={ 3 } />
+                                        
                                     </Marker>);
                         })}
-                </Markers>
+                </Markers>        
                 </ZoomableGroup>
             </ComposableMap>
+            <ReactTooltip />
             </TheContent>
             </Layout>
         );
