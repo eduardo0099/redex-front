@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
-import { Layout } from 'antd';
+import { Layout ,Select,Button} from 'antd';
+import Tooltip from "react-simple-tooltip"
 import { TheContent, TheHeader } from '../../components/layout';
-import { ComposableMap,
-     ZoomableGroup,
-      Geographies,
-       Geography,
+import { ComposableMap,ZoomableGroup,Geographies,Geography,
        Markers,
        Marker,
        Line,
        Lines
          } from 'react-simple-maps';
+import ReactTooltip from 'react-tooltip';
+//Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
 import locAlm from './../../utils/files/locations.json';
 import Modal from './Modal';
-
+const Option = Select.Option;
 class Simulacion extends Component{
     constructor(props) {
         super(props);
@@ -25,7 +25,9 @@ class Simulacion extends Component{
                 "code":"SABE",
                 "isoCode":"ARG",
                 "longitude":-58.3712,
-                "latitude":-34.6083
+                "latitude":-34.6083,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             },
             {
                 "idContinente":2,
@@ -34,7 +36,9 @@ class Simulacion extends Component{
                 "code":"SPIM",
                 "isoCode":"PER",
                 "longitude":-77.02824,
-                "latitude":-12.04318
+                "latitude":-12.04318,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+               
             },
             {
                 "idContinente":2,
@@ -43,7 +47,9 @@ class Simulacion extends Component{
                 "code":"SLLP",
                 "isoCode":"BOL",
                 "longitude":-68.1500015,
-                "latitude":-16.5
+                "latitude":-16.5,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             },
             {
                 "idContinente":2,
@@ -52,7 +58,9 @@ class Simulacion extends Component{
                 "code":"SBBR",
                 "isoCode":"BRA",
                 "longitude":-47.9292,
-                "latitude":-15.7801
+                "latitude":-15.7801,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             },
             {
                 "idContinente":4,
@@ -61,13 +69,16 @@ class Simulacion extends Component{
                 "code":"LEMD",
                 "isoCode":"ESP",
                 "longitude":-3.70256,
-                "latitude":40.4165
+                "latitude":40.4165,
+                "capacidad":[{name:'capacidadActual',value:50},{name:'capacidadMaxima',value:500}],
+                
             }  
         ];
         
         this.locAlm = locAlm;
         this.cont = 0;
         this.state = {
+            center: [0,20],
             zoom: 1,
             tooltipConfig: null,
         }
@@ -76,7 +87,45 @@ class Simulacion extends Component{
         this.handleClick = this.handleClick.bind(this);
         this.getLocationDef = this.getLocationDef.bind(this);
         this.buildCurves = this.buildCurves.bind(this);
+        //Zoom the city
+        this.handleCitySelection = this.handleCitySelection.bind(this)
+        this.handleReset = this.handleReset.bind(this)
+        //Tooltip handmade
+        this.disableDiv = this.disableDiv.bind(this);
+        this.enableDiv = this.enableDiv.bind(this);
     }
+
+    componentDidMount(){
+        setTimeout(()=>{
+            ReactTooltip.rebuild()
+        },100)
+    }
+    //Tooltip handmade
+    disableDiv() {
+        this.setState({
+           detalle:'none'
+        });
+    }
+    
+    enableDiv=(item) =>{
+        
+    }
+
+    //ZOOM the city
+    handleCitySelection=(e)=> {
+        console.log("Para hacer zoom",e)
+        this.setState({
+          center: [e.key.longitude,e.key.latitude],
+          zoom: 2,
+        })
+      }
+    handleReset() {
+        this.setState({
+          center: [0,20],
+          zoom: 1,
+        })
+    }
+
     handleZoomIn() {
         this.setState({
             zoom: this.state.zoom * 1.2,
@@ -120,41 +169,70 @@ class Simulacion extends Component{
 
     render(){
         const { tooltipConfig } = this.state;
+        var divStyle = {
+            display:this.state.disableDiv?'block':'none'
+        };
         return(
             <Layout>
             <TheHeader>
                 <h1> Simulación </h1>
             </TheHeader>
             <TheContent>
-                <button onClick={ this.handleZoomIn }>{ "Zoom in" }</button>
-                <button onClick={ this.handleZoomOut }>{ "Zoom out" }</button>
-                <hr />
-                <div>
-                    <Modal show={!!tooltipConfig} {...tooltipConfig} />
-                    <ComposableMap
+            <div >
+                <Select labelInValue={true} style={{width:"50%"}} onChange={this.handleCitySelection}>
+                        {this.locationInfo.map(i=>(
+                            <Option key={i.idContinente} value={i} >
+                            {i.city}
+                            </Option>
+                        ))}
+                </Select>
+            <Button onClick={this.handleReset}>
+                { "Reset" }
+            </Button>
+            </div>
+            <Button>Vuelos</Button>
+            <Button>Almacenes</Button>
+            <ComposableMap
                         projectionConfig={{
                             scale: 165,
                             rotation: [-10,0,0],
                     }}>
-                    <ZoomableGroup zoom={ this.state.zoom }>
-                    <Geographies geography={map}>
-                        {(geographies, projection) => geographies.map((geography,index) => (
-                        <Geography
-                            key={index}
-                            geography={ geography }
-                            projection={ projection }
-                            style={{
-                                default:  this.getLocationDef(geography) ? {fill: "#ffbe00"} : {fill: "#666"} ,
-                                hover:   { fill: "#999" },
-                                pressed: { fill: "#000" },
-                              }}
-                            onMouseEnter={this.handleClick}
-                            />
-                        ))}
-                    </Geographies>
-                    <Markers>
+                <ZoomableGroup center={this.state.center} zoom={this.state.zoom}>
+                <Geographies geography={map}>
+                    {(geographies, projection) => geographies.map((geography,index) => (
+                    <Geography
+                        key={index}
+                        geography={geography}
+                        projection={projection}
+                        data-tip = {geography.properties.NAME}
+                        style={{
+                        default: {
+                            fill: "#ECEFF1",
+                            stroke: "#607D8B",
+                            strokeWidth: 0.75,
+                            outline: "none",
+                        },
+                        hover: {
+                            fill: "#607D8B",
+                            stroke: "#607D8B",
+                            strokeWidth: 0.75,
+                            outline: "none",
+                        },
+                        pressed: {
+                            fill: "#FF5722",
+                            stroke: "#607D8B",
+                            strokeWidth: 0.75,
+                            outline: "none",
+                        },
+                        }}
+                    />
+                    ))
+                }
+                </Geographies>
+                <Markers>
                         {this.locationInfo.map((item, i) => { 
-                            return (<Marker key={i}
+                            return (
+                                    <Marker key={i} 
                                             marker={{ coordinates: [ item.longitude, item.latitude ] }}
                                             preserveMarkerAspect={false}
                                             style={{
@@ -162,29 +240,17 @@ class Simulacion extends Component{
                                                 hover:   { fill: "#999" },
                                                 pressed: { fill: "#000" },
                                               }}
+                                              
                                             >
+                                        
                                         <circle cx={ 0 } cy={ 0 } r={ 3 } />
+                                        
                                     </Marker>);
                         })}
-                    </Markers>
-                    <Lines>
-                        <Line
-                            className="world-map-arc"
-                            line={{
-                                coordinates: {
-                                    start: [-77.02824, -12.04318],
-                                    end: [-3.70256, 40.4165]
-                                }
-                            }}
-                            preserveMarkerAspect={false}
-                            buildPath={this.buildCurves}
-                            strokeWidth={1}
-                            stroke-width="1"
-                        />
-                    </Lines>
-                    </ZoomableGroup>
-                    </ComposableMap>
-                </div>
+                </Markers>        
+                </ZoomableGroup>
+            </ComposableMap>
+            <ReactTooltip />
             </TheContent>
             </Layout>
         );
