@@ -48,7 +48,7 @@ class InnerForm extends React.Component{
    };
 
     render(){
-        const {form, findPersonaDestino,findPersonaOrigen}=this.props;
+        const {form, findPersonaDestino,findPersonaOrigen,showModalRegistro}=this.props;
         const  {getFieldDecorator} = form;
 
         return(
@@ -119,7 +119,7 @@ class InnerForm extends React.Component{
                     <Col span={1}>
                     <FormItem >
                         <Tooltip placement="top" title={"Añadir nuevo cliente"}>
-                        <Button type="primary" shape="circle" icon="plus" onClick={this.showModalRegistro}/>
+                        <Button type="primary" shape="circle" icon="plus" onClick={showModalRegistro}/>
                         </Tooltip>
                     </FormItem>
                     </Col>
@@ -192,7 +192,7 @@ class InnerForm extends React.Component{
                     <Col span={1}>
                     <FormItem >
                         <Tooltip placement="top" title={"Añadir nuevo cliente"}>
-                        <Button type="primary" shape="circle" icon="plus" onClick={this.showModalRegistro}/>
+                        <Button type="primary" shape="circle" icon="plus" onClick={showModalRegistro}/>
                         </Tooltip>
                     </FormItem>
                     </Col>
@@ -263,9 +263,11 @@ export default class PaquetesNuevo extends React.Component {
     handleCancel = ()=>{
         this.setState({ modalRegistro: false });
     };
-    handleCreate = () => {
+    handleCreate = (value) => {
+        console.log(value)
         const form = this.formRef.props.form;
         form.validateFields((err, values) => {
+            
           if (err) {
             return;
           }
@@ -277,6 +279,7 @@ export default class PaquetesNuevo extends React.Component {
     findPersonaOrigen = () => {
         const form = this.formRef.props.form;
         form.validateFields((err, values) => {
+            console.log(values)
             let envelope =  {
                 tipoDocumentoIdentidad: {
                     id: values.tipoDocumentoIdentidadOrigen.key
@@ -385,6 +388,7 @@ export default class PaquetesNuevo extends React.Component {
             wrappedComponentRef = {this.saveFormRef} 
             findPersonaDestino = {this.findPersonaDestino}
             findPersonaOrigen = {this.findPersonaOrigen}
+            showModalRegistro = {this.showModalRegistro}
             />
             <Divider ></Divider>
             <Col span={2} align="right"><Button type="primary" onClick={this.showModalResumen}>Guardar</Button></Col>

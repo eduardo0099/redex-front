@@ -43,8 +43,6 @@ class Simulacion extends Component{
               cantidad: 100,
               cantidadSalida: 25
               }],
-            num:10
-
         }
         this.handleZoomIn = this.handleZoomIn.bind(this);
         this.handleZoomOut = this.handleZoomOut.bind(this);
@@ -62,16 +60,11 @@ class Simulacion extends Component{
     //Lectura de data cada minuto
     componentDidMount(){
       //this.loadData();
-      //setInterval(this.loadData,2);
+      //setInterval(this.loadData,300000);
     }
 
-    loadData(){
+    async loadData(){
       try{
-        let minus = this.state.num -1
-        this.setState({
-          num: minus
-        })
-        console.log("llamada",this.state.num);
         /*this.setState({
         planVuelos:[]
         })*/
