@@ -1,11 +1,14 @@
 import React from 'react';
-import { Col, Row, Layout, Button, Menu, Dropdown, Icon, Modal, Upload,Input} from 'antd';
+import { Col, Row, Layout, Button, Menu, Dropdown, Icon, Modal, Upload,Input,Select,Form} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import PaquetesList from './PaquetesList';
 import PaquetesDetail from './PaquetesDetail';
 import CrimsonUpload from '../../components/CrimsonUpload';
+import API from '../../Services/Api';
 
 const Search = Input.Search;
+const Option = Select.Option;
+const FormItem = Form.Item;
 
 export default class Paquetes extends React.Component {
 
@@ -14,6 +17,9 @@ export default class Paquetes extends React.Component {
     this.listRef = React.createRef();
     this.detailRef = React.createRef();
     this.uploadRef = React.createRef();
+    this.state=({
+      listaDoc:[]
+    })
   }
   
   upload = () => this.uploadRef.current.open();
@@ -26,19 +32,20 @@ export default class Paquetes extends React.Component {
     this.detailRef.current.detail(id);
   }
 
+  componentDidMount(){
+    API.get('/tipodocidentidad').then(response=>{
+      this.setState({...this.state,
+        listaDoc:response.data
+      })
+    })
+  }
+
   render() {
     const menu = (
       <Menu>
         <Menu.Item onClick={this.gotoNuevo} key="1">Nuevo Paquete</Menu.Item>
         <Menu.Item onClick={this.upload} key="2">Cargar datos</Menu.Item>
       </Menu>
-    );
-
-    const docI = (
-            <Menu >
-              <Menu.Item key="1"><Icon type="user" />DNI</Menu.Item>
-              <Menu.Item key="2"><Icon type="user" />Pasaporte</Menu.Item>
-            </Menu>
     );
 
     return (
@@ -58,9 +65,18 @@ export default class Paquetes extends React.Component {
           <TheContent>
             <Row>
               <Col span={5}>
-                <Dropdown.Button   overlay={docI}>
-                  Tipo de Documento
-                </Dropdown.Button>
+                <FormItem>
+                    <Select  style={{width:"100%"}}>
+                        {this.state.listaDoc.map(i=> 
+                        { 
+                          console.dir(i);
+                          return (
+                            <Option key={i.id} value={i.id}>
+                            {i.simbolo}
+                            </Option>
+                        )})}
+                    </Select>
+                </FormItem>
                 </Col>
               <Col span={6}>
                 <Search
