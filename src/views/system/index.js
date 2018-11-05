@@ -1,14 +1,48 @@
 import React, { Component } from "react";
-import { Layout } from "antd";
+import { Layout, Button ,Divider,DatePicker} from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
+import moment from 'moment';
 import API from "../../Services/Api";
+
+
+
+function disabledRangeTime(_, type) {
+  if (type === 'start') {
+    return {
+      disabledHours: () => range(0, 60).splice(4, 20),
+      disabledMinutes: () => range(30, 60),
+      disabledSeconds: () => [55, 56],
+    };
+  }
+  return {
+    disabledHours: () => range(0, 60).splice(20, 4),
+    disabledMinutes: () => range(0, 31),
+    disabledSeconds: () => [55, 56],
+  };
+}
+function disabledDate(current) {
+  // Can not select days before today and today
+  return current && current < moment().endOf('day');
+}
+function range(start, end) {
+  const result = [];
+  for (let i = start; i < end; i++) {
+    result.push(i);
+  }
+  return result;
+}
 
 export default class System extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      archivo: {}
+      archivo: {},
+      inicio:"",
+      fin:"",
+      
     };
+    this.fechaFin = this.fechaFin.bind(this);
+    this.fechaInicio = this.fechaInicio.bind(this);
   }
 
   onChange = e => {
@@ -40,6 +74,24 @@ export default class System extends Component {
 
   subirSimuPaquetes = () => API.post('/simulaciones/1/paquetes/carga', this.state.archivo);
 
+  subirSimulador = ()=>{
+    API.post('simulaciones/window',{
+      params:{
+        simulacion:  1, 
+        inicio: this.state.inicio, 
+        fin: this.state.fin
+      }
+    })
+  }
+  fechaFin(event){
+    console.log(event.target.value);
+    this.setState({fin: event.target.value});
+  }
+  fechaInicio(event){
+    this.setState({inicio: event.target.value});
+  }
+  
+
   render() {
     return (
       <Layout>
@@ -69,6 +121,10 @@ export default class System extends Component {
           <div>
             <button onClick={this.subirSimuPaquetes}> Subir simu paquetes </button>
           </div>
+          <Divider orientation="left">Simulador</Divider>
+          <input value={this.state.inicio} onChange={this.fechaInicio}></input>
+          <input value={this.state.fin} onChange={this.fechaFin}></input>
+          <Button onClick={this.subirSimulador}>Inicio</Button>
         </TheContent>
       </Layout>
     );
