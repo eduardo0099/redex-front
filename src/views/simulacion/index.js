@@ -6,7 +6,6 @@ import ReactTooltip from 'react-tooltip';
 //Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
 //import locAlm from './../../utils/files/locations.json';
-import FlightsLine from './FlightsLine';
 import Modal from './Modal';
 const Option = Select.Option;
 
@@ -28,6 +27,7 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
+            planVuelos:[]
         }
         this.handleZoomIn = this.handleZoomIn.bind(this);
         this.handleZoomOut = this.handleZoomOut.bind(this);
@@ -850,7 +850,7 @@ class Simulacion extends Component{
         }
     } 
     render(){
-        const { locationInfo } = this.state;
+        const { locationInfo,planVuelos } = this.state;
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
@@ -916,7 +916,28 @@ class Simulacion extends Component{
                                     </Marker>);
                         })}
                 </Markers>  
-                <FlightsLine />
+                <Lines>
+                  {planVuelos.map((item,i)=>{
+                    return(
+                      <Line
+                        className="world-map-arc"
+                        line={{
+                                coordinates: {
+                                    start: [-58.3712,-34.6083],
+                                    end: [-3.70256, 40.4165]
+                                }
+                        }}
+                        preserveMarkerAspect={false}
+                        buildPath={this.buildCurves}
+                        style={{
+                            default: { stroke: "#FF4233" },
+                            hover:   { stroke: "#999" },
+                            pressed: { stroke: "#000" },
+                          }}
+                      />
+                    )
+                  })}
+            </Lines>
               </ZoomableGroup>
             </ComposableMap>
             <ReactTooltip id='modal-city'
