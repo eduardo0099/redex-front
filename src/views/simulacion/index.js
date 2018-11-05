@@ -18,12 +18,16 @@ class Simulacion extends Component{
         this.colorUnSelected = '#f5cc00';
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
-
+        this.frecRefreshSimu = 2000;
+        this.foo = new Date();
         this.state = {
             center: [0,20],
             zoom: 1,
             tooltipConfig: null,
             myMap:null,
+            frecTime: 1,
+            intervalClock: null,
+            time: new Date().getTime(),
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
@@ -56,6 +60,10 @@ class Simulacion extends Component{
         this.handleReset = this.handleReset.bind(this)
         this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
+        this.handleFrecTimeChange = this.handleFrecTimeChange.bind(this);
+        this.tickClock = this.tickClock.bind(this);
+        this.handleStartClock = this.handleStartClock.bind(this);
+        this.handleTimeDateChange = this.handleTimeDateChange.bind(this);
     }
     //Lectura de data cada minuto
     componentDidMount(){
@@ -780,6 +788,38 @@ class Simulacion extends Component{
         })
         console.log("Hash-did",this.state.myMap);
     }
+    handleTimeDateChange(e){
+      let newTimeArr = e.target.value.split("-");
+      let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]))
+      console.log("ll>",newDateTime);
+      this.setState({
+        time: newDateTime.getTime()
+      })
+    }
+    handleFrecTimeChange(e){
+      this.setState({
+        frecTime: e.target.value,
+      });
+    }
+    tickClock(){
+      this.setState({
+        time: this.state.time + this.frecRefreshSimu*this.state.frecTime
+      })
+    }
+    handleStartClock(){
+      if(this.state.intervalClock){
+        //elimina y crea de nuevo
+        console.log(">>",this.state.intervalClock);
+        //clearInterval(this.state.intervalClock);
+      }else{
+        let intClock = setInterval(
+          () => this.tickClock()
+          ,this.frecRefreshSimu);
+        this.setState({
+            intervalClock: intClock
+        })
+      }
+    }
     isCountrySelected(elem){
         return this.state.selectedCountries.includes(elem);
     }
@@ -882,12 +922,20 @@ class Simulacion extends Component{
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
+        let objTime = new Date(this.state.time);
+        let timeStringFormat = objTime.getFullYear()+"-"+(objTime.getMonth()+1+"").padStart(2,"0")+"-"+(objTime.getDate()+"").padStart(2,"0");
         return(
             <Layout>
             <TheHeader>
                 <h1> Simulación </h1>
             </TheHeader>
             <TheContent>
+            <div>
+            <input type="date" value={timeStringFormat} onChange={this.handleTimeDateChange}/>
+            <input type="number" value={this.state.frecTime} onChange={this.handleFrecTimeChange}/>
+            {objTime.toLocaleString()}
+            <button onClick={this.handleStartClock}>Start</button>
+            </div>
             <ComposableMap
                         projectionConfig={{
                             scale: 165,
