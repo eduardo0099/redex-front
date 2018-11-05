@@ -27,7 +27,24 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
-            planVuelos:[]
+            planVuelos:[{
+              fechaLlegada: 1355316000000,
+              oficinaSalida: "BOL",
+              oficinaLlegada: "PER",
+              fechaSalida: 1355316900000,
+              tipo: "SALIDA",
+              cantidad: 100,
+              cantidadSalida: 25
+              },{fechaLlegada: 1355316000000,
+              oficinaSalida: "ECU",
+              oficinaLlegada: "AUT",
+              fechaSalida: 1355316900000,
+              tipo: "SALIDA",
+              cantidad: 100,
+              cantidadSalida: 25
+              }],
+            num:10
+
         }
         this.handleZoomIn = this.handleZoomIn.bind(this);
         this.handleZoomOut = this.handleZoomOut.bind(this);
@@ -41,6 +58,26 @@ class Simulacion extends Component{
         this.handleReset = this.handleReset.bind(this)
         this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
+    }
+    //Lectura de data cada minuto
+    componentDidMount(){
+      //this.loadData();
+      //setInterval(this.loadData,2);
+    }
+
+    loadData(){
+      try{
+        let minus = this.state.num -1
+        this.setState({
+          num: minus
+        })
+        console.log("llamada",this.state.num);
+        /*this.setState({
+        planVuelos:[]
+        })*/
+      }catch(e){
+        console.log(e);
+      }
     }
 
     componentWillMount(){
@@ -737,27 +774,25 @@ class Simulacion extends Component{
         setTimeout(()=>{
             ReactTooltip.rebuild()
         },100)
+        //Se genera una Map donde se almacenan oficina y coordenada
         let aux = [];
         for (let i = 0; i < response.length; i++) {
             let obj = [];
-            obj.push(response[i].codigo);
+            obj.push(response[i].pais.codigoIso);
             obj.push(response[i]);
             aux.push(obj)
         }
         this.setState({
             myMap:new Map(aux)
         })
-        //console.log("Hash-did",this.state.myMap);
+        console.log("Hash-did",this.state.myMap);
     }
     isCountrySelected(elem){
         return this.state.selectedCountries.includes(elem);
     }
     //ZOOM the city
     handleCitySelection=(e)=> {
-        //console.log("Para hacer zoom",e)
-        //console.log("Hash",this.state.myMap);
         let item = this.state.myMap.get(e.key)
-        //console.log("Info:",item)
         this.setState({
           center: [item.pais.longitud,item.pais.latitude],
           zoom: 2,
@@ -918,13 +953,15 @@ class Simulacion extends Component{
                 </Markers>  
                 <Lines>
                   {planVuelos.map((item,i)=>{
+                    let salida =this.state.myMap.get(item.oficinaSalida);
+                    let llegada=this.state.myMap.get(item.oficinaLlegada);
                     return(
                       <Line
                         className="world-map-arc"
                         line={{
                                 coordinates: {
-                                    start: [-58.3712,-34.6083],
-                                    end: [-3.70256, 40.4165]
+                                    start: [salida.pais.longitud,salida.pais.latitud],
+                                    end: [llegada.pais.longitud, llegada.pais.latitud]
                                 }
                         }}
                         preserveMarkerAspect={false}
