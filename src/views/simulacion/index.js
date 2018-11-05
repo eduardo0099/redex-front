@@ -1,18 +1,14 @@
 import React, { Component } from 'react';
 import { Layout ,Select,Button} from 'antd';
-import Tooltip from "react-simple-tooltip"
 import { TheContent, TheHeader } from '../../components/layout';
-import { ComposableMap,ZoomableGroup,Geographies,Geography,
-       Markers,
-       Marker,
-       Line,
-       Lines
-         } from 'react-simple-maps';
+import { ComposableMap,ZoomableGroup,Geographies,Geography,Markers,Marker,Line,Lines} from 'react-simple-maps';
 import ReactTooltip from 'react-tooltip';
 //Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
+//import locAlm from './../../utils/files/locations.json';
 import Modal from './Modal';
 const Option = Select.Option;
+
 class Simulacion extends Component{
     constructor(props) {
         super(props);
@@ -27,8 +23,11 @@ class Simulacion extends Component{
             center: [0,20],
             zoom: 1,
             tooltipConfig: null,
+            myMap:null,
+            infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
+            planVuelos:[]
         }
         this.handleZoomIn = this.handleZoomIn.bind(this);
         this.handleZoomOut = this.handleZoomOut.bind(this);
@@ -40,9 +39,6 @@ class Simulacion extends Component{
         //Zoom the city
         this.handleCitySelection = this.handleCitySelection.bind(this)
         this.handleReset = this.handleReset.bind(this)
-        //Tooltip handmade
-        this.disableDiv = this.disableDiv.bind(this);
-        this.enableDiv = this.enableDiv.bind(this);
         this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
     }
@@ -740,26 +736,30 @@ class Simulacion extends Component{
         });
         setTimeout(()=>{
             ReactTooltip.rebuild()
-        },100);
-    }
-    //Tooltip handmade
-    disableDiv() {
+        },100)
+        let aux = [];
+        for (let i = 0; i < response.length; i++) {
+            let obj = [];
+            obj.push(response[i].codigo);
+            obj.push(response[i]);
+            aux.push(obj)
+        }
         this.setState({
-           detalle:'none'
-        });
-    }
-    
-    enableDiv=(item) =>{
-        
+            myMap:new Map(aux)
+        })
+        //console.log("Hash-did",this.state.myMap);
     }
     isCountrySelected(elem){
         return this.state.selectedCountries.includes(elem);
     }
     //ZOOM the city
     handleCitySelection=(e)=> {
-        console.log("Para hacer zoom",e)
+        //console.log("Para hacer zoom",e)
+        //console.log("Hash",this.state.myMap);
+        let item = this.state.myMap.get(e.key)
+        //console.log("Info:",item)
         this.setState({
-          center: [e.key.longitude,e.key.latitude],
+          center: [item.pais.longitud,item.pais.latitude],
           zoom: 2,
         })
       }
@@ -850,7 +850,7 @@ class Simulacion extends Component{
         }
     } 
     render(){
-        const { locationInfo } = this.state;
+        const { locationInfo,planVuelos } = this.state;
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
@@ -860,20 +860,6 @@ class Simulacion extends Component{
                 <h1> Simulación </h1>
             </TheHeader>
             <TheContent>
-            <div >
-                <Select labelInValue={true} style={{width:"50%"}} onChange={this.handleCitySelection}>
-                        {locationInfo.map(i=>(
-                            <Option key={i.id} value={i.pais.nombre} >
-                            {i.pais.nombre}
-                            </Option>
-                        ))}
-                </Select>
-            <Button onClick={this.handleReset}>
-                { "Reset" }
-            </Button>
-            </div>
-            <Button>Vuelos</Button>
-            <Button>Almacenes</Button>
             <ComposableMap
                         projectionConfig={{
                             scale: 165,
@@ -931,24 +917,33 @@ class Simulacion extends Component{
                         })}
                 </Markers>  
                 <Lines>
-                    <Line
+                  {planVuelos.map((item,i)=>{
+                    return(
+                      <Line
                         className="world-map-arc"
                         line={{
-                            coordinates: {
-                                start: [-58.3712,-34.6083],
-                                end: [-3.70256, 40.4165]
-                            }
+                                coordinates: {
+                                    start: [-58.3712,-34.6083],
+                                    end: [-3.70256, 40.4165]
+                                }
                         }}
                         preserveMarkerAspect={false}
                         buildPath={this.buildCurves}
-
-                    />
-                </Lines> 
-                </ZoomableGroup>
+                        style={{
+                            default: { stroke: "#FF4233" },
+                            hover:   { stroke: "#999" },
+                            pressed: { stroke: "#000" },
+                          }}
+                      />
+                    )
+                  })}
+            </Lines>
+              </ZoomableGroup>
             </ComposableMap>
             <ReactTooltip id='modal-city'
                 getContent={this.getContentModalCity}
             />
+            
             </TheContent>
             </Layout>
         );
