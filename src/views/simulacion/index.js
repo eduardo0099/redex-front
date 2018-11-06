@@ -35,22 +35,26 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
-            planVuelos:[{
-              fechaLlegada: 1355316000000,
-              oficinaSalida: "BOL",
-              oficinaLlegada: "PER",
-              fechaSalida: 1355316900000,
-              tipo: "SALIDA",
-              cantidad: 100,
-              cantidadSalida: 25
-              },{fechaLlegada: 1355316000000,
-              oficinaSalida: "ECU",
-              oficinaLlegada: "AUT",
-              fechaSalida: 1355316900000,
-              tipo: "SALIDA",
-              cantidad: 100,
-              cantidadSalida: 25
-              }],
+            planVuelos:[
+              /*{
+                fechaLlegada: 1355316000000,
+                oficinaSalida: "BOL",
+                oficinaLlegada: "PER",
+                fechaSalida: 1355316900000,
+                tipo: "SALIDA",
+                cantidad: 100,
+                cantidadSalida: 25
+              },
+              {
+                fechaLlegada: 1355316000000,
+                oficinaSalida: "ECU",
+                oficinaLlegada: "AUT",
+                fechaSalida: 1355316900000,
+                tipo: "SALIDA",
+                cantidad: 100,
+                cantidadSalida: 25
+              }*/
+            ],
             num:10
         }
 
@@ -791,8 +795,6 @@ class Simulacion extends Component{
             mapIndexLoc.set(response[i].pais.codigoIso,i);
             aux.push(obj);
         }
-        
-        console.log("kha?",mapIndexLoc);
         this.setState({
             indexLoc: mapIndexLoc,
             myMap:new Map(aux),
@@ -819,50 +821,45 @@ class Simulacion extends Component{
       //Ini: Calculos que se deben hacer por cada tick del reloj
       let auxLocationInfo = [...this.state.locationInfo];
       let auxIndex = this.state.indexLoc;
+      let auxPlanesNew = [];
       let esTemprano = true;
       let obj;
-      let indObj;
+      let idx;
       while(this.listActions.length != 0 && esTemprano){
         if(this.listActions[0].fechaSalida < this.state.time){
+
           obj = this.listActions.shift();
 
           if(obj.tipo == "REGISTRO"){
-            let idx = auxIndex.get(obj.oficinaLlegada);
+            idx = auxIndex.get(obj.oficinaLlegada);
             auxLocationInfo[idx].capacidadActual++;
-            console.log("asssa");
+            console.log("R");
           }else if(obj.tipo == "SALIDA"){
-
+            auxPlanesNew.push(obj);
+            idx = auxIndex.get(obj.oficinaLlegada);
+            auxLocationInfo[idx].capacidadActual -= obj.cantidad;
+            console.log("S");
           }
+
         }else{
           esTemprano = false;
         }
       }
 
+      //manejar vuelos terminados
+      let liveFlights = this.state.planVuelos.filter(e => e.fechaLlegada > newTime );
+      let finishedFlights = this.state.planVuelos.filter(e => e.fechaLlegada <= newTime );
 
+      for(let delElem of finishedFlights){
+        let idxDel = auxIndex.get(delElem.oficinaSalida);
+        auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
+      }
 
       this.setState({
         locationInfo: auxLocationInfo,
-        time: newTime
+        time: newTime,
+        planVuelos: liveFlights.concat(auxPlanesNew)
       });
-        /*
-        {
-          "id": 1,
-          "capacidadActual": 0,
-          "capacidadMaxima": 250,
-          "estado": {
-            "name": "ACTIVO"
-          },
-          "codigo": "SPIM",
-          "pais": {
-            "codigo": "SPIM",
-            "nombre": "Perú",
-            "codigoIso": "PER",
-            "latitud": -12.04,
-            "longitud": -77.03,
-            "id": 8
-          }
-        },
-        */
       //Fin
     }
     handleStartClock(){
