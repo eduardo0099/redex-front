@@ -7,6 +7,8 @@ import ReactTooltip from 'react-tooltip';
 import map from "./../../utils/files/world-50m-simplified.json";
 //import locAlm from './../../utils/files/locations.json';
 import Modal from './Modal';
+import API from './../../Services/Api';
+
 const Option = Select.Option;
 
 class Simulacion extends Component{
@@ -20,7 +22,9 @@ class Simulacion extends Component{
         this.colorPressed = '#FF5722';
         this.frecRefreshSimu = 2000;
         this.foo = new Date();
+        this.listActions = [];
         this.state = {
+            indexLoc: null,
             center: [0,20],
             zoom: 1,
             tooltipConfig: null,
@@ -31,23 +35,29 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
-            planVuelos:[{
-              fechaLlegada: 1355316000000,
-              oficinaSalida: "BOL",
-              oficinaLlegada: "PER",
-              fechaSalida: 1355316900000,
-              tipo: "SALIDA",
-              cantidad: 100,
-              cantidadSalida: 25
-              },{fechaLlegada: 1355316000000,
-              oficinaSalida: "ECU",
-              oficinaLlegada: "AUT",
-              fechaSalida: 1355316900000,
-              tipo: "SALIDA",
-              cantidad: 100,
-              cantidadSalida: 25
-              }],
+            planVuelos:[
+              /*{
+                fechaLlegada: 1355316000000,
+                oficinaSalida: "BOL",
+                oficinaLlegada: "PER",
+                fechaSalida: 1355316900000,
+                tipo: "SALIDA",
+                cantidad: 100,
+                cantidadSalida: 25
+              },
+              {
+                fechaLlegada: 1355316000000,
+                oficinaSalida: "ECU",
+                oficinaLlegada: "AUT",
+                fechaSalida: 1355316900000,
+                tipo: "SALIDA",
+                cantidad: 100,
+                cantidadSalida: 25
+              }*/
+            ],
+            num:10
         }
+
         this.handleZoomIn = this.handleZoomIn.bind(this);
         this.handleZoomOut = this.handleZoomOut.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -56,8 +66,8 @@ class Simulacion extends Component{
         this.getContentModalCity = this.getContentModalCity.bind(this);
         this.handleClickGeography = this.handleClickGeography.bind(this);
         //Zoom the city
-        this.handleCitySelection = this.handleCitySelection.bind(this)
-        this.handleReset = this.handleReset.bind(this)
+        this.handleCitySelection = this.handleCitySelection.bind(this);
+        this.handleReset = this.handleReset.bind(this);
         this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
         this.handleFrecTimeChange = this.handleFrecTimeChange.bind(this);
@@ -82,6 +92,10 @@ class Simulacion extends Component{
     }
 
     componentWillMount(){
+      API.get('/simulacion/1/acciones/all').then(resp => {
+        this.listActions = resp.data;
+        console.log(">",this.listActions);
+      });
         let response = [
             {
               "id": 1,
@@ -768,30 +782,30 @@ class Simulacion extends Component{
         for(let loc of response){
             selectedCountries.push(loc.pais.codigoIso);
         }
-        this.setState({
-            locationInfo: response,
-            selectedCountries: selectedCountries
-        });
         setTimeout(()=>{
             ReactTooltip.rebuild()
         },100)
         //Se genera una Map donde se almacenan oficina y coordenada
         let aux = [];
+        let mapIndexLoc = new Map();
         for (let i = 0; i < response.length; i++) {
             let obj = [];
             obj.push(response[i].pais.codigoIso);
             obj.push(response[i]);
-            aux.push(obj)
+            mapIndexLoc.set(response[i].pais.codigoIso,i);
+            aux.push(obj);
         }
         this.setState({
-            myMap:new Map(aux)
+            indexLoc: mapIndexLoc,
+            myMap:new Map(aux),
+            locationInfo: response,
+            selectedCountries: selectedCountries
         })
         console.log("Hash-did",this.state.myMap);
     }
     handleTimeDateChange(e){
       let newTimeArr = e.target.value.split("-");
       let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]))
-      console.log("ll>",newDateTime);
       this.setState({
         time: newDateTime.getTime()
       })
@@ -802,9 +816,51 @@ class Simulacion extends Component{
       });
     }
     tickClock(){
+      let oldTime = this.state.time;
+      let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
+      //Ini: Calculos que se deben hacer por cada tick del reloj
+      let auxLocationInfo = [...this.state.locationInfo];
+      let auxIndex = this.state.indexLoc;
+      let auxPlanesNew = [];
+      let esTemprano = true;
+      let obj;
+      let idx;
+      while(this.listActions.length != 0 && esTemprano){
+        if(this.listActions[0].fechaSalida < this.state.time){
+
+          obj = this.listActions.shift();
+
+          if(obj.tipo == "REGISTRO"){
+            idx = auxIndex.get(obj.oficinaLlegada);
+            auxLocationInfo[idx].capacidadActual++;
+            console.log("R");
+          }else if(obj.tipo == "SALIDA"){
+            auxPlanesNew.push(obj);
+            idx = auxIndex.get(obj.oficinaLlegada);
+            auxLocationInfo[idx].capacidadActual -= obj.cantidad;
+            console.log("S");
+          }
+
+        }else{
+          esTemprano = false;
+        }
+      }
+
+      //manejar vuelos terminados
+      let liveFlights = this.state.planVuelos.filter(e => e.fechaLlegada > newTime );
+      let finishedFlights = this.state.planVuelos.filter(e => e.fechaLlegada <= newTime );
+
+      for(let delElem of finishedFlights){
+        let idxDel = auxIndex.get(delElem.oficinaSalida);
+        auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
+      }
+
       this.setState({
-        time: this.state.time + this.frecRefreshSimu*this.state.frecTime
-      })
+        locationInfo: auxLocationInfo,
+        time: newTime,
+        planVuelos: liveFlights.concat(auxPlanesNew)
+      });
+      //Fin
     }
     handleStartClock(){
       if(this.state.intervalClock){
@@ -937,6 +993,7 @@ class Simulacion extends Component{
             <button onClick={this.handleStartClock}>Start</button>
             </div>
             <ComposableMap
+                        className="mapa"
                         projectionConfig={{
                             scale: 165,
                             rotation: [-10,0,0],
