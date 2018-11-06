@@ -3,6 +3,7 @@ import { Layout ,Select,Button} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import { ComposableMap,ZoomableGroup,Geographies,Geography,Markers,Marker,Line,Lines} from 'react-simple-maps';
 import ReactTooltip from 'react-tooltip';
+import {findDOMNode} from 'react-dom'
 //Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
 //import locAlm from './../../utils/files/locations.json';
@@ -15,9 +16,9 @@ class Simulacion extends Component{
     constructor(props) {
         super(props);
         this.cont = 0;
-        this.colorSelected = '#c7a602';
+        this.colorSelected = '#f5cc00' ;
         this.colorCommon = '#ECEFF1';
-        this.colorUnSelected = '#f5cc00';
+        this.colorUnSelected ='#c7a602';
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
         this.frecRefreshSimu = 2000;
@@ -35,27 +36,23 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
-            planVuelos:[
-              /*{
-                fechaLlegada: 1355316000000,
-                oficinaSalida: "BOL",
-                oficinaLlegada: "PER",
-                fechaSalida: 1355316900000,
-                tipo: "SALIDA",
-                cantidad: 100,
-                cantidadSalida: 25
-              },
-              {
-                fechaLlegada: 1355316000000,
-                oficinaSalida: "ECU",
-                oficinaLlegada: "AUT",
-                fechaSalida: 1355316900000,
-                tipo: "SALIDA",
-                cantidad: 100,
-                cantidadSalida: 25
-              }*/
-            ],
-            num:10
+            planVuelos:[{
+              fechaLlegada: 1355316000000,
+              oficinaSalida: "BOL",
+              oficinaLlegada: "PER",
+              fechaSalida: 1355316900000,
+              tipo: "SALIDA",
+              cantidad: 100,
+              cantidadSalida: 25
+              },{fechaLlegada: 1355316000000,
+              oficinaSalida: "ECU",
+              oficinaLlegada: "AUT",
+              fechaSalida: 1355316900000,
+              tipo: "SALIDA",
+              cantidad: 100,
+              cantidadSalida: 25
+              }],
+            planVuelosParcial:[]
         }
 
         this.handleZoomIn = this.handleZoomIn.bind(this);
@@ -75,21 +72,7 @@ class Simulacion extends Component{
         this.handleStartClock = this.handleStartClock.bind(this);
         this.handleTimeDateChange = this.handleTimeDateChange.bind(this);
     }
-    //Lectura de data cada minuto
-    componentDidMount(){
-      //this.loadData();
-      //setInterval(this.loadData,300000);
-    }
-
-    async loadData(){
-      try{
-        /*this.setState({
-        planVuelos:[]
-        })*/
-      }catch(e){
-        console.log(e);
-      }
-    }
+    
 
     componentWillMount(){
       API.get('/simulacion/1/acciones/all').then(resp => {
@@ -782,6 +765,11 @@ class Simulacion extends Component{
         for(let loc of response){
             selectedCountries.push(loc.pais.codigoIso);
         }
+        this.setState({
+            locationInfo: response,
+            selectedCountries: selectedCountries,
+            planVuelosParcial : this.state.planVuelos,
+        });
         setTimeout(()=>{
             ReactTooltip.rebuild()
         },100)
@@ -879,6 +867,19 @@ class Simulacion extends Component{
     isCountrySelected(elem){
         return this.state.selectedCountries.includes(elem);
     }
+    //Filtrado de vuelosXpais
+    quitarVuelosXPais(elem){
+      this.setState({
+        planVuelosParcial: this.state.planVuelosParcial.filter(i=>i.oficinaSalida!==elem)
+      })
+    }
+    añadirVuelosXPais(elem){
+      let lista = this.state.planVuelos.filter(i=>i.oficinaSalida===elem)
+      console.log("Añadir vuelos",lista)
+      lista.forEach(e=>{
+        this.state.planVuelosParcial.push(e)
+      })
+    }
     //ZOOM the city
     handleCitySelection=(e)=> {
         let item = this.state.myMap.get(e.key)
@@ -920,12 +921,15 @@ class Simulacion extends Component{
                     selectedCountries: this.state.selectedCountries.filter(e => e != geo.properties.ISO_A3)
                 })
                 console.log("quita",this.state.selectedCountries.filter(e => e != geo.properties.ISO_A3));
+                this.quitarVuelosXPais(geo.properties.ISO_A3);
+                console.log("Plan vuelos:",this.state.planVuelosParcial);
             }else{
                 //Se agrega
                 this.setState({
                     selectedCountries: [...this.state.selectedCountries,geo.properties.ISO_A3]
                 })
                 console.log("agrega",[...this.state.selectedCountries,geo.properties.ISO_A3]);
+                this.añadirVuelosXPais(geo.properties.ISO_A3);
             }
         }
     }
@@ -973,8 +977,15 @@ class Simulacion extends Component{
             }  
         }
     } 
+    getContentModalFlight(item){
+      console.log(item);
+      return(
+        <div>Hola mundo</div>
+      )
+    }
+
     render(){
-        const { locationInfo,planVuelos } = this.state;
+        const { locationInfo,planVuelosParcial } = this.state;
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
@@ -1050,11 +1061,14 @@ class Simulacion extends Component{
                         })}
                 </Markers>  
                 <Lines>
-                  {planVuelos.map((item,i)=>{
+                  {planVuelosParcial.map((item,i)=>{
                     let salida =this.state.myMap.get(item.oficinaSalida);
                     let llegada=this.state.myMap.get(item.oficinaLlegada);
+                    console.log("efjpweo",this.state.planVuelosParcial)
                     return(
                       <Line
+                        data-tip={JSON.stringify(item)}
+                        data-id='modal-flight'
                         className="world-map-arc"
                         line={{
                                 coordinates: {
@@ -1073,12 +1087,13 @@ class Simulacion extends Component{
                     )
                   })}
             </Lines>
+            
               </ZoomableGroup>
             </ComposableMap>
+            <ReactTooltip  id='modal-flight' getContent={this.getContentModalFlight}/>
             <ReactTooltip id='modal-city'
                 getContent={this.getContentModalCity}
             />
-            
             </TheContent>
             </Layout>
         );
