@@ -9,20 +9,8 @@ class PaquetesCliente extends React.Component {
     constructor(props){
         super(props);
         this.state=({
-            docIdent:"",
-            nombre:"",
-            apPaterno:"",
-            apMaterno:"",
-            correo:"",
-            telefono:"",
             tipoDoc:[]
         })
-        this.handleDocI = this.handleDocI.bind(this);
-        this.handleNombre = this.handleNombre.bind(this);
-        this.handleApPaterno = this.handleApPaterno.bind(this);
-        this.handelApMaterno = this.handelApMaterno.bind(this);
-        this.handleCorreo = this.handleCorreo.bind(this);
-        this.handleTelefono = this.handleTelefono.bind(this);
     }
     
     componentDidMount(){
@@ -33,41 +21,6 @@ class PaquetesCliente extends React.Component {
         })
     }
 
-    handleTelefono(e){
-        this.setState({
-            telefono: e.target.value
-        })
-    }
-
-    handleCorreo(e){
-        this.setState({
-            correo: e.target.value
-        })
-    }
-
-    handleDocI(e){
-        this.setState({
-            docIdent:e.target.value
-        });
-    }
-
-    handleNombre(e){
-        this.setState({
-            nombre:e.target.value
-        })
-    }
-
-    handleApPaterno(e){
-        this.setState({
-            apPaterno:e.target.value
-        })
-    }
-
-    handelApMaterno(e){
-        this.setState({
-            apMaterno:e.target.value
-        })
-    }
 
     render(){
         const { visible, onCancel, onOk, form } = this.props;
@@ -90,10 +43,10 @@ class PaquetesCliente extends React.Component {
             <Form layout="vertical">
                 <Divider orientation="left">Informacion General</Divider>
                 <FormItem label="Doc. Identidad" >
-                {getFieldDecorator("tipoDoc", {
+                {getFieldDecorator("idDocumento", {
                 rules: [{ required: true, message: 'Porfavor ingrese el tipo de documento' }],
                 })(
-                <Select labelInValue={true} style={{width:"100%"}}>
+                <Select  style={{width:"100%"}}>
                     {this.state.tipoDoc.map(i=>(
                         <Option key={i.id} value={i.id}>
                         {i.simbolo}

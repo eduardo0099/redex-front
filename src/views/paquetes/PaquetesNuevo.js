@@ -403,12 +403,12 @@ export default class PaquetesNuevo extends React.Component {
 
     handleCreateOrigen = () => {
         const form = this.formRefClienteOrigen.props.form;
-        form.validateFields(["tipoDoc","docIdentidad","nombres","apPaterno","apMaterno","telefono","correoElectronico"],(err,values)=>{
+        form.validateFields(["idDocumento","docIdentidad","nombres","apPaterno","apMaterno","telefono","correoElectronico"],(err,values)=>{
             console.log(values);
             if(err){
                 return
             }
-            API.post('/save',values).then(response =>{
+            API.post('personas/save',values).then(response =>{
                 this.formRef.setFields()
             })
             
@@ -418,12 +418,12 @@ export default class PaquetesNuevo extends React.Component {
 
     handleCreateDestino = () => {
         const form = this.formRefClienteDestino.props.form;
-        form.validateFields(["tipoDoc","docIdentidad","nombres","apPaterno","apMaterno","telefono","correoElectronico"],(err,values)=>{
+        form.validateFields(["idDocumento","docIdentidad","nombres","apPaterno","apMaterno","telefono","correoElectronico"],(err,values)=>{
             console.log(values);
             if(err){
-                return
+                return;
             }
-            API.post('/save',values).then(response =>{
+            API.post('personas/save',{...values,idDocumento:values.idDocumento.key}).then(response =>{
                 this.formRef.setFields()
             })
             
@@ -449,7 +449,7 @@ export default class PaquetesNuevo extends React.Component {
             <PaquetesCliente
             visible={this.state.modalRegistroDestino}
             onCancel={this.handleCancelDestino}
-            onOk={this.handleCreateDestinoDestino}
+            onOk={this.handleCreateDestino}
             wrappedComponentRef={this.saveFormRefClienteDestino}
             />
             <WrappedForm
@@ -458,7 +458,6 @@ export default class PaquetesNuevo extends React.Component {
             findPersonaOrigen = {this.findPersonaOrigen}
             showModalRegistroOrigen = {this.showModalRegistroOrigen}
             showModalRegistroDestino={this.showModalRegistroDestino}
-
             />
             <Divider ></Divider>
             <Col span={2} align="right"><Button type="primary" onClick={this.showModalResumen}>Guardar</Button></Col>
