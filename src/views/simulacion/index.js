@@ -4,11 +4,10 @@ import { TheContent, TheHeader } from '../../components/layout';
 import { ComposableMap,ZoomableGroup,Geographies,Geography,Markers,Marker,Line,Lines} from 'react-simple-maps';
 import ReactTooltip from 'react-tooltip';
 import {findDOMNode} from 'react-dom'
-//Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
-//import locAlm from './../../utils/files/locations.json';
 import Modal from './Modal';
 import API from '../../Services/Api';
+
 const Option = Select.Option;
 
 class Simulacion extends Component{
@@ -135,11 +134,12 @@ class Simulacion extends Component{
     //Filtrado de vuelosXpais
     quitarVuelosXPais(elem){
       this.setState({
-        planVuelosParcial: this.state.planVuelosParcial.filter(i=>i.oficinaSalida!==elem)
+        planVuelosParcial: this.state.planVuelosParcial.filter(i=>i.oficinaSalida!==elem && i.oficinaLlegada!==elem )
       })
     }
     añadirVuelosXPais(elem){
-      let lista = this.state.planVuelos.filter(i=>i.oficinaSalida===elem)
+        console.log("oficina:",  elem);
+      let lista = this.state.planVuelos.filter(i=>i.oficinaSalida===elem || i.oficinaLlegada===elem)
       console.log("Añadir vuelos",lista)
       lista.forEach(e=>{
         this.state.planVuelosParcial.push(e)
@@ -320,7 +320,7 @@ class Simulacion extends Component{
                                                 pressed: { fill: "#000" },
                                               }}
                                             >                                      
-                                        <circle cx={ 0 } cy={ 0 } r={ 3 } />                              
+                                        <circle cx={ 0 } cy={ 0 } r={ 1 } />                              
                                     </Marker>);
                         })}
                 </Markers>  
