@@ -9,20 +9,6 @@ const FormItem = Form.Item;
 const InputGroup = Input.Group;
 const Option = Select.Option;
 
-function onSelect(value) {
-    console.log('onSelect', value);
-  }
-
-  function handleButtonClick(e) {
-    message.info('Click on left button.');
-    console.log('click left button', e);
-  }
-  
-  function handleMenuClick(e) {
-    message.info('Click on menu item.');
-    console.log('click', e);
-  }
-
 class InnerForm extends React.Component{
     constructor(props){
         super(props)
@@ -246,9 +232,7 @@ class InnerForm extends React.Component{
                         )}</FormItem></Col>
                         <Col span={10}><FormItem label="Notificar vuelos abordados por el paquete"></FormItem></Col>
                     </InputGroup>
-               
             </Form>
-
         )
     }
 }
@@ -265,17 +249,33 @@ export default class PaquetesNuevo extends React.Component {
             modalRegistroDestino:false,
             modalResumen:false,
             id:"",
-
+            clienteOrigen:"",
+            paisOrigen:"",
+            clienteDestino:"",
+            paisDestino:"",
+            notiReg:"",
+            notiAbor:"",
+            notiLle:""
         }
     }
     //Guardar button
     showModalResumen = () =>{   
         const form = this.formRef.props.form;
-        form.validateFields(["oficinaDestino","oficinaOrigen","tipoDocumentoIdentidadOrigen","numeroDocumentoOrigen","tipoDocumentoIdentidadDestino","numeroDocumentoDestino"],(err, values) => {
+        form.validateFields(["oficinaDestino","oficinaOrigen","tipoDocumentoIdentidadOrigen","nombreClienteOrigen",
+        "numeroDocumentoOrigen","tipoDocumentoIdentidadDestino","numeroDocumentoDestino","nombreClienteDestino",
+        "notiRegistro","notiAbordados","notiLlegada"],(err, values) => {
             if(err){
+                message.warning('Porfavor llenar los campos obligatorios');
                 return;
             }
-            this.setState({ modalResumen: true });
+            console.log("Info final:",values);
+            this.setState({ ...this.state,modalResumen: true, 
+                paisOrigen: values.oficinaOrigen.label,
+                paisDestino:values.oficinaDestino.label,
+                clienteOrigen:values.nombreClienteOrigen,
+                clienteDestino:values.nombreClienteDestino,
+             });
+            
         })
     }
     handleCancelResumen = ()=>{
@@ -326,7 +326,11 @@ export default class PaquetesNuevo extends React.Component {
                             value:data.id
                         }
                     });
-                })
+                }).catch(error => {
+                    Notify.error({
+                        message:'El cliente al cual busca no existe, porfavor registre nuevo cliente'
+                    })
+                  });
         })
     }
     
@@ -352,8 +356,11 @@ export default class PaquetesNuevo extends React.Component {
                         value:data.id
                     }
                 });
-              }
-            )
+              }).catch(error => {
+                Notify.error({
+                    message:'El cliente al cual busca no existe, porfavor registre nuevo cliente'
+                })
+              });
           })
     }
 
@@ -403,17 +410,23 @@ export default class PaquetesNuevo extends React.Component {
 
     handleCreateOrigen = () => {
         const form = this.formRefClienteOrigen.props.form;
-        form.validateFields(["idDocumento","docIdentidad","nombres","apPaterno","apMaterno","telefono","correoElectronico"],(err,values)=>{
+        form.validateFields(["idDocumento","docIdentidad","nombres","apPaterno","apMaterno","telefono","correoElectronico","notiRegistro","notiAbordados","notiLlegada"],(err,values)=>{
             console.log(values);
             if(err){
                 return
             }
             API.post('personas/save',values).then(response =>{
-                this.formRef.setFields()
+                this.formRef.props.form.setFields({
+                    nombreClienteOrigen:{
+                        value:response.nombreCompleto
+                    },
+                    "personaOrigen.id":{
+                        value:response.id
+                    }
+                })
+                this.setState({ modalRegistroOrigen: false });
             })
-            
         })
-        
     };
 
     handleCreateDestino = () => {
@@ -423,7 +436,7 @@ export default class PaquetesNuevo extends React.Component {
             if(err){
                 return;
             }
-            API.post('personas/save',{...values,idDocumento:values.idDocumento.key}).then(response =>{
+            API.post('personas/save',values).then(response =>{
                 this.formRef.setFields()
             })
             
@@ -471,15 +484,13 @@ export default class PaquetesNuevo extends React.Component {
             cancelText="Cancelar"
             >
             <Divider orientation="left">Origen</Divider>
-            <span>Cliente:</span>
-            <span>Pais:</span>
+            <span>Cliente: {this.state.clienteOrigen}</span>
+            <span>Pais: {this.state.paisOrigen} </span>
             <Divider orientation="left">Destino</Divider>
-            <span>Cliente:</span>
-            <span>Pais:</span>
+            <span>Cliente: {this.state.clienteDestino}</span>
+            <span>Pais: {this.state.paisDestino} </span>
             <Divider orientation="left">Notificaciones</Divider>
-            <span>Notificacion Registro:</span>
-            <span>Notificacion LLegada:</span>
-            <span>Notificacion Abordados:</span>
+            
             </Modal>
             </TheContent>
             </Layout>
