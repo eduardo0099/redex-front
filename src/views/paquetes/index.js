@@ -63,29 +63,6 @@ export default class Paquetes extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
-            <Row>
-              <Col span={5}>
-                <FormItem>
-                    <Select  style={{width:"100%"}}>
-                        {this.state.listaDoc.map(i=> 
-                        { 
-                          console.dir(i);
-                          return (
-                            <Option key={i.id} value={i.id}>
-                            {i.simbolo}
-                            </Option>
-                        )})}
-                    </Select>
-                </FormItem>
-                </Col>
-              <Col span={6}>
-                <Search
-                  placeholder="Ingresar documento del cliente"
-                  onSearch={value => console.log(value)}
-                  enterButton
-                />
-              </Col>
-            </Row>
             <PaquetesList ref={ this.listRef } onDetalle = { this.findDetalle } />
             <CrimsonUpload ref={ this.uploadRef } url="/paquetes/carga" title="Cargar paquetes"/>
             <PaquetesDetail ref= { this.detailRef }/>
