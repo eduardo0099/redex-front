@@ -2,6 +2,7 @@ import React from 'react';
 import { Col, Layout, Button ,Menu,Dropdown,Icon,Modal, Upload} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import UsuarioList from './UsuarioList';
+import UsuarioDetail from './UsuarioDetail';
 import UsuarioForm from './UsuarioForm';
 import CrimsonUpload from '../../components/CrimsonUpload';
 import API from '../../Services/Api';
@@ -13,6 +14,7 @@ export default class Usuarios extends React.Component {
     this.listRef = React.createRef();
     this.formRef =  React.createRef();
     this.uploadRef = React.createRef();
+    this.detailRef = React.createRef();
     this.state = {
       modalVisible: false,
     }
@@ -25,6 +27,10 @@ export default class Usuarios extends React.Component {
   subir = () => this.uploadRef.current.open();
 
   fetch = () => this.listRef.current.fetch();
+
+  findDetalle = (id) => {
+    this.detailRef.current.detail(id);
+  }
 
   showModal = () => {
     this.setState({ modalVisible: true });
@@ -73,8 +79,9 @@ export default class Usuarios extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
-            <UsuarioList/>
+            <UsuarioList ref = {this.listRef} onDetalle={this.findDetalle}/>
             <CrimsonUpload ref={this.uploadRef} url="/usuarios/carga" title="Cargar usuarios"/>
+            <UsuarioDetail ref={this.detailRef}/>
           </TheContent>
         </Layout>
     )
