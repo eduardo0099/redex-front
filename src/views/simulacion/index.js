@@ -3,10 +3,11 @@ import { Layout ,Select,Button} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import { ComposableMap,ZoomableGroup,Geographies,Geography,Markers,Marker,Line,Lines} from 'react-simple-maps';
 import ReactTooltip from 'react-tooltip';
-import {findDOMNode} from 'react-dom'
+//Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
+//import locAlm from './../../utils/files/locations.json';
 import Modal from './Modal';
-import API from '../../Services/Api';
+import API from './../../Services/Api';
 
 const Option = Select.Option;
 
@@ -14,14 +15,16 @@ class Simulacion extends Component{
     constructor(props) {
         super(props);
         this.cont = 0;
-        this.colorSelected = '#f5cc00' ;
+        this.colorSelected = '#c7a602';
         this.colorCommon = '#ECEFF1';
-        this.colorUnSelected ='#c7a602';
+        this.colorUnSelected = '#f5cc00';
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
         this.frecRefreshSimu = 2000;
         this.foo = new Date();
+        this.listActions = [];
         this.state = {
+            indexLoc: null,
             center: [0,20],
             zoom: 1,
             tooltipConfig: null,
@@ -32,24 +35,29 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
-            planVuelos:[{
-              fechaLlegada: 1355316000000,
-              oficinaSalida: "BOL",
-              oficinaLlegada: "PER",
-              fechaSalida: 1355316900000,
-              tipo: "SALIDA",
-              cantidad: 100,
-              cantidadSalida: 25
-              },{fechaLlegada: 1355316000000,
-              oficinaSalida: "ECU",
-              oficinaLlegada: "AUT",
-              fechaSalida: 1355316900000,
-              tipo: "SALIDA",
-              cantidad: 100,
-              cantidadSalida: 25
-              }],
-            planVuelosParcial:[]
+            planVuelos:[
+              /*{
+                fechaLlegada: 1355316000000,
+                oficinaSalida: "BOL",
+                oficinaLlegada: "PER",
+                fechaSalida: 1355316900000,
+                tipo: "SALIDA",
+                cantidad: 100,
+                cantidadSalida: 25
+              },
+              {
+                fechaLlegada: 1355316000000,
+                oficinaSalida: "ECU",
+                oficinaLlegada: "AUT",
+                fechaSalida: 1355316900000,
+                tipo: "SALIDA",
+                cantidad: 100,
+                cantidadSalida: 25
+              }*/
+            ],
+            num:10
         }
+
         this.handleZoomIn = this.handleZoomIn.bind(this);
         this.handleZoomOut = this.handleZoomOut.bind(this);
         this.handleClick = this.handleClick.bind(this);
@@ -58,8 +66,8 @@ class Simulacion extends Component{
         this.getContentModalCity = this.getContentModalCity.bind(this);
         this.handleClickGeography = this.handleClickGeography.bind(this);
         //Zoom the city
-        this.handleCitySelection = this.handleCitySelection.bind(this)
-        this.handleReset = this.handleReset.bind(this)
+        this.handleCitySelection = this.handleCitySelection.bind(this);
+        this.handleReset = this.handleReset.bind(this);
         this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
         this.handleFrecTimeChange = this.handleFrecTimeChange.bind(this);
@@ -67,39 +75,743 @@ class Simulacion extends Component{
         this.handleStartClock = this.handleStartClock.bind(this);
         this.handleTimeDateChange = this.handleTimeDateChange.bind(this);
     }
-    
+    //Lectura de data cada minuto
+    componentDidMount(){
+      //this.loadData();
+      //setInterval(this.loadData,300000);
+    }
+
+    async loadData(){
+      try{
+        /*this.setState({
+        planVuelos:[]
+        })*/
+      }catch(e){
+        console.log(e);
+      }
+    }
 
     componentWillMount(){
-        API.get('/simulaciones/1/oficinas').then(response =>{
-          let selectedCountries = [];
-          console.log(response.data)
-          for(let loc of response.data){
+      API.post('simulaciones/window',
+        {
+          simulacion:  1, 
+          inicio: '2018-04-16T19:01:00', 
+          fin: '2018-04-20T03:01:00',
+        }
+      ).then(resp => {
+        this.listActions = resp.data;
+        console.log(">",this.listActions);
+      });
+        let response = [
+            {
+              "id": 1,
+              "capacidadActual": 0,
+              "capacidadMaxima": 250,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SPIM",
+              "pais": {
+                "codigo": "SPIM",
+                "nombre": "Perú",
+                "codigoIso": "PER",
+                "latitud": -12.04,
+                "longitud": -77.03,
+                "id": 8
+              }
+            },
+            {
+              "id": 11,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SKBO",
+              "pais": {
+                "codigo": "SKBO",
+                "nombre": "Colombia",
+                "codigoIso": "COL",
+                "latitud": 4.61,
+                "longitud": -74.08,
+                "id": 5
+              }
+            },
+            {
+              "id": 21,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SEQM",
+              "pais": {
+                "codigo": "SEQM",
+                "nombre": "Ecuador",
+                "codigoIso": "ECU",
+                "latitud": -0.23,
+                "longitud": -78.52,
+                "id": 6
+              }
+            },
+            {
+              "id": 31,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SVMI",
+              "pais": {
+                "codigo": "SVMI",
+                "nombre": "Venezuela",
+                "codigoIso": "VEN",
+                "latitud": 10.49,
+                "longitud": -66.88,
+                "id": 10
+              }
+            },
+            {
+              "id": 41,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SBBR",
+              "pais": {
+                "codigo": "SBBR",
+                "nombre": "Brasil",
+                "codigoIso": "BRA",
+                "latitud": -15.78,
+                "longitud": -47.93,
+                "id": 3
+              }
+            },
+            {
+              "id": 51,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SLLP",
+              "pais": {
+                "codigo": "SLLP",
+                "nombre": "Bolivia",
+                "codigoIso": "BOL",
+                "latitud": -16.5,
+                "longitud": -68.15,
+                "id": 2
+              }
+            },
+            {
+              "id": 61,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SCEL",
+              "pais": {
+                "codigo": "SCEL",
+                "nombre": "Chile",
+                "codigoIso": "CHL",
+                "latitud": -33.46,
+                "longitud": -70.65,
+                "id": 4
+              }
+            },
+            {
+              "id": 71,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SABE",
+              "pais": {
+                "codigo": "SABE",
+                "nombre": "Argentina",
+                "codigoIso": "ARG",
+                "latitud": -34.61,
+                "longitud": -58.37,
+                "id": 1
+              }
+            },
+            {
+              "id": 81,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SGAS",
+              "pais": {
+                "codigo": "SGAS",
+                "nombre": "Paraguay",
+                "codigoIso": "PRY",
+                "latitud": -25.3,
+                "longitud": -57.64,
+                "id": 7
+              }
+            },
+            {
+              "id": 91,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "SUAA",
+              "pais": {
+                "codigo": "SUAA",
+                "nombre": "Uruguay",
+                "codigoIso": "URY",
+                "latitud": -34.9,
+                "longitud": -56.19,
+                "id": 9
+              }
+            },
+            {
+              "id": 101,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LATI",
+              "pais": {
+                "codigo": "LATI",
+                "nombre": "Albania",
+                "codigoIso": "ALB",
+                "latitud": 41.33,
+                "longitud": 19.82,
+                "id": 11
+              }
+            },
+            {
+              "id": 111,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EDDI",
+              "pais": {
+                "codigo": "EDDI",
+                "nombre": "Alemania",
+                "codigoIso": "DEU",
+                "latitud": 52.52,
+                "longitud": 13.41,
+                "id": 12
+              }
+            },
+            {
+              "id": 121,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LOWW",
+              "pais": {
+                "codigo": "LOWW",
+                "nombre": "Austria",
+                "codigoIso": "AUT",
+                "latitud": 48.21,
+                "longitud": 16.37,
+                "id": 13
+              }
+            },
+            {
+              "id": 131,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EBCI",
+              "pais": {
+                "codigo": "EBCI",
+                "nombre": "Belgica",
+                "codigoIso": "BEL",
+                "latitud": 50.85,
+                "longitud": 4.35,
+                "id": 14
+              }
+            },
+            {
+              "id": 141,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "UMMS",
+              "pais": {
+                "codigo": "UMMS",
+                "nombre": "Bielorrusia",
+                "codigoIso": "BLR",
+                "latitud": 53.9,
+                "longitud": 27.57,
+                "id": 15
+              }
+            },
+            {
+              "id": 151,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LBSF",
+              "pais": {
+                "codigo": "LBSF",
+                "nombre": "Bulgaria",
+                "codigoIso": "BGR",
+                "latitud": 42.7,
+                "longitud": 23.32,
+                "id": 16
+              }
+            },
+            {
+              "id": 161,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LKPR",
+              "pais": {
+                "codigo": "LKPR",
+                "nombre": "Checa",
+                "codigoIso": "CZE",
+                "latitud": 50.09,
+                "longitud": 14.42,
+                "id": 17
+              }
+            },
+            {
+              "id": 171,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LDZA",
+              "pais": {
+                "codigo": "LDZA",
+                "nombre": "Croacia",
+                "codigoIso": "HRV",
+                "latitud": 45.81,
+                "longitud": 15.98,
+                "id": 18
+              }
+            },
+            {
+              "id": 181,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EKCH",
+              "pais": {
+                "codigo": "EKCH",
+                "nombre": "Dinamarca",
+                "codigoIso": "DNK",
+                "latitud": 55.68,
+                "longitud": 12.57,
+                "id": 19
+              }
+            },
+            {
+              "id": 191,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LZIB",
+              "pais": {
+                "codigo": "LZIB",
+                "nombre": "Eslovaquia",
+                "codigoIso": "SVK",
+                "latitud": 48.15,
+                "longitud": 17.11,
+                "id": 20
+              }
+            },
+            {
+              "id": 201,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LJLJ",
+              "pais": {
+                "codigo": "LJLJ",
+                "nombre": "Eslovenia",
+                "codigoIso": "SVN",
+                "latitud": 46.05,
+                "longitud": 14.51,
+                "id": 21
+              }
+            },
+            {
+              "id": 211,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LEMD",
+              "pais": {
+                "codigo": "LEMD",
+                "nombre": "España",
+                "codigoIso": "ESP",
+                "latitud": 40.42,
+                "longitud": -3.7,
+                "id": 22
+              }
+            },
+            {
+              "id": 221,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EETN",
+              "pais": {
+                "codigo": "EETN",
+                "nombre": "Estonia",
+                "codigoIso": "EST",
+                "latitud": 59.44,
+                "longitud": 24.75,
+                "id": 23
+              }
+            },
+            {
+              "id": 231,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EFHK",
+              "pais": {
+                "codigo": "EFHK",
+                "nombre": "Finlandia",
+                "codigoIso": "FIN",
+                "latitud": 60.17,
+                "longitud": 24.94,
+                "id": 24
+              }
+            },
+            {
+              "id": 241,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LFPG",
+              "pais": {
+                "codigo": "LFPG",
+                "nombre": "Francia",
+                "codigoIso": "FRA",
+                "latitud": 48.85,
+                "longitud": 2.35,
+                "id": 25
+              }
+            },
+            {
+              "id": 251,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LGAV",
+              "pais": {
+                "codigo": "LGAV",
+                "nombre": "Grecia",
+                "codigoIso": "GRC",
+                "latitud": 37.98,
+                "longitud": 23.72,
+                "id": 26
+              }
+            },
+            {
+              "id": 261,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EHAM",
+              "pais": {
+                "codigo": "EHAM",
+                "nombre": "Holanda",
+                "codigoIso": "NLD",
+                "latitud": 52.37,
+                "longitud": 4.89,
+                "id": 27
+              }
+            },
+            {
+              "id": 271,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LHBP",
+              "pais": {
+                "codigo": "LHBP",
+                "nombre": "Hungría",
+                "codigoIso": "HUN",
+                "latitud": 47.5,
+                "longitud": 19.04,
+                "id": 28
+              }
+            },
+            {
+              "id": 281,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EIDW",
+              "pais": {
+                "codigo": "EIDW",
+                "nombre": "Irlanda",
+                "codigoIso": "IRL",
+                "latitud": 53.33,
+                "longitud": -6.25,
+                "id": 29
+              }
+            },
+            {
+              "id": 291,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "BIKF",
+              "pais": {
+                "codigo": "BIKF",
+                "nombre": "Islandia",
+                "codigoIso": "ISL",
+                "latitud": 64.14,
+                "longitud": -21.9,
+                "id": 30
+              }
+            },
+            {
+              "id": 301,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LIRA",
+              "pais": {
+                "codigo": "LIRA",
+                "nombre": "Italia",
+                "codigoIso": "ITA",
+                "latitud": 41.89,
+                "longitud": 12.51,
+                "id": 31
+              }
+            },
+            {
+              "id": 311,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EVRA",
+              "pais": {
+                "codigo": "EVRA",
+                "nombre": "Letonia",
+                "codigoIso": "LVA",
+                "latitud": 56.95,
+                "longitud": 24.11,
+                "id": 32
+              }
+            },
+            {
+              "id": 321,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "ELLX",
+              "pais": {
+                "codigo": "ELLX",
+                "nombre": "Luxemburgo",
+                "codigoIso": "LUX",
+                "latitud": 49.61,
+                "longitud": 6.13,
+                "id": 33
+              }
+            },
+            {
+              "id": 331,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LMML",
+              "pais": {
+                "codigo": "LMML",
+                "nombre": "Malta",
+                "codigoIso": "MLT",
+                "latitud": 35.9,
+                "longitud": 14.51,
+                "id": 34
+              }
+            },
+            {
+              "id": 341,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "ENGM",
+              "pais": {
+                "codigo": "ENGM",
+                "nombre": "Noruega",
+                "codigoIso": "NOR",
+                "latitud": 59.91,
+                "longitud": 10.75,
+                "id": 35
+              }
+            },
+            {
+              "id": 351,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EPMO",
+              "pais": {
+                "codigo": "EPMO",
+                "nombre": "Polonia",
+                "codigoIso": "POL",
+                "latitud": 52.23,
+                "longitud": 21.01,
+                "id": 36
+              }
+            },
+            {
+              "id": 361,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LPPT",
+              "pais": {
+                "codigo": "LPPT",
+                "nombre": "Portugal",
+                "codigoIso": "PRT",
+                "latitud": 38.72,
+                "longitud": -9.13,
+                "id": 37
+              }
+            },
+            {
+              "id": 371,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "EGLL",
+              "pais": {
+                "codigo": "EGLL",
+                "nombre": "Reino Unido",
+                "codigoIso": "GBR",
+                "latitud": 51.51,
+                "longitud": -0.13,
+                "id": 38
+              }
+            },
+            {
+              "id": 381,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "ESKN",
+              "pais": {
+                "codigo": "ESKN",
+                "nombre": "Suecia",
+                "codigoIso": "SWE",
+                "latitud": 59.33,
+                "longitud": 18.06,
+                "id": 39
+              }
+            },
+            {
+              "id": 391,
+              "capacidadActual": 0,
+              "capacidadMaxima": 100,
+              "estado": {
+                "name": "ACTIVO"
+              },
+              "codigo": "LSZB",
+              "pais": {
+                "codigo": "LSZB",
+                "nombre": "Suiza",
+                "codigoIso": "CHE",
+                "latitud": 46.95,
+                "longitud": 7.45,
+                "id": 40
+              }
+            }
+          ];
+        let selectedCountries = [];
+        for(let loc of response){
             selectedCountries.push(loc.pais.codigoIso);
-          }
-          let aux = [];
-          for (let i = 0; i < response.data.length; i++) {
-              let obj = [];
-              obj.push(response.data[i].pais.codigoIso);
-              obj.push(response.data[i]);
-              aux.push(obj)
-          }
-          this.setState({
-            locationInfo: response.data,
-            selectedCountries: selectedCountries,
-            planVuelosParcial : this.state.planVuelos,
-            myMap:new Map(aux)
-          },()=>{
-
-          });
-      })
+        }
         setTimeout(()=>{
             ReactTooltip.rebuild()
         },100)
+        //Se genera una Map donde se almacenan oficina y coordenada
+        let aux = [];
+        let mapIndexLoc = new Map();
+        for (let i = 0; i < response.length; i++) {
+            let obj = [];
+            obj.push(response[i].pais.codigoIso);
+            obj.push(response[i]);
+            mapIndexLoc.set(response[i].pais.codigoIso,i);
+            aux.push(obj);
+        }
+        this.setState({
+            indexLoc: mapIndexLoc,
+            myMap:new Map(aux),
+            locationInfo: response,
+            selectedCountries: selectedCountries
+        })
+        console.log("Hash-did",this.state.myMap);
     }
     handleTimeDateChange(e){
       let newTimeArr = e.target.value.split("-");
       let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]))
-      console.log("ll>",newDateTime);
       this.setState({
         time: newDateTime.getTime()
       })
@@ -110,9 +822,51 @@ class Simulacion extends Component{
       });
     }
     tickClock(){
+      let oldTime = this.state.time;
+      let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
+      //Ini: Calculos que se deben hacer por cada tick del reloj
+      let auxLocationInfo = [...this.state.locationInfo];
+      let auxIndex = this.state.indexLoc;
+      let auxPlanesNew = [];
+      let esTemprano = true;
+      let obj;
+      let idx;
+      while(this.listActions.length != 0 && esTemprano){
+        if(this.listActions[0].fechaSalida < this.state.time){
+
+          obj = this.listActions.shift();
+
+          if(obj.tipo == "REGISTRO"){
+            idx = auxIndex.get(obj.oficinaLlegada);
+            auxLocationInfo[idx].capacidadActual++;
+            console.log("R");
+          }else if(obj.tipo == "SALIDA"){
+            auxPlanesNew.push(obj);
+            idx = auxIndex.get(obj.oficinaLlegada);
+            auxLocationInfo[idx].capacidadActual -= obj.cantidad;
+            console.log("S");
+          }
+
+        }else{
+          esTemprano = false;
+        }
+      }
+
+      //manejar vuelos terminados
+      let liveFlights = this.state.planVuelos.filter(e => e.fechaLlegada > newTime );
+      let finishedFlights = this.state.planVuelos.filter(e => e.fechaLlegada <= newTime );
+
+      for(let delElem of finishedFlights){
+        let idxDel = auxIndex.get(delElem.oficinaSalida);
+        auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
+      }
+
       this.setState({
-        time: this.state.time + this.frecRefreshSimu*this.state.frecTime
-      })
+        locationInfo: auxLocationInfo,
+        time: newTime,
+        planVuelos: liveFlights.concat(auxPlanesNew)
+      });
+      //Fin
     }
     handleStartClock(){
       if(this.state.intervalClock){
@@ -130,20 +884,6 @@ class Simulacion extends Component{
     }
     isCountrySelected(elem){
         return this.state.selectedCountries.includes(elem);
-    }
-    //Filtrado de vuelosXpais
-    quitarVuelosXPais(elem){
-      this.setState({
-        planVuelosParcial: this.state.planVuelosParcial.filter(i=>i.oficinaSalida!==elem && i.oficinaLlegada!==elem )
-      })
-    }
-    añadirVuelosXPais(elem){
-        console.log("oficina:",  elem);
-      let lista = this.state.planVuelos.filter(i=>i.oficinaSalida===elem || i.oficinaLlegada===elem)
-      console.log("Añadir vuelos",lista)
-      lista.forEach(e=>{
-        this.state.planVuelosParcial.push(e)
-      })
     }
     //ZOOM the city
     handleCitySelection=(e)=> {
@@ -186,15 +926,12 @@ class Simulacion extends Component{
                     selectedCountries: this.state.selectedCountries.filter(e => e != geo.properties.ISO_A3)
                 })
                 console.log("quita",this.state.selectedCountries.filter(e => e != geo.properties.ISO_A3));
-                this.quitarVuelosXPais(geo.properties.ISO_A3);
-                console.log("Plan vuelos:",this.state.planVuelosParcial);
             }else{
                 //Se agrega
                 this.setState({
                     selectedCountries: [...this.state.selectedCountries,geo.properties.ISO_A3]
                 })
                 console.log("agrega",[...this.state.selectedCountries,geo.properties.ISO_A3]);
-                this.añadirVuelosXPais(geo.properties.ISO_A3);
             }
         }
     }
@@ -242,15 +979,8 @@ class Simulacion extends Component{
             }  
         }
     } 
-    getContentModalFlight(item){
-      console.log(item);
-      return(
-        <div>Hola mundo</div>
-      )
-    }
-
     render(){
-        const { locationInfo,planVuelosParcial } = this.state;
+        const { locationInfo,planVuelos } = this.state;
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
@@ -269,6 +999,7 @@ class Simulacion extends Component{
             <button onClick={this.handleStartClock}>Start</button>
             </div>
             <ComposableMap
+                        className="mapa"
                         projectionConfig={{
                             scale: 165,
                             rotation: [-10,0,0],
@@ -320,19 +1051,16 @@ class Simulacion extends Component{
                                                 pressed: { fill: "#000" },
                                               }}
                                             >                                      
-                                        <circle cx={ 0 } cy={ 0 } r={ 1 } />                              
+                                        <circle cx={ 0 } cy={ 0 } r={ 3 } />                              
                                     </Marker>);
                         })}
                 </Markers>  
                 <Lines>
-                  {planVuelosParcial.map((item,i)=>{
+                  {planVuelos.map((item,i)=>{
                     let salida =this.state.myMap.get(item.oficinaSalida);
                     let llegada=this.state.myMap.get(item.oficinaLlegada);
-                    console.log("efjpweo",this.state.planVuelosParcial)
                     return(
                       <Line
-                        data-tip={JSON.stringify(item)}
-                        data-id='modal-flight'
                         className="world-map-arc"
                         line={{
                                 coordinates: {
@@ -351,13 +1079,12 @@ class Simulacion extends Component{
                     )
                   })}
             </Lines>
-            
               </ZoomableGroup>
             </ComposableMap>
-            <ReactTooltip  id='modal-flight' getContent={this.getContentModalFlight}/>
             <ReactTooltip id='modal-city'
                 getContent={this.getContentModalCity}
             />
+            
             </TheContent>
             </Layout>
         );
