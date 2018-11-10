@@ -4,9 +4,9 @@ import {Modal,Form} from 'antd';
 class InnerForm extends React.Component {
 
     render(){
-        const {visible} = this.props;
+        const {visible, close} = this.props;
         return(
-            <Modal visible = {visible}/>
+            <Modal visible = {visible} onCancel={close}/>
         )
     }
 }
@@ -29,6 +29,10 @@ export default class UsuarioDetail extends React.Component {
     saveFormRef = (detailRef) => {
         this.detailRef = detailRef;
     }
+
+    close = () => {
+        this.setState({ ...this.state, visible: false });
+      };
 
     detail = id =>{
         console.log("Info del usuario",id);
