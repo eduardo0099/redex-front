@@ -391,7 +391,6 @@ export default class PaquetesNuevo extends React.Component {
 
               form.resetFields();
               //this.props.fetch();
-              this.handleCancel();
             })
         }); 
     };
@@ -416,12 +415,19 @@ export default class PaquetesNuevo extends React.Component {
                 return
             }
             API.post('personas/save',values).then(response =>{
+                console.log("FORMREF",response.data)
                 this.formRef.props.form.setFields({
                     nombreClienteOrigen:{
-                        value:response.nombreCompleto
+                        value:response.data.nombreCompleto
+                    },
+                    "numeroDocumentoOrigen":{
+                        value:response.data.numeroDocumentoIdentidad
+                    },
+                    "tipoDocumentoIdentidadOrigen":{
+                        value:{key:response.data.tipoDocumentoIdentidad.id,label:response.data.tipoDocumentoIdentidad.simbolo}
                     },
                     "personaOrigen.id":{
-                        value:response.id
+                        value:response.data.id
                     }
                 })
                 this.setState({ modalRegistroOrigen: false });
@@ -437,7 +443,22 @@ export default class PaquetesNuevo extends React.Component {
                 return;
             }
             API.post('personas/save',values).then(response =>{
-                this.formRef.setFields()
+                console.log("FORMREFdestino",response.data);
+                this.formRef.props.form.setFields({
+                    nombreClienteDestino:{
+                        value:response.data.nombreCompleto
+                    },
+                    "numeroDocumentoDestino":{
+                        value:response.data.numeroDocumentoIdentidad
+                    },
+                    "tipoDocumentoIdentidadDestino":{
+                        value:{key:response.data.tipoDocumentoIdentidad.id,label:response.data.tipoDocumentoIdentidad.simbolo}
+                    },
+                    "personaDestino.id":{
+                        value:response.data.id
+                    }
+                })
+                this.setState({ modalRegistroDestino: false });
             })
             
         })
@@ -484,13 +505,12 @@ export default class PaquetesNuevo extends React.Component {
             cancelText="Cancelar"
             >
             <Divider orientation="left">Origen</Divider>
-            <span>Cliente: {this.state.clienteOrigen}</span>
-            <span>Pais: {this.state.paisOrigen} </span>
+            <FormItem>
+            <span>Cliente: {this.state.clienteOrigen}</span></FormItem>
+            <FormItem><span>Pais: {this.state.paisOrigen} </span></FormItem>
             <Divider orientation="left">Destino</Divider>
-            <span>Cliente: {this.state.clienteDestino}</span>
-            <span>Pais: {this.state.paisDestino} </span>
-            <Divider orientation="left">Notificaciones</Divider>
-            
+            <FormItem><span>Cliente: {this.state.clienteDestino}</span></FormItem>
+            <FormItem><span>Pais: {this.state.paisDestino} </span></FormItem>
             </Modal>
             </TheContent>
             </Layout>
