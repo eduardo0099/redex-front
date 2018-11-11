@@ -34,23 +34,18 @@ class Simulacion extends Component{
             intervalClock: null,
             intervalWindowClock: null,
             time: new Date().getTime(),
+            realTime: 0,
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
             planVuelos:[],
             num:10
         }
-
-        this.handleZoomIn = this.handleZoomIn.bind(this);
-        this.handleZoomOut = this.handleZoomOut.bind(this);
-        this.handleClick = this.handleClick.bind(this);
         this.getLocationDef = this.getLocationDef.bind(this);
         this.buildCurves = this.buildCurves.bind(this);
         this.getContentModalCity = this.getContentModalCity.bind(this);
         this.handleClickGeography = this.handleClickGeography.bind(this);
         //Zoom the city
-        this.handleCitySelection = this.handleCitySelection.bind(this);
-        this.handleReset = this.handleReset.bind(this);
         this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
         this.handleFrecTimeChange = this.handleFrecTimeChange.bind(this);
@@ -60,17 +55,6 @@ class Simulacion extends Component{
         this.handleWindowTimeChange = this.handleWindowTimeChange.bind(this);
         this.sendRequestActions = this.sendRequestActions.bind(this);
     }
-
-    async loadData(){
-      try{
-        /*this.setState({
-        planVuelos:[]
-        })*/
-      }catch(e){
-        console.log(e);
-      }
-    }
-
     componentWillMount(){
       API.get('/simulaciones/1/oficinas').then(response =>{
         let selectedCountries = [];
@@ -116,18 +100,7 @@ class Simulacion extends Component{
         frecTime: e.target.value,
       });
     }
-    sendRequestActions(){
-        API.post('simulaciones/window',
-            {
-            simulacion:  1, 
-            inicio: '2018-04-16T19:01:00', 
-            fin: '2018-04-20T03:01:00',
-            }
-        ).then(resp => {
-            this.listActions = resp.data;
-            console.log(">",this.listActions);
-        });
-    }
+    
     tickClock(){
       let oldTime = this.state.time;
       let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
@@ -175,13 +148,30 @@ class Simulacion extends Component{
       });
       //Fin
     }
+
+    sendRequestActions(){
+        API.post('simulaciones/window',
+            {
+            simulacion:  1, 
+            inicio: new Date(this.state.realTime), //2018-04-16T19:01:00 
+            fin: new Date(this.state.realTime + this.state.windowTime), //2018-04-20T03:01:00
+            }
+        ).then(resp => {
+            console.log("resp>",this.listActions.length);
+            this.listActions.concat(resp.data);
+            console.log("new>",this.listActions.length);
+            this.setState({
+                realTime: this.state.realTime + this.state.windowTime
+            })
+        });
+    }
     handleStartClock(){
       if(this.state.intervalClock){
         console.log(">>",this.state.intervalClock);
       }else{
         let intClock = setInterval(
           () => this.tickClock()
-          ,this.frecRefreshSimu);
+          ,this.frecRefreshSimu); 
 
         let intWindowClock = setInterval(
             () => this.sendRequestActions()
@@ -189,46 +179,15 @@ class Simulacion extends Component{
 
         this.setState({
             intervalClock: intClock,
-            intervalWindowClock: intWindowClock 
+            intervalWindowClock: intWindowClock,
+            realTime: this.state.time
         });
       }
     }
     isCountrySelected(elem){
         return this.state.selectedCountries.includes(elem);
     }
-    //ZOOM the city
-    handleCitySelection=(e)=> {
-        let item = this.state.myMap.get(e.key)
-        this.setState({
-          center: [item.pais.longitud,item.pais.latitude],
-          zoom: 2,
-        })
-      }
-    handleReset() {
-        this.setState({
-          center: [0,20],
-          zoom: 1,
-        })
-    }
 
-    handleZoomIn() {
-        this.setState({
-            zoom: this.state.zoom * 1.2,
-        })
-    }
-    handleZoomOut() {
-        this.setState({
-            zoom: this.state.zoom / 1.2,
-        })
-    }
-    handleClick(geography, evt) {
-        let objLoc = this.getLocationDef(geography);
-        if(objLoc){
-            console.log("Estado pais");
-        }else{
-            console.log("Pais no declarado");
-        }
-    }
     handleClickGeography(geo,evt){
         let objLoc = this.getLocationDef(geo);
         if(objLoc){
@@ -238,7 +197,6 @@ class Simulacion extends Component{
                 })
                 console.log("quita",this.state.selectedCountries.filter(e => e != geo.properties.ISO_A3));
             }else{
-                //Se agrega
                 this.setState({
                     selectedCountries: [...this.state.selectedCountries,geo.properties.ISO_A3]
                 })
@@ -265,24 +223,18 @@ class Simulacion extends Component{
         }['forceDown'];
         return `M ${start.join(' ')} Q ${curve} ${end.join(' ')}`;
     }
-    handleMouseUpMarker(geo,e){
-        console.log(">>u",geo,e);
-    }
-    handleModalContent(geo){
-        return <h1>{geo.properties.NAME}</h1>;
-    }
+
     getContentModalCity(item){
         if(item){
             let elem = JSON.parse(item);
             let infoObj = this.getLocationDef(elem);
             
             if(infoObj){
-                //console.log("..",infoObj);
                 return (
                     <div>{elem.properties.NAME + " - " +elem.properties.ISO_A3 +" - " + infoObj.codigo }
                         <div>{"Capacidad: " + infoObj.capacidadActual + "/" + infoObj.capacidadMaxima}</div>
                     </div>
-                    )
+                )
             }else{
                 return (
                     <div>{elem.properties.NAME}</div>
