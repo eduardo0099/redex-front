@@ -17,7 +17,7 @@ class InnerForm extends React.Component{
             onCancel={onCancel}
             onOk={onCreate}>
             <FormItem label="Nombre">
-            {getFieldDecorator("nombrePersona")(<Input type="textarea" disabled={true} />)}
+            {getFieldDecorator("nombre")(<Input type="textarea" disabled={true} />)}
             </FormItem>
             <FormItem label="DNI">
             {getFieldDecorator("dni")(<Input type="textarea" disabled={true} />)}
@@ -27,9 +27,6 @@ class InnerForm extends React.Component{
             </FormItem>
             <FormItem label="Telefono">
             {getFieldDecorator("telefono")(<Input type="textarea"  />)}
-            </FormItem>
-            <FormItem label="Estado">
-            {getFieldDecorator("estado")(<Input type="textarea" disabled={true} />)}
             </FormItem>
             </Modal>
         )
@@ -58,12 +55,37 @@ export default class PersonasForm extends React.Component{
     }
 
     save = () =>{
-        this.setState({...this.state,visible:true
+        const form = this.formRef.props.form;
+        form.validateFields((err, values) => {
+            if (err) {
+              return;
+            }
+            console.log("Valores form:", values);
+        });
+        this.setState({...this.state,visible:false
         })
+
     }
 
+    saveFormRef = (formRef) => {
+        this.formRef = formRef;
+      }
+
     detail = id =>{
-        this.setState({...this.state,visible:true
+        console.log(id);
+        //Api para devolver info de la persona
+        API.get(`personas/${id}`).then(response=>{
+            let data = response.data;
+            console.log("Data:",data);
+            this.setState({...this.state,visible:true},()=>{
+                this.formRef.props.form.setFields({
+                    nombre:{value:data.nombres + data.paterno + data.materno},
+                    dni:{value:data.numeroDocumentoIdentidad},
+                    email:{value:data.email},
+                    telefono:{value:data.telefono}
+                })
+            }
+            )
         })
     }
 
