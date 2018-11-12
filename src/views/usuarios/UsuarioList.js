@@ -16,7 +16,9 @@ export default class UsuarioList extends React.Component {
   }
 
   fetch = () => this.listRef.current.fetch();
-
+  saveFormRef = (listRef) => {
+    this.listRef = listRef;
+  }
   showConfirmDesactivar=(record)=> {
     confirm({
       title: 'Usted desea desactivar a este usuario?',
@@ -49,11 +51,8 @@ export default class UsuarioList extends React.Component {
     this.fetch()
   });
 
-  editarUsuario=(record)=>{
-
-  }
-
     render(){
+      const {onDetalle}  = this.props;
         return (
             <CrimsonTable url="/usuarios" ref={this.listRef}>
               <Column
@@ -134,7 +133,7 @@ export default class UsuarioList extends React.Component {
                       record.estado.name === 'ACTIVO' ? 
                       ( 
                         <Menu.Item>
-                        <a target="_blank" rel="noopener noreferrer" onClick={this.editarUsuario.bind(this, record)}> Editar</a> 
+                        <a target="_blank" rel="noopener noreferrer" onClick={() => onDetalle(record.id)}> Editar</a> 
                         </Menu.Item>
                         ) :
                       ( null )
