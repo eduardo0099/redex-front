@@ -11,7 +11,6 @@ class Dashboard extends Component{
             </TheHeader>
             <TheContent>
                
-        
             </TheContent>
           </Layout>
         );

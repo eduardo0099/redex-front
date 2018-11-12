@@ -56,7 +56,7 @@ export default class UsuarioList extends React.Component {
         return (
             <CrimsonTable url="/usuarios" ref={this.listRef}>
               <Column
-                title="Persona"
+                title="Usuarios"
                 key="nombres"
                 render={record=>(
                   <div>

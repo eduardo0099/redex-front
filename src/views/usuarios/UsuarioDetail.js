@@ -39,7 +39,7 @@ class InnerForm extends React.Component {
             <FormItem label="Nombre">
             {getFieldDecorator("nombrePersona")(<Input type="textarea" disabled={true} />)}
             </FormItem>
-            <FormItem label="DNI">
+            <FormItem label="Numero de documento de identidad">
             {getFieldDecorator("dni")(<Input type="textarea" disabled={true} />)}
             </FormItem>
             <InputGroup size="large"> 
@@ -118,9 +118,24 @@ export default class UsuarioDetail extends React.Component {
     detail = id =>{
         console.log("Info del usuario",id);
         //Utilizar api para obtener informacion del usuario
-        this.setState({
-            visible:true
+        API.get(`/usuarios/${id}`).then(response=>{
+            let data=response.data;
+            console.log("info usuario:",data);
+            this.setState({...this.state,visible:true},()=>{
+                this.detailRef.props.form.setFields({
+                    nombrePersona:{value:data.colaborador.persona.nombreCompleto},
+                    dni:{value:data.colaborador.persona.numeroDocumentoIdentidad},
+                    rol:{value:{key:data.rol.id,label:data.rol.nombre}},
+                    oficina:{value:{key:data.colaborador.oficina.id,label:data.colaborador.oficina.pais.nombre}},
+                    email:{value:data.colaborador.email},
+                    telefono:{value:data.colaborador.telefono},
+                    estado:{value:data.colaborador.estado.name},
+                })
+            })
+
+
         })
+        
     }
 
     saveChange = () =>{
