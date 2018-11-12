@@ -102,7 +102,7 @@ export default class UsuarioDetail extends React.Component {
         this.state ={
             visible: false,
             usuario:[],
-            title:"Persona"
+            title:"Editar usuario"
         }
         this.detailRef = React.createRef();
     }
