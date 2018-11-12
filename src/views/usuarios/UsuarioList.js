@@ -15,7 +15,7 @@ export default class UsuarioList extends React.Component {
     this.listRef = React.createRef();
   }
 
-  //fetch = () => this.listRef.current.fetch();
+  fetch = () => this.listRef.current.fetch();
   saveFormRef = (listRef) => {
     this.listRef = listRef;
   }

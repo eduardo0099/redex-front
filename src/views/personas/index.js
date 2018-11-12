@@ -2,6 +2,7 @@ import React from 'react';
 import { Col, Layout, Button, Modal, Upload } from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import PersonasList from './PersonasList';
+import PersonasForm from './PersonasForm';
 import API from '../../Services/Api';
 
 export default class Personas extends React.Component {
@@ -10,14 +11,17 @@ export default class Personas extends React.Component {
         super(props);
 
         this.listRef = React.createRef();
-
+        this.formRef = React.createRef();
         this.state = {
           cargaVisible: false,
           fileList: [],
           formData: ''
         }
       }
-    
+      fetch = () => {
+        this.formRef.current.fetch();
+      }
+
       showModalCarga = () => {
         this.setState({ cargaVisible: true });
       }
@@ -30,7 +34,11 @@ export default class Personas extends React.Component {
         API.post('personas/carga', this.state.formData)
           .then(response => {
             this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
-          })
+        })
+      }
+
+      findDetalle = id => {
+        this.formRef.current.detail(id);
       }
 
     render() {
@@ -60,7 +68,8 @@ export default class Personas extends React.Component {
                 </Col>
               </TheHeader>
               <TheContent>
-                <PersonasList ref={this.listRef}/>
+                <PersonasList ref={this.listRef} editarPersona={this.findDetalle}/>
+                <PersonasForm ref={this.formRef}/>
               </TheContent>
               <Modal
                 title="Cargar personas"
