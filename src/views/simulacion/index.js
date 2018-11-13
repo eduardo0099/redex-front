@@ -46,7 +46,6 @@ class Simulacion extends Component{
         this.getContentModalCity = this.getContentModalCity.bind(this);
         this.handleClickGeography = this.handleClickGeography.bind(this);
         //Zoom the city
-        this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
         this.handleFrecTimeChange = this.handleFrecTimeChange.bind(this);
         this.tickClock = this.tickClock.bind(this);
@@ -69,7 +68,6 @@ class Simulacion extends Component{
             selectedCountries.push(response[i].pais.codigoIso);
             aux.push(obj);
         }
-
         this.setState({
             indexLoc: mapIndexLoc,
             myMap:new Map(aux),
@@ -92,7 +90,8 @@ class Simulacion extends Component{
       let newTimeArr = e.target.value.split("-");
       let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]))
       this.setState({
-        time: newDateTime.getTime()
+        time: newDateTime.getTime(),
+        realTime: newDateTime.getTime(),
       })
     }
     handleFrecTimeChange(e){
@@ -124,7 +123,7 @@ class Simulacion extends Component{
             auxPlanesNew.push(obj);
             idx = auxIndex.get(obj.oficinaLlegada);
             auxLocationInfo[idx].capacidadActual -= obj.cantidad;
-            console.log("S");
+            //console.log("S");
           }
 
         }else{
@@ -150,6 +149,7 @@ class Simulacion extends Component{
     }
 
     sendRequestActions(){
+        console.log("envia",new Date(this.state.realTime), " - ",new Date(this.state.realTime + this.state.windowTime))
         API.post('simulaciones/window',
             {
             simulacion:  1, 
@@ -157,11 +157,12 @@ class Simulacion extends Component{
             fin: new Date(this.state.realTime + this.state.windowTime), //2018-04-20T03:01:00
             }
         ).then(resp => {
+            console.log("resp.data",resp.data);
             console.log("resp>",this.listActions.length);
-            this.listActions.concat(resp.data);
+            this.listActions = this.listActions.concat(resp.data);
             console.log("new>",this.listActions.length);
             this.setState({
-                realTime: this.state.realTime + this.state.windowTime
+                realTime: this.state.realTime + this.state.windowTime + 1
             })
         });
     }
@@ -176,11 +177,11 @@ class Simulacion extends Component{
         let intWindowClock = setInterval(
             () => this.sendRequestActions()
             ,Math.floor(this.state.windowTime/this.state.frecTime));
-
+        console.log("cada x llama",Math.floor(this.state.windowTime/this.state.frecTime)/1000)
+        this.sendRequestActions()
         this.setState({
             intervalClock: intClock,
             intervalWindowClock: intWindowClock,
-            realTime: this.state.time
         });
       }
     }
