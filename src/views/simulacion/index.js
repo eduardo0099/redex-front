@@ -38,7 +38,26 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
-            planVuelos:[],
+            planVuelos:[
+               /* {
+                    fechaLlegada: 1355316000000,
+                    oficinaSalida: "BOL",
+                    oficinaLlegada: "PER",
+                    fechaSalida: 1355316900000,
+                    tipo: "SALIDA",
+                    cantidad: 100,
+                    cantidadSalida: 25
+                  },
+                  {
+                    fechaLlegada: 1355316000000,
+                    oficinaSalida: "ECU",
+                    oficinaLlegada: "AUT",
+                    fechaSalida: 1355316900000,
+                    tipo: "SALIDA",
+                    cantidad: 100,
+                    cantidadSalida: 25
+                  }*/
+            ],
             num:10
         }
         this.getLocationDef = this.getLocationDef.bind(this);
@@ -65,7 +84,7 @@ class Simulacion extends Component{
             obj.push(response[i].pais.codigoIso);
             obj.push(response[i]);
             mapIndexLoc.set(response[i].pais.codigoIso,i);
-            selectedCountries.push(response[i].pais.codigoIso);
+            //selectedCountries.push(response[i].pais.codigoIso);
             aux.push(obj);
         }
         this.setState({
@@ -244,7 +263,7 @@ class Simulacion extends Component{
         }
     } 
     render(){
-        const { locationInfo, planVuelos, windowTime, frecTime } = this.state;
+        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries } = this.state;
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
@@ -321,7 +340,11 @@ class Simulacion extends Component{
                         })}
                 </Markers>  
                 <Lines>
-                  {planVuelos.map((item,i)=>{
+                  {planVuelos.filter(
+                      pv => 
+                        (selectedCountries.includes(pv.oficinaLlegada) 
+                            || selectedCountries.includes(pv.oficinaSalida))
+                        ).map((item,i)=>{
                     let salida =this.state.myMap.get(item.oficinaSalida);
                     let llegada=this.state.myMap.get(item.oficinaLlegada);
                     return(
