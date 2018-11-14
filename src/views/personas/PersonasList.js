@@ -6,11 +6,19 @@ import CrimsonTable from "../../components/CrimsonTable";
 const { Column } = Table;
 
 export default class PersonasList extends React.Component {
-  editarUsuario = record => {};
+  constructor(props){
+    super(props)
+    this.listRef = React.createRef();
+  }
+  fetch = () => this.listRef.current.fetch();
+  saveFormRef = (listRef) => {
+    this.listRef = listRef;
+  }
 
   render() {
+    const {editarPersona}  = this.props;
     return (
-      <CrimsonTable url="/personas">
+      <CrimsonTable url="/personas" ref={this.listRef}>
         <Column
           title="Nombre"
           key="nombres"
@@ -30,18 +38,6 @@ export default class PersonasList extends React.Component {
             </div>
           )}
         />
-        <Column
-          title="Pais"
-          key="pais"
-          render={record => (
-            <div>
-              <div>
-                <b> {record.pais.nombre} </b>
-              </div>
-              <small> {record.pais.codigo} </small>
-            </div>
-          )}
-        />
         <Column title="Email" dataIndex="email" key="email" />
         <Column title="Telefono" dataIndex="telefono" key="telefono" />
         <Column
@@ -55,7 +51,7 @@ export default class PersonasList extends React.Component {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={this.editarUsuario.bind(this, record)}
+                    onClick={()=>editarPersona(record.id)}
                   >
                     {" "}
                     Editar

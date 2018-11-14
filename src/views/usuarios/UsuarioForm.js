@@ -1,171 +1,205 @@
 import React from 'react';
-import { AutoComplete, Modal, Form, Input ,Dropdown, Menu, Col} from 'antd';
+import { Modal, Form, Input , Col,Select} from 'antd';
+import API from '../../Services/Api';
+
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
+const Option = Select.Option;
 
-const menu = (
-  <Menu >
-    <Menu.Item key="1">Oficina 1</Menu.Item>
-    <Menu.Item key="2">Oficina 2</Menu.Item>
-    <Menu.Item key="3">Oficina 3</Menu.Item>
-  </Menu>
-);
-
-const menuDocumento = (
-  <Menu >
-    <Menu.Item key="1">DNI</Menu.Item>
-    <Menu.Item key="2">Pasaporte</Menu.Item>
-    <Menu.Item key="3">Oficina 3</Menu.Item>
-  </Menu>
-);
-
-const menuRol = (
-  <Menu >
-    <Menu.Item key="1">Trabajador</Menu.Item>
-    <Menu.Item key="2">Jefe de Oficina</Menu.Item>
-    <Menu.Item key="3">Gerente General</Menu.Item>
-  </Menu>
-);
-
-function onSelect(value) {
-  console.log('onSelect', value);
-}
-
-class UsuarioForm extends React.Component {
-
-    state = {
-      dataSource: [],
-    } 
-
-    handleSearch = (value) => {
-      this.setState({
-        dataSource: !value ? [] : [
-          value,
-          value + value,
-          value + value + value,
-        ],
-      });
+class InnerForm extends React.Component{
+  constructor(props){
+    super(props);
+    this.state={
+      tipoDoc:[],
+      oficinas:[],
+      roles:[]
     }
+  }
 
-    render() {
-      const { visible, onCancel, onCreate, form } = this.props;
-      const { getFieldDecorator } = form;
-      const { dataSource } = this.state;
+  componentDidMount(){
+    API.get('/tipodocidentidad').then(response=>{
+        this.setState({...this.state,
+          tipoDoc:response.data
+        })
+      })
+    API.get('/roles/all').then(response=>{
+        this.setState({...this.state,
+            roles:response.data
+        })
+    })
+  }
 
-      return (
-        <Modal
-        style={{ top: 20 }}
-        visible={visible}
-        width = {800}
-        title="Crear nuevo usuario"
-        okText="Create"
-        onCancel={onCancel}
-        onCreate={onCreate}
-        >
-          <Form layout="vertical">
-            <FormItem label="Nombres">
-              {getFieldDecorator('nombres', {
-                rules: [{ required: true, message: 'Porfavor ingrese el nombre del usuario' }],
-              })(
-                <Input />
-              )}
-            </FormItem>
+  fetchOficinas=q=>{
+    API.get("oficinas/search",{params:{q:q}}).then(response=>{
+        this.setState({...this.state,oficinas:response.data});
+    });
+  };
+
+  render() {
+    const { visible, onCancel, onCreate, form } = this.props;
+    const { getFieldDecorator } = form;
+    console.log("Roles",this.state.roles);
+    return (
+      <Modal
+      style={{ top: 20 }} visible={visible}  width = {800} title="Crear nuevo usuario"  okText="Create"
+      onCancel={onCancel}
+      onOk={onCreate}
+      >
+        <Form layout="vertical">
+          <FormItem label="Nombres">
+            {getFieldDecorator('nombres', {
+              rules: [{ required: true, message: 'Porfavor ingrese el nombre del usuario' }],
+            })(
+              <Input />
+            )}
+          </FormItem>
+          <InputGroup size="large">
+          <Col span={12}>
             <FormItem label="Apellido Paterno">
               {getFieldDecorator('aPaterno', {
                 rules: [{ required: true, message: 'Porfavor ingrese el apellido paterno ' }],
               })(
                 <Input />
               )}
-            </FormItem>
-            <FormItem label="Apellido Materno">
+            </FormItem></Col>
+            <Col span={12}><FormItem label="Apellido Materno">
               {getFieldDecorator('aMaterno', {
                 rules: [{ required: true, message: 'Porfavor ingrese el apellido materno' }],
               })(
                 <Input />
               )}
-            </FormItem>
-            <InputGroup size="large">
-            <Col span={12}>
-            <FormItem label="Tipo de documento">
-              {getFieldDecorator('tipDoc', {
-                initialValue:'Seleccionar',
-                rules: [{ required: true, message: 'Porfavor seleccione el tipo de documento' }],
-              })(
-                <Dropdown.Button  overlay={menuDocumento}>
-                  Seleccionar
-                </Dropdown.Button>
+            </FormItem></Col>
+          </InputGroup>
+          <InputGroup size="large">
+          <Col span={12}>
+          <FormItem label="Tipo de documento">
+            {getFieldDecorator('tipDoc', {
+              initialValue:'Seleccionar',
+              rules: [{ required: true, message: 'Porfavor seleccione el tipo de documento' }],
+            })(
+              <Select labelInValue={true} style={{width:"100%"}}>
+                  {this.state.tipoDoc.map(i=>(
+                      <Option key={i.id} value={i.id}>
+                      {i.simbolo}
+                      </Option>
+                  ))}
+              </Select>
               )}
-            </FormItem>
-            </Col>
-            <Col span = {12}>
-            <FormItem label="Documento de Identidad">
-              {getFieldDecorator('docId', {
-                rules: [{ required: true, message: 'Porfavor ingrese el documento de identidad' }],
-              })(
-                <Input value ={Number}/>
-              )}
-            </FormItem>
-            </Col>
-            <Col span={12}>
-            <FormItem label="Email">
-              {getFieldDecorator('email', {
-                rules: [{ required: true, message: 'Porfavor ingrese el email' }],
-              })(
-                <Input />
-              )}
-            </FormItem>
-            </Col>
-            <Col span={12}>
-            <FormItem label="Telefono">
-              {getFieldDecorator('telefono', {
-                rules: [{ required: true, message: 'Porfavor ingrese el telefono' }],
-              })(
-                <Input value={Number}/>
-              )}
-            </FormItem>
-            </Col>
-            <Col span={8}>
-            <FormItem label="Pais">
-              <AutoComplete
-                dataSource={dataSource}
-                style={{ width: 200 }}
-                onSelect={onSelect}
-                onSearch={this.handleSearch}
-                placeholder="input here"
-              />
-            </FormItem>
-            </Col>
-            <Col span={8}>
-            <FormItem label="Oficina">
-              {getFieldDecorator('oficina', {
-                initialValue:'Seleccionar',
-              })(
-                <Dropdown.Button  overlay={menu}>
-                  Seleccionar
-                </Dropdown.Button>
-              )}
-            </FormItem>
-            </Col>
-            <Col span={8}>
-            <FormItem label="Rol">
-              {getFieldDecorator('rol', {
-                initialValue:'Seleccionar',
-              })(
-                <Dropdown.Button  overlay={menuRol}>
-                  Seleccionar
-                </Dropdown.Button>
-              )}
-            </FormItem>
-            </Col>
-            </InputGroup>
-          </Form>
-        </Modal>
-
-      )
-    }
+          </FormItem>
+          </Col>
+          <Col span = {12}>
+          <FormItem label="Documento de Identidad">
+            {getFieldDecorator('docId', {
+              rules: [{ required: true, message: 'Porfavor ingrese el documento de identidad' }],
+            })(
+              <Input value ={Number}/>
+            )}
+          </FormItem>
+          </Col>
+          <Col span={12}>
+          <FormItem label="Email">
+            {getFieldDecorator('email', {
+              rules: [{ required: true, message: 'Porfavor ingrese el email' }],
+            })(
+              <Input />
+            )}
+          </FormItem>
+          </Col>
+          <Col span={12}>
+          <FormItem label="Telefono">
+            {getFieldDecorator('telefono', {
+              rules: [{ required: true, message: 'Porfavor ingrese el telefono' }],
+            })(
+              <Input value={Number}/>
+            )}
+          </FormItem>
+          </Col>
+          <Col span={12}>
+          <FormItem label="Rol">
+          {getFieldDecorator('rol', {
+              rules: [{ required: true, message: 'Porfavor ingrese el oficina' }],
+            })(
+              <Select 
+                style={{width:"100%"}}
+                notFoundContent = {null}
+                labelInValue={true}
+                >
+                  {this.state.roles.map(i=>(
+                    <Option key={i.id} value={i.id}>
+                    {i.nombre}
+                    </Option>
+                ))}
+              </Select>)}
+          </FormItem>
+          </Col>
+          <Col span={12}>
+          <FormItem label="Oficina">
+          {getFieldDecorator('oficina', {
+              rules: [{ required: true, message: 'Porfavor ingrese el rol' }],
+            })(
+              <Select 
+                style={{width:"100%"}}
+                showSearch
+                defaultActiveFirstOption={false}
+                filterOption={false}
+                onSearch={this.fetchOficinas}
+                notFoundContent = {null}
+                labelInValue={true}
+                >
+                  {this.state.oficinas.map(i=>(
+                    <Option key={i.id} value={i.id}>
+                    {i.pais.nombre}
+                    </Option>
+                ))}
+              </Select>)}
+          </FormItem>
+          </Col>
+          </InputGroup>
+        </Form>
+      </Modal>
+     )}
 }
 
-const WrappedForm = Form.create()(UsuarioForm);
 
-export default WrappedForm;
+const WrappedForm = Form.create()(InnerForm);
+
+export default class UsuarioForm extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      title: '',
+      action: '',
+    }
+  }
+  
+  nuevo=()=>{
+    this.setState({...this.state,visible:true
+    })
+  }
+
+  close=()=>{
+    this.setState({...this.state,visible:false
+    })
+  }
+
+  save=()=>{
+    this.setState({...this.state,visible:false
+    })
+  }
+
+  render(){
+    return(
+      <WrappedForm
+        wrappedComponentRef={this.saveFormRef}
+        visible={this.state.visible}
+        onCancel={this.close}
+        onCreate={this.save}
+        title={this.state.title}
+        action={this.state.action}
+      />
+    )
+  }
+   
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import { Col, Layout, Button ,Menu,Dropdown,Icon,Modal, Upload} from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import UsuarioList from './UsuarioList';
+import UsuarioDetail from './UsuarioDetail';
 import UsuarioForm from './UsuarioForm';
 import CrimsonUpload from '../../components/CrimsonUpload';
 import API from '../../Services/Api';
@@ -11,39 +12,22 @@ export default class Usuarios extends React.Component {
   constructor(props) {
     super(props);
     this.listRef = React.createRef();
-    this.formRef =  React.createRef();
     this.uploadRef = React.createRef();
+    this.detailRef = React.createRef();
+    this.nuevoRef = React.createRef();
     this.state = {
       modalVisible: false,
     }
   }
-
-  nuevo = () => this.formRef.current.nuevo();
-
-  editar = (id) => this.formRef.current.editar(id);
-
+  nuevo = () => this.nuevoRef.current.nuevo();
   subir = () => this.uploadRef.current.open();
 
-  fetch = () => this.listRef.current.fetch();
-
-  showModal = () => {
-    this.setState({ modalVisible: true });
+  fetch = () => {
+    this.nuevoRef.current.fetch();
   }
 
-  handleCancel = () => {
-    this.setState({ modalVisible: false });
-  }
-
-  handleCreate = () => {
-    const form = this.formRef.props.form;
-    form.validateFields((err, values) => {
-      if (err) {
-        return;
-      }
-
-      form.resetFields();
-      this.setState({ modalVisible: false });
-    }); 
+  findDetalle = (id) => {
+    this.detailRef.current.detail(id);
   }
 
   saveFormRef = (formRef) => {
@@ -53,7 +37,7 @@ export default class Usuarios extends React.Component {
   render() {
     const menu = (
       <Menu>
-        <Menu.Item onClick={this.showModal} key="1">Nuevo Usuario</Menu.Item>
+        <Menu.Item onClick={this.nuevo} key="1">Nuevo Usuario</Menu.Item>
         <Menu.Item onClick={this.subir} key="2">Cargar datos</Menu.Item>
       </Menu>
     );
@@ -73,8 +57,10 @@ export default class Usuarios extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
-            <UsuarioList/>
+            <UsuarioList ref = {this.listRef} onDetalle={this.findDetalle}/>
+            <UsuarioForm  ref = {this.nuevoRef} fetch={this.fetch} />
             <CrimsonUpload ref={this.uploadRef} url="/usuarios/carga" title="Cargar usuarios"/>
+            <UsuarioDetail ref={this.detailRef}/>
           </TheContent>
         </Layout>
     )
