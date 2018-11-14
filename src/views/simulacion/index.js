@@ -38,7 +38,26 @@ class Simulacion extends Component{
             infoVuelos:[],
             locationInfo: [],
             selectedCountries: [],
-            planVuelos:[],
+            planVuelos:[
+               /* {
+                    fechaLlegada: 1355316000000,
+                    oficinaSalida: "BOL",
+                    oficinaLlegada: "PER",
+                    fechaSalida: 1355316900000,
+                    tipo: "SALIDA",
+                    cantidad: 100,
+                    cantidadSalida: 25
+                  },
+                  {
+                    fechaLlegada: 1355316000000,
+                    oficinaSalida: "ECU",
+                    oficinaLlegada: "AUT",
+                    fechaSalida: 1355316900000,
+                    tipo: "SALIDA",
+                    cantidad: 100,
+                    cantidadSalida: 25
+                  }*/
+            ],
             num:10
         }
         this.getLocationDef = this.getLocationDef.bind(this);
@@ -46,7 +65,6 @@ class Simulacion extends Component{
         this.getContentModalCity = this.getContentModalCity.bind(this);
         this.handleClickGeography = this.handleClickGeography.bind(this);
         //Zoom the city
-        this.handleModalContent = this.handleModalContent.bind(this);
         this.isCountrySelected = this.isCountrySelected.bind(this);
         this.handleFrecTimeChange = this.handleFrecTimeChange.bind(this);
         this.tickClock = this.tickClock.bind(this);
@@ -66,10 +84,9 @@ class Simulacion extends Component{
             obj.push(response[i].pais.codigoIso);
             obj.push(response[i]);
             mapIndexLoc.set(response[i].pais.codigoIso,i);
-            selectedCountries.push(response[i].pais.codigoIso);
+            //selectedCountries.push(response[i].pais.codigoIso);
             aux.push(obj);
         }
-
         this.setState({
             indexLoc: mapIndexLoc,
             myMap:new Map(aux),
@@ -92,7 +109,8 @@ class Simulacion extends Component{
       let newTimeArr = e.target.value.split("-");
       let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]))
       this.setState({
-        time: newDateTime.getTime()
+        time: newDateTime.getTime(),
+        realTime: newDateTime.getTime(),
       })
     }
     handleFrecTimeChange(e){
@@ -124,7 +142,7 @@ class Simulacion extends Component{
             auxPlanesNew.push(obj);
             idx = auxIndex.get(obj.oficinaLlegada);
             auxLocationInfo[idx].capacidadActual -= obj.cantidad;
-            console.log("S");
+            //console.log("S");
           }
 
         }else{
@@ -150,6 +168,7 @@ class Simulacion extends Component{
     }
 
     sendRequestActions(){
+        console.log("envia",new Date(this.state.realTime), " - ",new Date(this.state.realTime + this.state.windowTime))
         API.post('simulaciones/window',
             {
             simulacion:  1, 
@@ -157,11 +176,12 @@ class Simulacion extends Component{
             fin: new Date(this.state.realTime + this.state.windowTime), //2018-04-20T03:01:00
             }
         ).then(resp => {
+            console.log("resp.data",resp.data);
             console.log("resp>",this.listActions.length);
-            this.listActions.concat(resp.data);
+            this.listActions = this.listActions.concat(resp.data);
             console.log("new>",this.listActions.length);
             this.setState({
-                realTime: this.state.realTime + this.state.windowTime
+                realTime: this.state.realTime + this.state.windowTime + 1
             })
         });
     }
@@ -176,11 +196,11 @@ class Simulacion extends Component{
         let intWindowClock = setInterval(
             () => this.sendRequestActions()
             ,Math.floor(this.state.windowTime/this.state.frecTime));
-
+        console.log("cada x llama",Math.floor(this.state.windowTime/this.state.frecTime)/1000)
+        this.sendRequestActions()
         this.setState({
             intervalClock: intClock,
             intervalWindowClock: intWindowClock,
-            realTime: this.state.time
         });
       }
     }
@@ -243,7 +263,7 @@ class Simulacion extends Component{
         }
     } 
     render(){
-        const { locationInfo, planVuelos, windowTime, frecTime } = this.state;
+        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries } = this.state;
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
@@ -320,7 +340,11 @@ class Simulacion extends Component{
                         })}
                 </Markers>  
                 <Lines>
-                  {planVuelos.map((item,i)=>{
+                  {planVuelos.filter(
+                      pv => 
+                        (selectedCountries.includes(pv.oficinaLlegada) 
+                            || selectedCountries.includes(pv.oficinaSalida))
+                        ).map((item,i)=>{
                     let salida =this.state.myMap.get(item.oficinaSalida);
                     let llegada=this.state.myMap.get(item.oficinaLlegada);
                     return(
