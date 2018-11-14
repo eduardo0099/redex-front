@@ -19,7 +19,7 @@ export default class Personas extends React.Component {
         }
       }
       fetch = () => {
-        this.formRef.current.fetch();
+        this.listRef.current.fetch();
       }
 
       showModalCarga = () => {
@@ -69,7 +69,7 @@ export default class Personas extends React.Component {
               </TheHeader>
               <TheContent>
                 <PersonasList ref={this.listRef} editarPersona={this.findDetalle}/>
-                <PersonasForm ref={this.formRef}/>
+                <PersonasForm ref={this.formRef} fetch={this.fetch}/>
               </TheContent>
               <Modal
                 title="Cargar personas"

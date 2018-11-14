@@ -36,6 +36,9 @@ class InnerForm extends React.Component {
         console.log(this.state.roles);
         return(
             <Modal visible = {visible} title={title} onCancel={close} style={{ top: 20 }} onOk={ok}>
+            <FormItem style={{display: 'none'}}>
+            {getFieldDecorator("id")(<div></div>)}
+            </FormItem>
             <FormItem label="Nombre">
             {getFieldDecorator("nombrePersona")(<Input type="textarea" disabled={true} />)}
             </FormItem>
@@ -113,7 +116,7 @@ export default class UsuarioDetail extends React.Component {
 
     close = () => {
         this.setState({ ...this.state, visible: false });
-      };
+    }
 
     detail = id =>{
         console.log("Info del usuario",id);
@@ -123,6 +126,7 @@ export default class UsuarioDetail extends React.Component {
             console.log("info usuario:",data);
             this.setState({...this.state,visible:true},()=>{
                 this.detailRef.props.form.setFields({
+                    id:{value:data.id},
                     nombrePersona:{value:data.colaborador.persona.nombreCompleto},
                     dni:{value:data.colaborador.persona.numeroDocumentoIdentidad},
                     rol:{value:{key:data.rol.id,label:data.rol.nombre}},
@@ -132,14 +136,28 @@ export default class UsuarioDetail extends React.Component {
                     estado:{value:data.colaborador.estado.name},
                 })
             })
-
-
         })
         
     }
 
     saveChange = () =>{
         //Utiliza api para guardar los cambios
+ 
+        const form = this.detailRef.props.form;
+        form.validateFields((err, values) => {
+            console.log(values);
+            if(err){
+                return;
+            }
+            let usuario={id:values.id,
+                rol:{id:values.rol.key},
+                colaborador:{oficina:{id:values.oficina.key},email:values.email,
+                            telefono:values.telefono}
+            }
+            API.post(`/usuarios/editar`,usuario).then(response=>{
+                this.setState({ ...this.state, visible: false })
+            })
+        })
     }
 
     render(){

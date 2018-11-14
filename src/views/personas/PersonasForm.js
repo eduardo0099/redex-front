@@ -1,6 +1,7 @@
 import React from 'react';
 import { Modal, Form, Input , Col,Select} from 'antd';
 import API from '../../Services/Api';
+import Notify from '../../utils/notify';
 
 const FormItem = Form.Item;
 
@@ -16,6 +17,9 @@ class InnerForm extends React.Component{
             <Modal style={{ top: 20 }} visible={visible} title={title}  
             onCancel={onCancel}
             onOk={onCreate}>
+            <FormItem style={{display: 'none'}}>
+            {getFieldDecorator("id")(<div></div>)}
+            </FormItem>
             <FormItem label="Nombre">
             {getFieldDecorator("nombre")(<Input type="textarea" disabled={true} />)}
             </FormItem>
@@ -61,10 +65,16 @@ export default class PersonasForm extends React.Component{
               return;
             }
             console.log("Valores form:", values);
+            API.post(`personas/editar`,values).then(response=>{
+                Notify.success({
+                    message: 'Persona actualizada'
+                });
+                form.resetFields();
+                this.props.fetch();
+                this.setState({...this.state,visible:false
+                });
+            })
         });
-        this.setState({...this.state,visible:false
-        })
-
     }
 
     saveFormRef = (formRef) => {
@@ -79,6 +89,7 @@ export default class PersonasForm extends React.Component{
             console.log("Data:",data);
             this.setState({...this.state,visible:true},()=>{
                 this.formRef.props.form.setFields({
+                    id:{value:data.id},
                     nombre:{value:data.nombres + data.paterno + data.materno},
                     dni:{value:data.numeroDocumentoIdentidad},
                     email:{value:data.email},

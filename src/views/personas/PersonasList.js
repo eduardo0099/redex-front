@@ -18,7 +18,7 @@ export default class PersonasList extends React.Component {
   render() {
     const {editarPersona}  = this.props;
     return (
-      <CrimsonTable url="/personas">
+      <CrimsonTable url="/personas" ref={this.listRef}>
         <Column
           title="Nombre"
           key="nombres"
