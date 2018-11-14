@@ -1,7 +1,14 @@
 import React from 'react';
 import API from '../../Services/Api';
 import notify from '../../utils/notify';
-import { Button, Modal, Upload } from "antd";
+import { Button, Modal, Upload, message } from "antd";
+
+
+const success = () => {
+    const hide = message.loading('Action in progress..', 0);
+    // Dismiss manually and asynchronously
+    setTimeout(hide, 2500);
+  };
 
 export default class CrimsonUpload extends React.Component {
 
@@ -23,8 +30,12 @@ export default class CrimsonUpload extends React.Component {
     }
 
     upload = () => {
+        this.close();
+        const hide = message.loading('Cargando archivo...', 0);
+
         API.post(this.props.url, this.state.formdata)
             .then(response => {
+                hide();
                 notify.success({
                     message: "Carga finalizada",
                     description: `${response.data.cantidadRegistros} registros agregados`
