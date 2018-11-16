@@ -9,7 +9,15 @@ class App extends Component {
 
     render() {
       const ds = JSON.parse(localStorage.getItem('datasession'));
-      const authorizedRoutes = routes.filter(route => !route.roles || route.roles.includes(ds.rol.codigo.name));
+
+      let authorizedRoutes = [];
+
+      if(ds){
+        authorizedRoutes = routes.filter(route => !route.roles || route.roles.includes(ds.rol.codigo.name));
+      }else{
+        authorizedRoutes = routes;
+      }
+
     return (
     
       <BrowserRouter>
