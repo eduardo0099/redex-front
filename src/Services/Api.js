@@ -6,7 +6,8 @@ const API =  axios.create({
     crossDomain: true,
     transformRequest: [function (data, headers) {
         headers['Authorization'] = localStorage.getItem('token');
-        return JSON.stringify(data);
+        console.dir(data);
+        return data;
       }],
     headers: {
         'Content-Type': 'application/json',
