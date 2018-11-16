@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Form, Input , Col,Select} from 'antd';
 import API from '../../Services/Api';
-
+import Notify from "../../utils/notify";
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -42,13 +42,14 @@ class InnerForm extends React.Component{
     console.log("Roles",this.state.roles);
     return (
       <Modal
-      style={{ top: 20 }} visible={visible}  width = {800} title="Crear nuevo usuario"  okText="Create"
+      style={{ top: 20 }} visible={visible}  width = {800} title="Crear nuevo usuario"  okText="Guardar"
+      cancelText="Cancelar"
       onCancel={onCancel}
       onOk={onCreate}
       >
         <Form layout="vertical">
           <FormItem label="Nombres">
-            {getFieldDecorator('nombres', {
+            {getFieldDecorator("nombres", {
               rules: [{ required: true, message: 'Porfavor ingrese el nombre del usuario' }],
             })(
               <Input />
@@ -185,8 +186,28 @@ export default class UsuarioForm extends React.Component {
   }
 
   save=()=>{
-    this.setState({...this.state,visible:false
+    let form =  this.formRef.props.form;
+    form.validateFields((err, values) => {
+      if (err) {
+        return;
+      }
+      
+      let usuario = {nombres:values.nombres, aPaterno:values.aPaterno, aMaterno:values.aMaterno,
+      tipDoc:{id:values.tipDoc.key},docId:values.docId,email:values.email, telefono:values.telefono,
+      rol:{id:values.rol.key}, oficina:{id:values.oficina.key}}
+
+    API.post(`usuarios/save`,usuario).then(response=>{
+      Notify.success({
+        message: 'Usuario registrado'
+      });
+      this.setState({...this.state,visible:false
+      })
     })
+    })
+  }
+
+  saveFormRef= (formRef) =>{
+    this.formRef = formRef;
   }
 
   render(){
