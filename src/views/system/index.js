@@ -75,9 +75,8 @@ export default class System extends Component {
   subirSimuPaquetes = () => API.post('/simulacion/paquetes/carga', this.state.archivo);
 
   subirSimulador = ()=>{
-    API.post('simulaciones/window',
+    API.post('simulacion/window',
       {
-        simulacion:  1, 
         inicio: this.state.inicio, 
         fin: this.state.fin
       }

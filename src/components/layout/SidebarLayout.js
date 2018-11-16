@@ -14,16 +14,21 @@ export default class SidebarLayout extends React.Component {
   }
   render() {
     let index = "1";
+
     const currentPath = this.props.route.match.path;
-    routes.forEach((route, i) => {
+
+    const ds = JSON.parse(localStorage.getItem('datasession'));
+    const authorizedRoutes = routes.filter(route => !route.roles || route.roles.includes(ds.rol.codigo.name));
+
+    authorizedRoutes.forEach((route, i) => {
       if (currentPath.includes(route.path)) {
         index = i.toString();
       }
     });
 
-
     const Component = this.props.component;
     const route = this.props.route;
+    
     return (
       <div>
         <Layout>
@@ -32,7 +37,7 @@ export default class SidebarLayout extends React.Component {
             <div>
             </div>
             <Menu theme="dark" mode="inline" defaultSelectedKeys={[index]}>
-              {routes.map((route, key) => {
+              {authorizedRoutes.map((route, key) => {
                 const { path, name } = route;
                 return (
                   <Menu.Item key={key}>

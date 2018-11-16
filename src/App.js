@@ -8,11 +8,14 @@ import { SidebarLayout } from './components/layout';
 class App extends Component {
 
     render() {
+      const ds = JSON.parse(localStorage.getItem('datasession'));
+      const authorizedRoutes = routes.filter(route => !route.roles || route.roles.includes(ds.rol.codigo.name));
     return (
+    
       <BrowserRouter>
         <Switch>
           <Route path="/" exact component={Login}></Route>
-          { routes.map((route, key) => {
+          { authorizedRoutes.map((route, key) => {
             const { component, path } = route;
             return (
               <Route exact path={path} key={key}

@@ -11,16 +11,25 @@ import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
 import Roles from './views/roles';
 import Paises from './views/paises';
 
+const RolesEnum = {
+  ADMINISTRADOR: 'ADMINISTRADOR',
+  JEFE_OFICINA: 'JEFE_OFICINA',
+  GERENTE_GENERAL: 'GERENTE_GENERAL',
+  EMPLEADO: 'EMPLEADO'
+}
+
 const routes = [
   {
     path: '/dashboard',
     component: Dashboard,
-    name: 'Dashboard'
+    name: 'Dashboard',
+    roles: [RolesEnum.ADMINISTRADOR]
   },
   {
     path: '/personas',
     component: Personas,
-    name: 'Personas'
+    name: 'Personas',
+    roles: [RolesEnum.EMPLEADO]
   },
   {
     path: '/paises',
@@ -35,7 +44,8 @@ const routes = [
   {
    path: '/planvuelo',
    component: PlanVuelo,
-   name: 'Plan de vuelo'
+   name: 'Plan de vuelo',
+   roles: [RolesEnum.ADMINISTRADOR, RolesEnum.GERENTE_GENERAL]
   },
   {
     path: '/vuelosagendados',
@@ -45,12 +55,14 @@ const routes = [
   {
     path: '/simulacion',
     component: Simulacion,
-    name: 'Simulación'
+    name: 'Simulación',
+    roles: [RolesEnum.ADMINISTRADOR]
   },
   {
     path: '/usuarios',
     component: Usuarios,
-    name: 'Usuarios'
+    name: 'Usuarios',
+    roles: [RolesEnum.ADMINISTRADOR]
   },
   {
     path: '/paquetes',
