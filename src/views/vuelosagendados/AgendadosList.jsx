@@ -15,6 +15,13 @@ export default class OficinasList extends React.Component {
     this.listRef.current.fetch();
   };
 
+  reporte = (id) => {
+    let aux = {id:id};
+    API.post(`reportes/paquetesXvuelo`,aux).then(response=>{
+      console.log(response);
+    })
+  }
+
   render() {
     const { updateAction } = this.props;
     return (
@@ -86,7 +93,7 @@ export default class OficinasList extends React.Component {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={updateAction.bind(this, record.id)}
+                    onClick={this.reporte.bind(this,record.id)}
                   >
                     Paquetes
                   </a>

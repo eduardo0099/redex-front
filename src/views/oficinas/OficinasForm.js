@@ -119,10 +119,10 @@ export default class OficinasForm extends React.PureComponent {
         pais: {id: values.pais.key},
       }
 
-      API.post('vuelos/save', envelope)
+      API.post('oficinas/save', envelope)
         .then(response => {
           Notify.success({
-            message: 'Oficina actualizada'
+            message: 'Oficina Registrada'
           });
           form.resetFields();
           this.props.fetch();

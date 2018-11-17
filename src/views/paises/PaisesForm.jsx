@@ -123,7 +123,7 @@ export default class OficinasForm extends React.PureComponent {
 
       let envelope = {
         ...values,
-        pais: {id: values.pais.key},
+        continente: {id: values.continente.key},
       }
 
       API.post('paises/save', envelope)
