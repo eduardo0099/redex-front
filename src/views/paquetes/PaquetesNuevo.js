@@ -290,9 +290,10 @@ class InnerForm extends React.Component {
         <FormItem style={{ display: "none" }}>
           {getFieldDecorator("personaDestino.id")(<div />)}
         </FormItem>
-
+                    
+        <Divider orientation="left">Descripción</Divider>
         <InputGroup size="large">
-          <FormItem label="Descripción">
+          <FormItem >
             {getFieldDecorator("descripcion")(<Input type="textarea" />)}
           </FormItem>
         </InputGroup>
@@ -500,6 +501,7 @@ export default class PaquetesNuevo extends React.Component {
         personaDestino: { id: values.personaDestino.id },
         oficinaOrigen: { id: values.oficinaOrigen.key },
         oficinaDestino: { id: values.oficinaDestino.key },
+        descripcion:values.descripcion,
         notiRegistro: values.notiRegistro,
         notiAbordados: values.notiAbordados,
         notiLlegada: values.notiLlegada
@@ -510,8 +512,16 @@ export default class PaquetesNuevo extends React.Component {
           message: "Paquete registrado"
         });
         this.setState({ modalResumen: false });
-
-        form.resetFields();
+        form.resetFields(["descripcion","nombreClienteDestino","oficinaDestino","tipoDocumentoIdentidadDestino","numeroDocumentoDestino"]);
+        form.setFields({
+            notiLlegada:{
+                value:false
+            },notiAbordados:{
+                value:false
+            },notiRegistro:{
+                value:false
+            }
+        })
         //this.props.fetch();
       });
     });

@@ -80,20 +80,27 @@ class PaquetesCliente extends React.Component {
                 {getFieldDecorator("apMaterno")(<Input type="textarea" />)}
                 </FormItem>
                 <Divider orientation="left">Contacto</Divider>
-                <FormItem label="Correo Electronico">
-                {getFieldDecorator("correoElectronico", {
-                rules: [{ required: true, message: 'Porfavor ingrese el correo electronico' }],
-                })(
-                    <Input type="textarea"/>
-                )}
-                </FormItem>
-                <FormItem label="Telefono">
-                {getFieldDecorator("telefono", {
-                rules: [{ required: true, message: 'Porfavor ingrese el telefono' }],
-                })(
-                    <Input type="textarea"/>
-                )}
-                </FormItem>
+                    <FormItem label="Correo Electronico">
+                    {getFieldDecorator("correoElectronico", {
+                    rules: [{ required: true, message: 'Porfavor ingrese el correo electronico' }],
+                    })(
+                        <Input type="textarea"/>
+                    )}
+                    </FormItem>
+                    <FormItem label="Telefono">
+                    {getFieldDecorator("telefono", {
+                    rules: [{ required: true, message: 'Porfavor ingrese el telefono' }],
+                    })(
+                        <Input type="textarea"/>
+                    )}
+                    </FormItem>
+                    <FormItem label="Direccion">
+                    {getFieldDecorator("direccion", {
+                    rules: [{ required: true, message: 'Porfavor ingrese la direccion' }],
+                    })(
+                        <Input type="textarea"/>
+                    )}
+                    </FormItem>
             </Form>
             </Modal>
         )
