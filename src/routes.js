@@ -29,7 +29,6 @@ const routes = [
     path: '/personas',
     component: Personas,
     name: 'Personas',
-    roles: [RolesEnum.EMPLEADO]
   },
   {
     path: '/paises',

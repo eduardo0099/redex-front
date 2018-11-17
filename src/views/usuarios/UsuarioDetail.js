@@ -168,7 +168,6 @@ export default class UsuarioDetail extends React.Component {
                 close={this.close}
                 ok={this.saveChange}
                 title={this.state.title}
-                action={this.state.action}
                 usuario={this.state.usuario}
             />
 

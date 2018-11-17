@@ -2,6 +2,8 @@ import React from "react";
 import { Col, Layout, Button, Menu, Dropdown, Icon } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import AgendadosList from "./AgendadosList";
+import API from '../../Services/Api';
+import notify from "../../utils/notify";
 
 export default class Oficinas extends React.Component {
 
@@ -11,18 +13,24 @@ export default class Oficinas extends React.Component {
     this.uploadRef = React.createRef();
   }
 
-  nuevo = () => this.formRef.current.nuevo();
-
-  editar = (id) => this.formRef.current.editar(id);
+  
 
   subir = () => this.uploadRef.current.open();
 
   fetch = () => this.listRef.current.fetch();
 
+  eliminar = () =>{
+    API.post(`vuelosagendados/eliminar`).then(response=>{
+      notify.success({
+        message:"Elinacion de vuelos agendados pasados"
+      })
+    })
+  }
+
   render() {
     const menu = (
       <Menu>
-        <Menu.Item onClick={this.nuevo}> Eliminar </Menu.Item>
+        <Menu.Item onClick={this.eliminar}> Eliminar </Menu.Item>
       </Menu>
     );
 

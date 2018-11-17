@@ -18,8 +18,10 @@ export default class Paquetes extends React.Component {
     this.detailRef = React.createRef();
     this.uploadRef = React.createRef();
     this.state=({
-      listaDoc:[]
+      listaDoc:[],
+      visible:false,
     })
+    this.mostrarModal= this.mostrarModal.bind(this);
   }
   
   upload = () => this.uploadRef.current.open();
@@ -40,11 +42,33 @@ export default class Paquetes extends React.Component {
     })
   }
 
+  emitirReporte = () =>{
+    let obj={fecha_ini:"16-11-2018",fecha_fin:"18-11-2018"}
+    API.post(`reportes/enviosXfechas`,obj).then(response=>{
+      this.setState({
+        visible:false
+      })
+    })
+  }
+
+  mostrarModal = () =>{
+    this.setState({
+      visible:true
+    })
+  }
+
+  closeModal = () =>{
+    this.setState({
+      visible:false
+    })
+  }
+
   render() {
     const menu = (
       <Menu>
         <Menu.Item onClick={this.gotoNuevo} key="1">Nuevo Paquete</Menu.Item>
         <Menu.Item onClick={this.upload} key="2">Cargar datos</Menu.Item>
+        <Menu.Item onClick={this.mostrarModal} key="2">Emitir Reporte</Menu.Item>
       </Menu>
     );
 
@@ -66,6 +90,7 @@ export default class Paquetes extends React.Component {
             <PaquetesList ref={ this.listRef } onDetalle = { this.findDetalle } />
             <CrimsonUpload ref={ this.uploadRef } url="/paquetes/carga" title="Cargar paquetes"/>
             <PaquetesDetail ref= { this.detailRef }/>
+            <Modal visible={this.state.visible} onOk={this.emitirReporte} onCancel={this.closeModal}></Modal>
           </TheContent>
         </Layout>
     )
