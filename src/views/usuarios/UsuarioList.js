@@ -95,6 +95,16 @@ export default class UsuarioList extends React.Component {
                 </div>
               )}
             />
+            <Column
+              title="Telefono"
+              key="telefono"
+              render={record=>(
+                <div>
+                <span> { record.colaborador.telefono } </span>
+                </div>
+                )
+              }
+            />
                <Column
               title="Estado"
               key="estado"
