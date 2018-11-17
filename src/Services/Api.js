@@ -1,6 +1,6 @@
 import axios from 'axios';
 import backend from './backend';
-
+import fileDownload from 'js-file-download';
 const API =  axios.create({
     baseURL: backend,
     crossDomain: true,
@@ -10,4 +10,8 @@ const API =  axios.create({
     }
 });
 
+function getFile(response){
+    fileDownload(response, response.headers["content-disposition"]);
+}
+export { getFile };
 export default API;
