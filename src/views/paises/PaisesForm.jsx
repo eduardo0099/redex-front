@@ -67,6 +67,9 @@ class InnerForm extends React.Component {
           <FormItem label="ISO">
             {getFieldDecorator("codigoIso")(<Input type="textarea" />)}
           </FormItem>
+          <FormItem label="husoHorario">
+            {getFieldDecorator("husoHorario")(<Input type="textarea" />)}
+          </FormItem>
         </Form>
         </Modal>
     )
