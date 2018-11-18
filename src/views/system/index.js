@@ -52,14 +52,6 @@ export default class System extends Component {
     this.setState({ ...this.state, archivo: formData });
   };
 
-  subirOficinas = () => {
-    API.post('/oficinas/carga', this.state.archivo);
-  };
-
-  subirVuelos = () => {
-    API.post('/planvuelo/carga', this.state.archivo);
-  };
-
   subirUsuarios = () => {
     API.post('/usuarios/carga', this.state.archivo);
   };
@@ -67,10 +59,6 @@ export default class System extends Component {
   subirPaquetes = () => {
     API.post('/paquetes/carga', this.state.archivo);
   };
-
-  subirSimuOficinas = () => API.post('/simulacion/oficinas/carga', this.state.archivo);
-
-  subirSimuVuelos = () => API.post('/simulacion/vuelos/carga', this.state.archivo);
 
   subirSimuPaquetes = () => API.post('/simulacion/paquetes/carga', this.state.archivo);
 
@@ -92,6 +80,26 @@ export default class System extends Component {
     this.setState({inicio: event.target.value});
   }
   
+  paquetesXOficinaLinea = () => {
+    API.post('/graficos/paquetesXoficinaXfecha_linea', {fecha_ini: '08/11/2018', fecha_fin: '08/12/2018', idOf: 2 })
+    .then(response => {
+      console.dir(response);
+    })
+  }
+
+  paquetesXOficinaBarra = () => {
+    API.post('/graficos/paquetesXoficinasXfecha_barra', {fecha_ini: '08/11/2018', fecha_fin: '08/12/2018'})
+    .then(response => {
+      console.dir(response);
+    })
+  }
+
+  paquetesXvuelosXfecha = () => {
+    API.post('/graficos/paquetesXvuelosXfecha', {fecha_ini: '08/11/2018', fecha_fin: '08/12/2018'})
+    .then(response => {
+      console.dir(response);
+    })
+  }
 
   render() {
     return (
@@ -126,6 +134,14 @@ export default class System extends Component {
           <input value={this.state.inicio} onChange={this.fechaInicio}></input>
           <input value={this.state.fin} onChange={this.fechaFin}></input>
           <Button onClick={this.subirSimulador}>Inicio</Button>
+          <Divider orientation="left">Dashboard</Divider>
+          <div>
+            <button onClick={this.paquetesXOficinaLinea}>paquetesXoficinaXfecha_linea </button>
+          </div> <div>
+            <button onClick={this.paquetesXvuelosXfecha}> paquetesXvuelosXfecha </button>
+          </div> <div>
+            <button onClick={this.paquetesXOficinaBarra}> paquetesXoficinasXfecha_barra </button>
+          </div>
         </TheContent>
       </Layout>
     );
