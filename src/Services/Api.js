@@ -10,8 +10,16 @@ const API =  axios.create({
     }
 });
 
+API.interceptors.request.use(function (config) {
+    config.headers.Authorization = localStorage.getItem('token');
+    return config;
+  }, function (error) {
+    return Promise.reject(error);
+  });
+
 function getFile(response){
     fileDownload(response, response.headers["content-disposition"]);
 }
+
 export { getFile };
 export default API;
