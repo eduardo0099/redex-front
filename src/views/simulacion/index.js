@@ -1,15 +1,15 @@
 import React, { Component } from 'react';
-import { Layout ,Select,Button} from 'antd';
+import { Layout ,Select, Modal ,Button, DatePicker, TimePicker, InputNumber } from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import { ComposableMap,ZoomableGroup,Geographies,Geography,Markers,Marker,Line,Lines} from 'react-simple-maps';
 import ReactTooltip from 'react-tooltip';
+
 //Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
 //import locAlm from './../../utils/files/locations.json';
-import Modal from './Modal';
 import API from './../../Services/Api';
-
-const Option = Select.Option;
+import { SIGWINCH } from 'constants';
+import moment from 'moment';
 
 class Simulacion extends Component{
     constructor(props) {
@@ -20,22 +20,29 @@ class Simulacion extends Component{
         this.colorUnSelected = '#f5cc00';
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
-        this.frecRefreshSimu = 2000;
+        this.frecRefreshSimu = 1000;
         this.foo = new Date();
         this.listActions = [];
+        this.maxStepConfig = 4; 
         this.state = {
             windowTime: 5*60*60 *1000, //El ultimo mil es porque es en milisegundos
             indexLoc: null,
             center: [0,20],
             zoom: 1,
+            visibleModalConfig: false,
             tooltipConfig: null,
             myMap:null,
-            frecTime: 1,
+            frecTime: 1000,
             intervalClock: null,
             intervalWindowClock: null,
             time: new Date().getTime(),
             realTime: 0,
             infoVuelos:[],
+            archivo:{},
+            stepConfig:1,
+            collapsed: false,
+            infoCollapsed: {},
+            errorConfig: false,
             locationInfo: [],
             selectedCountries: [],
             planVuelos:[
@@ -74,7 +81,7 @@ class Simulacion extends Component{
         this.sendRequestActions = this.sendRequestActions.bind(this);
     }
     componentWillMount(){
-      API.get('/simulaciones/1/oficinas').then(response =>{
+      /*API.get('/simulaciones/1/oficinas').then(response =>{
         let selectedCountries = [];
         let aux = [];
         let mapIndexLoc = new Map();
@@ -93,29 +100,180 @@ class Simulacion extends Component{
             locationInfo: response,
             selectedCountries: selectedCountries
         });
-      });
+      });*/
       
         setTimeout(()=>{
             ReactTooltip.rebuild()
         },100)
         
-    }   
-    handleWindowTimeChange(e){
+    } 
+    
+    handleOpenModalConfig = (e) => {
         this.setState({
-            windowTime: e.target.value,
+            visibleModalConfig: true,
+        });
+        
+    }
+    handleCancelModalConfig = (e) => {
+        this.setState({
+            visibleModalConfig: false,
         });
     }
-    handleTimeDateChange(e){
-      let newTimeArr = e.target.value.split("-");
-      let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]))
+    contentConfigModal = (numStep) => {
+        switch(numStep){
+            case 1:
+                return (
+                    <div>
+                        <strong><p>Paso {this.state.stepConfig} de {this.maxStepConfig}</p></strong>
+                        <div className="title-config">Sube el archivo de ofinas o areropuertos</div>
+                        <div style={{textAlign:'center'}}><input type="file" onChange={this.onChangeFileLoad} /></div>
+                        {this.state.errorConfig ? <div style={{color:'#f5222d'}} className="error-config">Hubo un error al subir el archivo, intentelo de nuevo</div> : '' }
+                    </div>
+                );
+            case 2:
+                return (
+                    <div>
+                        <strong><p>Paso {this.state.stepConfig} de {this.maxStepConfig}</p></strong>
+                        <div className="title-config">Sube el archivo de vuelos programados</div>
+                        <div style={{textAlign:'center'}}><input type="file" onChange={this.onChangeFileLoad} /></div>
+                        {this.state.errorConfig ? <div style={{color:'#f5222d'}} className="error-config">Hubo un error al subir el archivo, intentelo de nuevo</div> : '' }
+                    </div>
+                );  
+            case 3:
+                return (
+                    <div>
+                        <strong><p>Paso {this.state.stepConfig} de {this.maxStepConfig}</p></strong>
+                        <div className="title-config">Sube el archivo de registro de paquetes</div>
+                        <div style={{textAlign:'center'}}><input type="file" onChange={this.onChangeFileLoad} /></div>
+                        {this.state.errorConfig ? <div style={{color:'#f5222d'}} className="error-config">Hubo un error al subir el archivo, intentelo de nuevo</div> : '' }
+                    </div>
+                );
+            case 4:
+                return (
+                    <div>
+                        <strong><p>Paso {this.state.stepConfig} de {this.maxStepConfig}</p></strong>
+                        <div className="title-config">Establece la fecha inicial y la escala de tiempo</div>
+                        <div>
+                            Seleccione la fecha inicio: <DatePicker onChange={this.handleTimeDateChange} />
+                        </div>
+                        <div style={{marginTop:'1rem'}}>
+                            Seleccione la hora inicio: <TimePicker onChange={this.handleTimeChange} defaultOpenValue={moment('00:00:00', 'HH:mm:ss')} />
+                        </div>
+                        <div style={{marginTop:'1rem'}}>
+                            Intervalo de tiempo en simulación: <InputNumber min={1} defaultValue={this.state.frecTime} onChange={this.handleFrecTimeChange} />seg
+                        </div>
+                        <div style={{marginTop:'1rem'}}>
+                            Intervalo de tiempo real: <InputNumber min={1} defaultValue={this.state.windowTime} onChange={this.handleWindowTimeChange} />
+                        </div>
+                        <strong>{"Cada 1seg , será " + Math.floor(this.state.windowTime/this.state.frecTime)}</strong>
+                        {this.state.errorConfig ? <div style={{color:'#f5222d'}} className="error-config">Hubo un error al subir el archivo, intentelo de nuevo</div> : '' }
+                    </div>
+                );
+        }
+    } 
+    handleOkModalConfig = (e) => {
+        let urlApi = '';
+        switch(this.state.stepConfig){
+            case 1:
+                urlApi = '/simulacion/oficinas/carga';
+                break;
+            case 2:
+                urlApi = '/simulacion/vuelos/carga';
+                break;
+            case 3:
+                urlApi = '/simulacion/paquetes/carga';
+                break;
+            case 4:
+                urlApi = '';
+                break;
+        }
+        console.log("envia",urlApi,this.state.archivo);
+        if(urlApi != ''){
+            API.post(urlApi, this.state.archivo)
+            .then(response => {
+                if(this.state.stepConfig == 1){
+                    API.get('/simulacion/oficinas').then(response =>{
+                        console.log("offiii",response)
+                        let selectedCountries = [];
+                        let aux = [];
+                        let mapIndexLoc = new Map();
+                        response = response.data
+                        for (let i = 0; i < response.length; i++) {
+                            let obj = [];
+                            obj.push(response[i].pais.codigoIso);
+                            obj.push(response[i]);
+                            mapIndexLoc.set(response[i].pais.codigoIso,i);
+                            //selectedCountries.push(response[i].pais.codigoIso);
+                            aux.push(obj);
+                        }
+                        this.setState({
+                            indexLoc: mapIndexLoc,
+                            myMap:new Map(aux),
+                            locationInfo: response,
+                            selectedCountries: selectedCountries,
+                            stepConfig: this.state.stepConfig + 1,
+                            visibleModalConfig: this.state.stepConfig == this.maxStepConfig ? false : true,
+                            errorConfig : false,
+                            archivo:{},
+                        });
+                      });
+                }else{
+                    this.setState({
+                        stepConfig: this.state.stepConfig + 1,
+                        visibleModalConfig: this.state.stepConfig == this.maxStepConfig ? false : true,
+                        errorConfig : false,
+                        archivo:{},
+                    });
+                }
+            }).catch(response => {
+                this.setState({
+                    visibleModalConfig: true,
+                    errorConfig : true,
+                    archivo: {},
+                });
+            });
+        }else{
+            this.setState({
+                stepConfig: this.state.stepConfig + 1,
+                visibleModalConfig: this.state.stepConfig == this.maxStepConfig ? false : true,
+                archivo:{},
+            });
+        }
+    }
+    onChangeFileLoad = e => {
+        let file = e.target.files[0];
+        let formData = new FormData();
+        formData.append("file", file);
+        console.log(">>>",file,formData,formData.getAll('file'));
+        this.setState({
+            archivo: formData
+        });
+    };  
+    handleWindowTimeChange(value){
+        this.setState({
+            windowTime: value,
+        });
+    }
+    handleTimeDateChange(objData, dataString){
+      let newTimeArr = dataString.split("-");
+      let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]));
       this.setState({
         time: newDateTime.getTime(),
         realTime: newDateTime.getTime(),
-      })
+      });
     }
-    handleFrecTimeChange(e){
+    handleTimeChange = (objTime, timeString) => {
+        let newTimeArr = timeString.split(":");
+        let newDateTime = new Date(this.state.time);
+        newDateTime.setHours(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]),parseInt(newTimeArr[2]));
+        this.setState({
+            time: newDateTime.getTime(),
+            realTime: newDateTime.getTime(),
+        });
+    }
+    handleFrecTimeChange(value){
       this.setState({
-        frecTime: e.target.value,
+        frecTime: value,
       });
     }
     
@@ -129,6 +287,8 @@ class Simulacion extends Component{
       let esTemprano = true;
       let obj;
       let idx;
+      let isCollapsed = false;
+      let objInfoCollap = {};
       while(this.listActions.length != 0 && esTemprano){
         if(this.listActions[0].fechaSalida < this.state.time){
 
@@ -137,12 +297,16 @@ class Simulacion extends Component{
           if(obj.tipo == "REGISTRO"){
             idx = auxIndex.get(obj.oficinaLlegada);
             auxLocationInfo[idx].capacidadActual++;
+            if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
+                isCollapsed = true;
+                objInfoCollap = {code: obj.oficinaLlegada}
+            }
             console.log("R");
           }else if(obj.tipo == "SALIDA"){
             auxPlanesNew.push(obj);
             idx = auxIndex.get(obj.oficinaLlegada);
             auxLocationInfo[idx].capacidadActual -= obj.cantidad;
-            //console.log("S");
+            console.log("S");
           }
 
         }else{
@@ -156,20 +320,29 @@ class Simulacion extends Component{
 
       for(let delElem of finishedFlights){
         let idxDel = auxIndex.get(delElem.oficinaSalida);
+        if(auxLocationInfo[idxDel].capacidadActual + delElem.cantidad > auxLocationInfo[idxDel].capacidadMaxima){
+            isCollapsed = true;
+            objInfoCollap = {code: delElem.oficinaSalida}
+        }
         auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
       }
-
+      if(isCollapsed){
+        console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
+        clearInterval(this.state.intervalClock);
+        clearInterval(this.state.intervalWindowClock);
+      }
       this.setState({
         locationInfo: auxLocationInfo,
         time: newTime,
-        planVuelos: liveFlights.concat(auxPlanesNew)
+        planVuelos: liveFlights.concat(auxPlanesNew),
+        infoCollapsed: objInfoCollap,
+        collapsed: isCollapsed,
       });
       //Fin
     }
 
     sendRequestActions(){
-        console.log("envia",new Date(this.state.realTime), " - ",new Date(this.state.realTime + this.state.windowTime))
-        API.post('simulaciones/window',
+        API.post('simulacion/window',
             {
             simulacion:  1, 
             inicio: new Date(this.state.realTime), //2018-04-16T19:01:00 
@@ -195,8 +368,9 @@ class Simulacion extends Component{
 
         let intWindowClock = setInterval(
             () => this.sendRequestActions()
-            ,Math.floor(this.state.windowTime/this.state.frecTime));
-        console.log("cada x llama",Math.floor(this.state.windowTime/this.state.frecTime)/1000)
+           // ,Math.floor(this.state.windowTime/this.state.frecTime));
+           ,this.state.frecTime*1000);
+        console.log("cada x llama" + this.state.frecTime  + " seg")
         this.sendRequestActions()
         this.setState({
             intervalClock: intClock,
@@ -276,12 +450,20 @@ class Simulacion extends Component{
             </TheHeader>
             <TheContent>
             <div>
-            <input type="date" value={timeStringFormat} onChange={this.handleTimeDateChange}/>
-            <input type="number" value={frecTime} onChange={this.handleFrecTimeChange}/>
-            <input type="number" value={windowTime} onChange={this.handleWindowTimeChange}/>
             {objTime.toLocaleString()}
-            <button onClick={this.handleStartClock}>Start</button>
+            {this.state.isCollapsed ? ("El sistema colapso en el almacen "+ this.state.infoCollapsed.code) : "Aun no colapsa"}
             </div>
+            <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
+                {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
+            </Button>
+            <Modal
+                title="Configuración de la simulación"
+                visible={this.state.visibleModalConfig}
+                onOk={this.handleOkModalConfig}
+                onCancel={this.handleCancelModalConfig}
+            >
+                {this.contentConfigModal(this.state.stepConfig)}
+            </Modal>
             <ComposableMap
                         className="mapa"
                         projectionConfig={{
