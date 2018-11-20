@@ -38,7 +38,8 @@ const routes = [
   {
    path: '/oficinas',
    component: Oficinas,
-   name: 'Oficinas'
+   name: 'Oficinas',
+   roles:[RolesEnum.ADMINISTRADOR,RolesEnum.GERENTE_GENERAL]
   },
   {
    path: '/planvuelo',
@@ -71,17 +72,20 @@ const routes = [
    {
     path: '/paquetes/nuevo',
     component: PaquetesNuevo,
-    name: 'PaquetesNuevo'
+    name: 'PaquetesNuevo',
+    roles:[RolesEnum.EMPLEADO,RolesEnum.ADMINISTRADOR]
    },
    {
     path: '/roles',
     component: Roles,
-    name: 'Roles'
+    name: 'Roles',
+    roles:[RolesEnum.ADMINISTRADOR]
    },
   {
     path: '/system',
     component: System,
-    name: 'Pruebas'
+    name: 'Pruebas',
+    roles:[RolesEnum.ADMINISTRADOR]
    },
    
 ]
