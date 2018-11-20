@@ -8,65 +8,6 @@ import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,AreaChart, A
 const Option = Select.Option;
 const RangePicker = DatePicker.RangePicker;
 
-const data = [
-      {name: 'Enero', paquetes: 400, amt: 2400},
-      {name: 'Febrero', paquetes: 300, amt: 2210},
-      {name: 'Marzo', paquetes: 200, amt: 2290},
-      {name: 'Abril', paquetes: 278, amt: 2000},
-      {name: 'Mayo', paquetes: 189, amt: 2181},
-      {name: 'Junio', paquetes: 239, amt: 2500},
-      {name: 'Julio', paquetes: 239, amt: 2500},
-      {name: 'Agosto', paquetes: 349, amt: 2100},
-      {name: 'Setiembre', paquetes: 349, amt: 2100},
-      {name: 'Octubre', paquetes: 10, amt: 2100},
-      {name: 'Noviembre', paquetes: 349, amt: 2100},
-      {name: 'Diciembre', paquetes: 0, amt: 2100},
-];
-
-const vuelos=[
-  {name: 'Peru-Francia', paquetes: 400},
-  {name: 'Chile-Brasil', paquetes: 300},
-  {name: 'Francia-Lima', paquetes: 250},
-  {name: 'Rusia-España', paquetes: 400},
-  {name: 'Grecia-Italia', paquetes: 400}
-  
-];
-
-const oficinas=[
-  {name:'Peru',registrados:250,entregados:100},
-  {name:'Chile',registrados:150,entregados:50},
-  {name:'Brasil',registrados:350,entregados:100},
-  {name:'Bolivia',registrados:170,entregados:160},
-  {name:'Rusia',registrados:60,entregados:140},
-  {name:'España',registrados:123,entregados:90}
-];
-
-
-const SimpleAreaChart = (
-  <AreaChart width={450} height={190} data={vuelos}
-            margin={{top: 0, right: 0, left: -20, bottom: 0}}>
-        <CartesianGrid strokeDasharray="3 3"/>
-        <XAxis dataKey="name"/>
-        <YAxis/>
-        <Tooltip/>
-        <Area type='monotone' dataKey='paquetes' stroke='#8884d8' fill='#8884d8' />
-      </AreaChart>
-);
-
-const LineaBarComposeChart = (
-  <ComposedChart width={600} height={190} data={oficinas}
-            margin={{top: 0, right: 0, bottom: 0, left: 200}}>
-          <CartesianGrid stroke='#f5f5f5'/>
-          <XAxis dataKey="name"/>
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Bar dataKey='registrados' barSize={20} fill='#413ea0' />
-          <Line type='monotone' dataKey='entregados' stroke='#ff7300' />
-       </ComposedChart>
-);
-
-
 class Dashboard extends Component {
 
   constructor(props){
@@ -78,7 +19,11 @@ class Dashboard extends Component {
       idOf:"",
       fechaInicioV:"2018-01-01",
       fechaFinV:"2018-12-31",
-      vuelos:[]
+      fechaInicioO:"01-01-2018",
+      fechaFinO:"31-12-2018",
+      vuelos:[],
+      oficinas:[],
+      oficina:[]
     }
   }
 
@@ -90,6 +35,16 @@ class Dashboard extends Component {
     }}).then(response => {
       this.setState({
         vuelos:response.data
+      })
+    });
+    let data = {
+      fecha_ini:this.state.fechaInicioO,
+      fecha_fin:this.state.fechaFinO
+    }
+    API.post(`/dashboard/paquetesXoficinasXfecha_barra`,data).then(response=>{
+      console.log("Oficinas:",response.data)
+      this.setState({...this.state,
+        oficinas:response.data
       })
     })
   }
@@ -109,6 +64,14 @@ class Dashboard extends Component {
     )
   };
 
+  chooseFechaOficinas = values =>{
+    this.setState({
+      ...this.values,
+      fechaInicioO:values[0],
+      fechaFinO:values[1]
+    })
+  }
+
   dataGrafVuelos =() =>{
     let data = {
       inicio: this.state.fechaInicioV.format('YYYY-MM-DD'),
@@ -125,12 +88,27 @@ class Dashboard extends Component {
     })
   }
 
+  dataGrafOficinas =()=>{
+    let data = {
+      fecha_ini:this.state.fechaInicioO.format('DD-MM-YYYY'),
+      fecha_fin:this.state.fechaFinO.format('DD-MM-YYYY')
+    }
+    console.log("Fechas oficinas:",data);
+    API.post(`/dashboard/paquetesXoficinasXfecha_barra`,data).then(response=>{
+      console.log("Oficinas:",response.data)
+      this.setState({...this.state,
+        oficinas:response.data
+      })
+    })
+  }
+
   dataGrafPais=()=>{
     let data = {idOf:this.state.idOf,fecha_ini: this.state.fechaInicio.format('DD/MM/YYYY'),
     fecha_fin: this.state.fechaFin.format('DD/MM/YYYY')}
     console.log("Envia:",data);
     API.post(`dashboard/paquetesXoficinaXfecha_linea`,data).then(response=>{
       console.log("Devuelve api:",response.data);
+      this.setState({...this.state,oficina:response.data})
     }).catch()
   }
 
@@ -160,6 +138,30 @@ class Dashboard extends Component {
       </BarChart>
     );
 
+    const SimpleAreaChart = (
+      <AreaChart width={450} height={190} data={this.state.oficinas}
+                margin={{top: 0, right: 0, left: -20, bottom: 0}}>
+            <CartesianGrid strokeDasharray="3 3"/>
+            <XAxis dataKey="pais"/>
+            <YAxis/>
+            <Tooltip/>
+            <Area type='monotone' dataKey='cantidad' stroke='#8884d8' fill='#8884d8' />
+          </AreaChart>
+    );
+    
+    const LineaBarComposeChart = (
+    <ComposedChart width={600} height={190} data={this.state.oficina}
+            margin={{top: 0, right: 0, bottom: 0, left: 200}}>
+          <CartesianGrid stroke='#f5f5f5'/>
+          <XAxis dataKey="name"/>
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Bar dataKey='registrados' barSize={20} fill='#413ea0' />
+          <Line type='monotone' dataKey='entregados' stroke='#ff7300' />
+       </ComposedChart>
+    );
+
     const colStyle = { 'padding':'15px 15px'};
     const middleHeight= { 'height' : '35vh' };
     console.log(this.state.idOf,this.state.fechaInicio,this.state.fechaFin);
@@ -171,21 +173,29 @@ class Dashboard extends Component {
         <TheContent>
           <Row>
             <Col span={12} style={colStyle}>
-              <Divider >Vuelos mas usuados</Divider>
-              <Col span={12}>
-              <RangePicker
-              style={{ width: "100%" }}
-              format="DD/MM/YYYY"
-              onChange={this.choose2}
-              />
-              </Col>
-              <Button onClick={this.dataGrafVuelos}>MOSTRAR</Button>
+              <Divider >Vuelos mas usados</Divider>
+              <Row style={colStyle}>
+                <Col span={12}>
+                <RangePicker
+                style={{ width: "100%" }}
+                format="DD/MM/YYYY"
+                onChange={this.choose2}/></Col>
+                <Col span={12}><Button onClick={this.dataGrafVuelos}>MOSTRAR</Button></Col>
+              </Row>
               <CrimsonChartCard style={{...middleHeight}}>
               {SimpleBarChart}
               </CrimsonChartCard>
             </Col>
             <Col span={12} style={colStyle}>
-              <Divider >vuelosXpaquetes(vuelos mas usuados?)</Divider>
+              <Divider >Resumen Oficinas</Divider>
+              <Row style={colStyle}>
+                <Col span={12}><RangePicker
+                style={{ width: "100%" }}
+                format="DD/MM/YYYY"
+                onChange={this.chooseFechaOficinas}
+                /></Col>
+                <Col span={12}><Button onClick={this.dataGrafOficinas}>MOSTRAR</Button></Col>
+              </Row>
               <CrimsonChartCard style={{...middleHeight}} >
               {SimpleAreaChart}
               </CrimsonChartCard>
@@ -193,28 +203,30 @@ class Dashboard extends Component {
           </Row>
           <Row style={colStyle}> 
             <Divider >Resumen por oficina</Divider>
-            <Select
-              style={{ width: "100%" }}
-              showSearch
-              defaultActiveFirstOption={false}
-              filterOption={false}
-              onSearch={this.fetchOficinasOrigen}
-              notFoundContent={null}
-              labelInValue={true}
-              onChange={this.cambiaPais}
-              >
-              {this.state.oficinas.map(i => (
-                <Option key={i.id} value={i.id}>
-                {i.pais.nombre}
-                </Option>
-              ))}
-            </Select>
-            <RangePicker
-              style={{ width: "100%" }}
-              format="DD/MM/YYYY"
-              onChange={this.choose}
-            />
-            <Button onClick={this.dataGrafPais}>MOSTRAR</Button>
+            <Row style={colStyle}>
+              <Col span={10}><Select
+                style={{ width: "100%" }}
+                showSearch
+                defaultActiveFirstOption={false}
+                filterOption={false}
+                onSearch={this.fetchOficinasOrigen}
+                notFoundContent={null}
+                labelInValue={true}
+                onChange={this.cambiaPais}
+                >
+                {this.state.oficinas.map(i => (
+                  <Option key={i.id} value={i.id}>
+                  {i.pais.nombre}
+                  </Option>
+                ))}
+              </Select></Col>
+              <Col span={10}><RangePicker
+                style={{ width: "100%" }}
+                format="DD/MM/YYYY"
+                onChange={this.choose}
+              /></Col>
+              <Col span={4}><Button onClick={this.dataGrafPais}>MOSTRAR</Button></Col>
+            </Row>
             <CrimsonChartCard style={{...middleHeight}} >
             {LineaBarComposeChart}
             </CrimsonChartCard>
