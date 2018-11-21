@@ -23,7 +23,9 @@ class Dashboard extends Component {
       fechaFinO:"31-12-2018",
       vuelos:[],
       oficinas:[],
-      oficina:[]
+      oficina:[],
+      btnPaises:true,
+      btnVuelos:true,
     }
   }
 
@@ -60,7 +62,9 @@ class Dashboard extends Component {
     this.setState({
       ...this.values,
       fechaInicioV: values[0],
-      fechaFinV: values[1]}
+      fechaFinV: values[1],
+      btnVuelos:false
+    }
     )
   };
 
@@ -68,7 +72,8 @@ class Dashboard extends Component {
     this.setState({
       ...this.values,
       fechaInicioO:values[0],
-      fechaFinO:values[1]
+      fechaFinO:values[1],
+      btnPaises:false
     })
   }
 
@@ -180,7 +185,7 @@ class Dashboard extends Component {
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 onChange={this.choose2}/></Col>
-                <Col span={12}><Button onClick={this.dataGrafVuelos}>MOSTRAR</Button></Col>
+                <Col span={12}><Button onClick={this.dataGrafVuelos} disabled={this.state.btnVuelos}>MOSTRAR</Button></Col>
               </Row>
               <CrimsonChartCard style={{...middleHeight}}>
               {SimpleBarChart}
@@ -194,42 +199,12 @@ class Dashboard extends Component {
                 format="DD/MM/YYYY"
                 onChange={this.chooseFechaOficinas}
                 /></Col>
-                <Col span={12}><Button onClick={this.dataGrafOficinas}>MOSTRAR</Button></Col>
+                <Col span={12}><Button onClick={this.dataGrafOficinas} disabled={this.state.btnPaises}>MOSTRAR</Button></Col>
               </Row>
               <CrimsonChartCard style={{...middleHeight}} >
               {SimpleAreaChart}
               </CrimsonChartCard>
             </Col>
-          </Row>
-          <Row style={colStyle}> 
-            <Divider >Resumen por oficina</Divider>
-            <Row style={colStyle}>
-              <Col span={10}><Select
-                style={{ width: "100%" }}
-                showSearch
-                defaultActiveFirstOption={false}
-                filterOption={false}
-                onSearch={this.fetchOficinasOrigen}
-                notFoundContent={null}
-                labelInValue={true}
-                onChange={this.cambiaPais}
-                >
-                {this.state.oficinas.map(i => (
-                  <Option key={i.id} value={i.id}>
-                  {i.pais.nombre}
-                  </Option>
-                ))}
-              </Select></Col>
-              <Col span={10}><RangePicker
-                style={{ width: "100%" }}
-                format="DD/MM/YYYY"
-                onChange={this.choose}
-              /></Col>
-              <Col span={4}><Button onClick={this.dataGrafPais}>MOSTRAR</Button></Col>
-            </Row>
-            <CrimsonChartCard style={{...middleHeight}} >
-            {LineaBarComposeChart}
-            </CrimsonChartCard>
           </Row>
         </TheContent>
       </Layout>

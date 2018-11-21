@@ -34,6 +34,7 @@ export default class Usuarios extends React.Component {
     this.formRef = formRef;
   }
 
+  
   render() {
     const menu = (
       <Menu>
@@ -57,7 +58,7 @@ export default class Usuarios extends React.Component {
             </Col>
           </TheHeader>
           <TheContent>
-            <UsuarioList ref = {this.listRef} onDetalle={this.findDetalle}/>
+            <UsuarioList ref = {this.listRef} onDetalle={this.findDetalle} />
             <UsuarioForm  ref = {this.nuevoRef} fetch={this.fetch} />
             <CrimsonUpload ref={this.uploadRef} url="/usuarios/carga" title="Cargar usuarios"/>
             <UsuarioDetail ref={this.detailRef}/>

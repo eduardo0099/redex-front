@@ -3,6 +3,7 @@ import { Table, Menu, Dropdown, Icon,Modal, Tag} from 'antd';
 import API from '../../Services/Api';
 import CrimsonTable from '../../components/CrimsonTable';
 import notify from '../../utils/notify';
+import MenuItem from 'antd/lib/menu/MenuItem';
 
 const { Column } = Table;
 
@@ -50,6 +51,16 @@ export default class UsuarioList extends React.Component {
     notify.success({message: response.data.msg})
     this.fetch()
   });
+
+  emitirReporte = (record) =>{
+    let persona = {id:record.id}
+    console.log("Reporte id=",record.id)
+    API.post(`/reportes/paquetesXusuario`,persona).then((response) => {
+      notify.success({
+        message: "Se emitio el reporte correctamente"
+      })
+    })
+  }
 
     render(){
       const {onDetalle}  = this.props;
@@ -147,6 +158,13 @@ export default class UsuarioList extends React.Component {
                         </Menu.Item>
                         ) :
                       ( null )
+                    }
+                    {
+                      record.estado.name === 'ACTIVO' ? (
+                        <Menu.Item>
+                          <a target="_blank" rel="noopener noreferrer" onClick={this.emitirReporte(this.record)}> Reporte</a>
+                        </Menu.Item>
+                      ): (null)
                     }
 
                   </Menu>
