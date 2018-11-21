@@ -81,44 +81,23 @@ class Simulacion extends Component{
         this.sendRequestActions = this.sendRequestActions.bind(this);
     }
     componentWillMount(){
-      /*API.get('/simulaciones/1/oficinas').then(response =>{
-        let selectedCountries = [];
-        let aux = [];
-        let mapIndexLoc = new Map();
-        response = response.data
-        for (let i = 0; i < response.length; i++) {
-            let obj = [];
-            obj.push(response[i].pais.codigoIso);
-            obj.push(response[i]);
-            mapIndexLoc.set(response[i].pais.codigoIso,i);
-            //selectedCountries.push(response[i].pais.codigoIso);
-            aux.push(obj);
-        }
-        this.setState({
-            indexLoc: mapIndexLoc,
-            myMap:new Map(aux),
-            locationInfo: response,
-            selectedCountries: selectedCountries
-        });
-      });*/
-      
         setTimeout(()=>{
             ReactTooltip.rebuild()
-        },100)
-        
+        },100)  
     } 
     
     handleOpenModalConfig = (e) => {
         this.setState({
             visibleModalConfig: true,
         });
-        
     }
+
     handleCancelModalConfig = (e) => {
         this.setState({
             visibleModalConfig: false,
         });
     }
+
     contentConfigModal = (numStep) => {
         switch(numStep){
             case 1:
@@ -160,17 +139,18 @@ class Simulacion extends Component{
                             Seleccione la hora inicio: <TimePicker onChange={this.handleTimeChange} defaultOpenValue={moment('00:00:00', 'HH:mm:ss')} />
                         </div>
                         <div style={{marginTop:'1rem'}}>
-                            Intervalo de tiempo en simulación: <InputNumber min={1} defaultValue={this.state.frecTime} onChange={this.handleFrecTimeChange} />seg
+                            Multiplicador de velocidad: <InputNumber min={1} defaultValue={this.state.frecTime} onChange={this.handleFrecTimeChange} />x seg
                         </div>
                         <div style={{marginTop:'1rem'}}>
-                            Intervalo de tiempo real: <InputNumber min={1} defaultValue={this.state.windowTime} onChange={this.handleWindowTimeChange} />
+                            Intervalo de tiempo: <InputNumber min={1} defaultValue={this.state.windowTime} onChange={this.handleWindowTimeChange} />
                         </div>
-                        <strong>{"Cada 1seg , será " + Math.floor(this.state.windowTime/this.state.frecTime)}</strong>
+                        <p>La velocidad se ve incrementada x<strong>{this.state.frecTime}</strong></p>
                         {this.state.errorConfig ? <div style={{color:'#f5222d'}} className="error-config">Hubo un error al subir el archivo, intentelo de nuevo</div> : '' }
                     </div>
                 );
         }
     } 
+    
     handleOkModalConfig = (e) => {
         let urlApi = '';
         switch(this.state.stepConfig){
@@ -308,7 +288,6 @@ class Simulacion extends Component{
             auxLocationInfo[idx].capacidadActual -= obj.cantidad;
             console.log("S");
           }
-
         }else{
           esTemprano = false;
         }
@@ -369,8 +348,8 @@ class Simulacion extends Component{
         let intWindowClock = setInterval(
             () => this.sendRequestActions()
            // ,Math.floor(this.state.windowTime/this.state.frecTime));
-           ,this.state.frecTime*1000);
-        console.log("cada x llama" + this.state.frecTime  + " seg")
+           ,Math.floor(this.state.windowTime/this.state.frecTime));
+        console.log("cada x llama" + this.state.windowTime/this.state.frecTime  + " seg")
         this.sendRequestActions()
         this.setState({
             intervalClock: intClock,
