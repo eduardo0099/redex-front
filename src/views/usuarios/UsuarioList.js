@@ -52,9 +52,9 @@ export default class UsuarioList extends React.Component {
     this.fetch()
   });
 
-  emitirReporte = (record) =>{
-    let persona = {id:record.id}
-    console.log("Reporte id=",record.id)
+  emitirReporte = (id) =>{
+    console.log(id)
+    let persona = {id:id}
     API.post(`/reportes/paquetesXusuario`,persona).then((response) => {
       notify.success({
         message: "Se emitio el reporte correctamente"
@@ -162,7 +162,7 @@ export default class UsuarioList extends React.Component {
                     {
                       record.estado.name === 'ACTIVO' ? (
                         <Menu.Item>
-                          <a target="_blank" rel="noopener noreferrer" onClick={this.emitirReporte(this.record)}> Reporte</a>
+                          <a target="_blank" rel="noopener noreferrer" onClick={()=>this.emitirReporte(record.id)}> Reporte</a>
                         </Menu.Item>
                       ): (null)
                     }

@@ -138,7 +138,7 @@ class InnerForm extends React.Component {
                   })(<Input type="textarea" />)}
                 </FormItem>
               </Col>
-              <Col span={1}>
+              <Col span={2}>
                 <FormItem>
                   <Tooltip placement="top" title={"Buscar cliente"}>
                     <Button
@@ -150,7 +150,7 @@ class InnerForm extends React.Component {
                   </Tooltip>
                 </FormItem>
               </Col>
-              <Col span={1}>
+              <Col span={2}>
                 <FormItem>
                   <Tooltip placement="top" title={"Añadir nuevo cliente"}>
                     <Button
@@ -247,7 +247,7 @@ class InnerForm extends React.Component {
                   })(<Input type="textarea" />)}
                 </FormItem>
               </Col>
-              <Col span={1}>
+              <Col span={2}>
                 <FormItem>
                   <Tooltip placement="top" title={"Buscar cliente"}>
                     <Button
@@ -259,7 +259,7 @@ class InnerForm extends React.Component {
                   </Tooltip>
                 </FormItem>
               </Col>
-              <Col span={1}>
+              <Col span={2}>
                 <FormItem>
                   <Tooltip placement="top" title={"Añadir nuevo cliente"}>
                     <Button
@@ -625,6 +625,10 @@ export default class PaquetesNuevo extends React.Component {
     );
   };
 
+  volverPrincipal =() =>{
+    this.props.route.history.push("/paquetes")
+  }
+
   render() {
     return (
       <Layout>
@@ -660,7 +664,7 @@ export default class PaquetesNuevo extends React.Component {
             </Button>
           </Col>
           <Col span={-2} align="right">
-            <Button>Cancelar</Button>
+            <Button onClick = {this.volverPrincipal}>Cancelar</Button>
           </Col>
           <Modal
             visible={this.state.modalResumen}

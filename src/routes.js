@@ -10,6 +10,7 @@ import VuelosAgendados from './views/vuelosagendados';
 import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
 import Roles from './views/roles';
 import Paises from './views/paises';
+import Perfil from './views/perfil';
 
 const RolesEnum = {
   ADMINISTRADOR: 'ADMINISTRADOR',
@@ -19,6 +20,11 @@ const RolesEnum = {
 }
 
 const routes = [
+  {
+    path: '/perfil',
+    component: Perfil,
+    name: 'Perfil',
+  },
   {
     path: '/dashboard',
     component: Dashboard,
@@ -73,6 +79,7 @@ const routes = [
     path: '/paquetes/nuevo',
     component: PaquetesNuevo,
     name: 'PaquetesNuevo',
+    hidden : true,
     roles:[RolesEnum.EMPLEADO,RolesEnum.ADMINISTRADOR]
    },
    {
@@ -85,6 +92,7 @@ const routes = [
     path: '/system',
     component: System,
     name: 'Pruebas',
+    hidden : true,
     roles:[RolesEnum.ADMINISTRADOR]
    },
    

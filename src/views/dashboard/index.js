@@ -139,7 +139,7 @@ class Dashboard extends Component {
        <YAxis/>
        <Tooltip />
        <Legend />
-       <Bar dataKey="cantidad" fill="#82ca9d" />
+       <Bar dataKey="capacidad" fill="#82ca9d" />
       </BarChart>
     );
 

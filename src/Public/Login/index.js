@@ -87,9 +87,6 @@ class LoginForm extends Component {
               )}
             </FormItem>
             <FormItem>
-              <a className="login-form-forgot" href="">
-                Recuperar contraseña
-              </a>
               <Button
                 type="primary"
                 htmlType="submit"
