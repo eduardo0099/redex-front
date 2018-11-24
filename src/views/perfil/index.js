@@ -16,7 +16,7 @@ class Perfil extends Component {
                 <h1> Perfil de Usuario </h1>
                 </TheHeader>
                 <TheContent>
-                    <FormItem label={Nombre}></FormItem>
+                    <FormItem label="Nombre"></FormItem>
                 </TheContent>
             </Layout>
         )
