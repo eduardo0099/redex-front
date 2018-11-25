@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Menu, Dropdown, Icon,Modal, Tag} from 'antd';
-import API from '../../Services/Api';
+import API, { getFile } from '../../Services/Api';
 import CrimsonTable from '../../components/CrimsonTable';
 import notify from '../../utils/notify';
 import MenuItem from 'antd/lib/menu/MenuItem';
@@ -55,7 +55,8 @@ export default class UsuarioList extends React.Component {
   emitirReporte = (id) =>{
     console.log(id)
     let persona = {id:id}
-    API.post(`/reportes/paquetesXusuario`,persona).then((response) => {
+    API.get(`/reportes/paquetesXusuario`, { params: {idUsuario: id}, responseType: "arraybuffer" }).then((response) => {
+      getFile(response);
       notify.success({
         message: "Se emitio el reporte correctamente"
       })

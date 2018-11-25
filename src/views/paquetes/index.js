@@ -1,13 +1,24 @@
 import React from "react";
 import {
-  Col,  Row,  Layout,  Button,  Menu,  Dropdown,
-  Icon,  Modal,  Upload,  Input,  Select,  Form, DatePicker
+  Col,
+  Row,
+  Layout,
+  Button,
+  Menu,
+  Dropdown,
+  Icon,
+  Modal,
+  Upload,
+  Input,
+  Select,
+  Form,
+  DatePicker
 } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import PaquetesList from "./PaquetesList";
 import PaquetesDetail from "./PaquetesDetail";
 import CrimsonUpload from "../../components/CrimsonUpload";
-import API, {getFile} from "../../Services/Api";
+import API, { getFile } from "../../Services/Api";
 import notify from "../../utils/notify";
 
 const Search = Input.Search;
@@ -23,8 +34,8 @@ export default class Paquetes extends React.Component {
     this.state = {
       listaDoc: [],
       visible: false,
-      fechaInicio:"",
-      fechaFin:""
+      fechaInicio: "",
+      fechaFin: ""
     };
     this.mostrarModal = this.mostrarModal.bind(this);
   }
@@ -47,24 +58,29 @@ export default class Paquetes extends React.Component {
 
   emitirReporte = () => {
     let data = {
-      fecha_ini: this.state.fechaInicio.format('DD-MM-YYYY'),
-      fecha_fin: this.state.fechaFin.format('DD-MM-YYYY')
-    }
-    API.post(`reportes/enviosXfechas`, data).then(response => {
-      getFile(response);
-      this.setState({
-        visible: false
-      });
-    }).catch(error=>{
-      notify.error({
-        message: "Error",
-        description: "No se pudo emitir el reporte"
-      });
-      this.setState({
-        visible: false
-      });
+      inicio: this.state.fechaInicio.format("YYYY-MM-DD"),
+      fin: this.state.fechaFin.format("YYYY-MM-DD")
+    };
+
+    API.get(`reportes/enviosXfechas`, {
+      params: data,
+      responseType: "arraybuffer"
     })
-    ;
+      .then(response => {
+        getFile(response);
+        this.setState({
+          visible: false
+        });
+      })
+      .catch(error => {
+        notify.error({
+          message: "Error",
+          description: "No se pudo emitir el reporte"
+        });
+        this.setState({
+          visible: false
+        });
+      });
   };
 
   mostrarModal = () => {
@@ -79,12 +95,12 @@ export default class Paquetes extends React.Component {
     });
   };
 
-  chooseDate = values =>{
+  chooseDate = values => {
     this.setState({
       ...this.values,
       fechaInicio: values[0],
-      fechaFin: values[1]}
-    )
+      fechaFin: values[1]
+    });
   };
 
   render() {
@@ -133,7 +149,8 @@ export default class Paquetes extends React.Component {
             <RangePicker
               style={{ width: "100%" }}
               format="DD/MM/YYYY"
-              onChange={this.chooseDate}/>
+              onChange={this.chooseDate}
+            />
           </Modal>
         </TheContent>
       </Layout>
