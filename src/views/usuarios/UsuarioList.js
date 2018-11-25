@@ -62,6 +62,11 @@ export default class UsuarioList extends React.Component {
     })
   }
 
+  emitirReporteAcciones = (id) =>{
+    //FALTA API
+    
+  }
+
     render(){
       const {onDetalle}  = this.props;
         return (
@@ -163,6 +168,13 @@ export default class UsuarioList extends React.Component {
                       record.estado.name === 'ACTIVO' ? (
                         <Menu.Item>
                           <a target="_blank" rel="noopener noreferrer" onClick={()=>this.emitirReporte(record.id)}> Reporte</a>
+                        </Menu.Item>
+                      ): (null)
+                    }
+                    {
+                      record.estado.name === 'ACTIVO' ? (
+                        <Menu.Item>
+                          <a target="_blank" rel="noopener noreferrer" onClick={()=>this.emitirReporteAcciones(record.id)}> Acciones</a>
                         </Menu.Item>
                       ): (null)
                     }
