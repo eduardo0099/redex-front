@@ -55,7 +55,7 @@ export default class UsuarioList extends React.Component {
   emitirReporte = (id) =>{
     console.log(id)
     let persona = {id:id}
-    API.post(`/reportes/paquetesXusuario`,persona).then((response) => {
+    API.get(`/reportes/paquetesXusuario`, { params: {idUsuario: id}, responseType: "arraybuffer" }).then((response) => {
       notify.success({
         message: "Se emitio el reporte correctamente"
       })
