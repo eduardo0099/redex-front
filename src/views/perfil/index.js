@@ -1,9 +1,8 @@
 import React, { Component } from "react";
 import { Layout, Row, Col,Button,Form,Input,Icon,Tooltip,Modal } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
-import CambioContraseña from "./CambioContraseña"
 import API from "../../Services/Api";
-import WrappedForm from "./CambioContraseña";
+import WrappedForm from "./CambioContrasenha";
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -46,6 +45,11 @@ class Perfil extends Component {
             modalChange:false
         })
     }
+
+    save = (cambioRef) => {
+        this.cambioRef = cambioRef;
+    }
+
 
     guardarContraseña = () =>{
         const form = this.cambioRef.props.form;
@@ -103,7 +107,7 @@ class Perfil extends Component {
                     </FormItem></Col>
                     <Col span={18}><Input type="textarea" disabled={true} placeholder={this.state.info.colaborador.oficina.codigo}/></Col>
                 </InputGroup>
-                <CambioContraseña ref={this.cambioRef} onCancel={this.cancelModal} onOk={this.guardarContraseña} visible={this.state.modalChange}/>
+                <WrappedForm wrappedComponentRef={this.save} onCancel={this.cancelModal} onOk={this.guardarContraseña} visible={this.state.modalChange}/>
                 </TheContent>
             </Layout>
         )
