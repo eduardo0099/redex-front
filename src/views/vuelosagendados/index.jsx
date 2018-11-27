@@ -22,7 +22,7 @@ export default class Oficinas extends React.Component {
   eliminar = () =>{
     API.post(`vuelosagendados/eliminar`).then(response=>{
       notify.success({
-        message:"Elinacion de vuelos agendados pasados"
+        message:"Eliminación de vuelos agendados pasados"
       })
     })
   }

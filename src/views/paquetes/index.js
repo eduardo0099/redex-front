@@ -11,18 +11,20 @@ import {
   Upload,
   Input,
   Select,
-  Form
+  Form,
+  DatePicker
 } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import PaquetesList from "./PaquetesList";
 import PaquetesDetail from "./PaquetesDetail";
 import CrimsonUpload from "../../components/CrimsonUpload";
-import API, {getFile} from "../../Services/Api";
+import API, { getFile } from "../../Services/Api";
+import notify from "../../utils/notify";
 
 const Search = Input.Search;
 const Option = Select.Option;
 const FormItem = Form.Item;
-
+const RangePicker = DatePicker.RangePicker;
 export default class Paquetes extends React.Component {
   constructor(props) {
     super(props);
@@ -31,7 +33,9 @@ export default class Paquetes extends React.Component {
     this.uploadRef = React.createRef();
     this.state = {
       listaDoc: [],
-      visible: false
+      visible: false,
+      fechaInicio: "",
+      fechaFin: ""
     };
     this.mostrarModal = this.mostrarModal.bind(this);
   }
@@ -53,13 +57,33 @@ export default class Paquetes extends React.Component {
   }
 
   emitirReporte = () => {
-    let obj = { fecha_ini: "16-11-2018", fecha_fin: "18-11-2018" };
-    API.post(`reportes/enviosXfechas`, obj).then(response => {
-      getFile(response);
-      this.setState({
-        visible: false
+    let data = {
+      inicio: this.state.fechaInicio.format("YYYY-MM-DD"),
+      fin: this.state.fechaFin.format("YYYY-MM-DD")
+    };
+
+    API.get(`reportes/enviosXfechas`, {
+      params: data,
+      responseType: "arraybuffer"
+    })
+      .then(response => {
+        notify.success({
+          message: "Se emitio el reporte de los paquetes registrados correctamente"
+        });
+        getFile(response);
+        this.setState({
+          visible: false
+        });
+      })
+      .catch(error => {
+        notify.error({
+          message: "Error",
+          description: "No se pudo emitir el reporte de los paquetes registrados"
+        });
+        this.setState({
+          visible: false
+        });
       });
-    });
   };
 
   mostrarModal = () => {
@@ -71,6 +95,14 @@ export default class Paquetes extends React.Component {
   closeModal = () => {
     this.setState({
       visible: false
+    });
+  };
+
+  chooseDate = values => {
+    this.setState({
+      ...this.values,
+      fechaInicio: values[0],
+      fechaFin: values[1]
     });
   };
 
@@ -115,7 +147,14 @@ export default class Paquetes extends React.Component {
             visible={this.state.visible}
             onOk={this.emitirReporte}
             onCancel={this.closeModal}
-          />
+            title="Emitir Reporte"
+          >
+            <RangePicker
+              style={{ width: "100%" }}
+              format="DD/MM/YYYY"
+              onChange={this.chooseDate}
+            />
+          </Modal>
         </TheContent>
       </Layout>
     );

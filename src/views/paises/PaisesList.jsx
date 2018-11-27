@@ -2,6 +2,7 @@ import React from "react";
 import { Table, Tag, Dropdown, Menu, Icon} from "antd";
 import API from "../../Services/Api";
 import CrimsonTable from "../../components/CrimsonTable";
+import notify from '../../utils/notify';
 
 const { Column } = Table;
 
@@ -15,14 +16,24 @@ export default class PaisesList extends React.Component {
 
   activar = record => {
     API.post(`oficinas/${record.id}/activar`).then(response => {
+      notify.success({message:"Se activo la oficina seleccionada correctamente"})
       this.fetch();
-    });
+    }).catch((eror)=>{
+      notify.error({
+        message: "No se pudo activar la oficina seleccionada"
+      })
+    })
   };
 
   desactivar = record => {
     API.post(`oficinas/${record.id}/desactivar`).then(response => {
+      notify.success({message:"Se desactivo la oficina seleccionada correctamente"})
       this.fetch();
-    });
+    }).catch((eror)=>{
+      notify.error({
+        message: "No se pudo desactivar la oficina seleccionada"
+      })
+    })
   };
 
   render() {

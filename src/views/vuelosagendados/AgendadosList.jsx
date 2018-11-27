@@ -1,7 +1,8 @@
 import React from "react";
-import { Table, Tag, Dropdown, Menu, Icon } from "antd";
-import API from "../../Services/Api";
+import { Table, Tag, Dropdown, Menu, Icon, message } from "antd";
+import API, { getFile } from "../../Services/Api";
 import CrimsonTable from "../../components/CrimsonTable";
+import  notify  from "../../utils/notify";
 
 const { Column } = Table;
 
@@ -15,12 +16,25 @@ export default class OficinasList extends React.Component {
     this.listRef.current.fetch();
   };
 
-  reporte = (id) => {
-    let aux = {id:id};
-    API.post(`reportes/paquetesXvuelo`,aux).then(response=>{
-      console.log(response);
-    })
-  }
+  reporte = id => {
+    const hide = message.loading('Procesando...', 0);
+    let aux = { idVueloAgendado: id };
+    API.get(`reportes/paquetesXvuelo`, {
+      params: aux,
+      responseType: "arraybuffer"
+    }).then(response => {
+      getFile(response);
+      hide();
+      notify.success({
+        message: "Reporte generado",
+      });
+    }).catch(error => {
+      hide();
+      notify.error({
+        message: "No se pudo emitir el reporte"
+      });
+    });
+  };
 
   render() {
     const { updateAction } = this.props;
@@ -40,7 +54,7 @@ export default class OficinasList extends React.Component {
             </div>
           )}
         />
-         <Column
+        <Column
           title="Destino"
           key="destino"
           width="25%"
@@ -93,7 +107,7 @@ export default class OficinasList extends React.Component {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    onClick={this.reporte.bind(this,record.id)}
+                    onClick={this.reporte.bind(this, record.id)}
                   >
                     Paquetes
                   </a>

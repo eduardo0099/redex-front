@@ -1,7 +1,7 @@
 import React from "react";
 import { Modal, Form, Input, Select } from "antd";
 import API from "../../Services/Api";
-import Notify from '../../utils/notify';
+import notify from '../../utils/notify';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -100,7 +100,11 @@ export default class OficinasForm extends React.PureComponent {
           capacidadMaxima: { value: data.capacidadMaxima }
         });
       });
-    });
+    }).catch((eror)=>{
+      notify.error({
+        message: "No se pudo obtener el listado de oficinas"
+      })
+    })
   }
 
   close = () => {
@@ -121,12 +125,16 @@ export default class OficinasForm extends React.PureComponent {
 
       API.post('oficinas/save', envelope)
         .then(response => {
-          Notify.success({
-            message: 'Oficina Registrada'
+          notify.success({
+            message: 'Se registro la oficina nueva correctamente'
           });
           form.resetFields();
           this.props.fetch();
           this.close();
+        }).catch((eror)=>{
+          notify.error({
+            message: "No se pudo registrar la oficina nueva"
+          })
         })
       
     }); 
