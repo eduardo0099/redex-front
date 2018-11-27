@@ -67,6 +67,9 @@ export default class Paquetes extends React.Component {
       responseType: "arraybuffer"
     })
       .then(response => {
+        notify.success({
+          message: "Se emitio el reporte de los paquetes registrados correctamente"
+        });
         getFile(response);
         this.setState({
           visible: false
@@ -75,7 +78,7 @@ export default class Paquetes extends React.Component {
       .catch(error => {
         notify.error({
           message: "Error",
-          description: "No se pudo emitir el reporte"
+          description: "No se pudo emitir el reporte de los paquetes registrados"
         });
         this.setState({
           visible: false

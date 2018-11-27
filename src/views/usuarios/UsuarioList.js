@@ -14,6 +14,18 @@ export default class UsuarioList extends React.Component {
   constructor(props){
     super(props)
     this.listRef = React.createRef();
+    this.state={
+      ds:{}
+    }
+  }
+
+  componentWillMount(){
+    API.get("/usuarios/yo").then(response => {
+      console.log(response.data);
+      this.setState({
+          ds:response.data
+      })
+  });
   }
 
   fetch = () => this.listRef.current.fetch();
@@ -42,23 +54,38 @@ export default class UsuarioList extends React.Component {
     });
   }
 
-  activar = (id) => API.post(`/usuarios/${id}/activar`).then((response) => {
-    notify.success({message: response.data.msg})
-    this.fetch()
-  });
+  activar = (id) =>{ 
+    API.post(`/usuarios/${id}/activar`).then((response) => {
+      notify.success({message: "Se activo al usuario correctamente"})
+      this.fetch()
+    }).catch((eror)=>{
+      notify.error({
+        message: "No se pudo activar al usuario"
+      })
+    })
+  }
 
-  desactivar = (id) => API.post(`/usuarios/${id}/desactivar`).then((response) => {
-    notify.success({message: response.data.msg})
-    this.fetch()
-  });
+  desactivar = (id) => {
+    API.post(`/usuarios/${id}/desactivar`).then((response) => {
+      notify.success({message: "Se desactivo al usuario correctamente"})
+      this.fetch()
+    }).catch((error)=>{
+      notify.error({
+        message: "No se pudo desactivar al usuario"
+      })
+    })
+  }
 
   emitirReporte = (id) =>{
-    console.log(id)
-    let persona = {id:id}
+    console.log(id);
     API.get(`/reportes/paquetesXusuario`, { params: {idUsuario: id}, responseType: "arraybuffer" }).then((response) => {
       getFile(response);
       notify.success({
-        message: "Se emitio el reporte correctamente"
+        message: "Se emitio el reporte de registro de paquetes del usuario correctamente"
+      })
+    }).catch((error)=>{
+      notify.error({
+        message: "No se pudo emitir el reporte de registro de paquetes del usuario"
       })
     })
   }

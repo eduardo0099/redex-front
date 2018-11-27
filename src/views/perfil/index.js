@@ -87,25 +87,33 @@ class Perfil extends Component {
                     <Col span={4}> 
                     <FormItem label="Nombre">
                     </FormItem></Col>
-                    <Col span={18}><Input type="textarea" disabled={true} placeholder={this.state.info.persona.nombreCorto}></Input></Col>
+                    <Col span={18}>
+                    <h3>{this.state.info.persona.nombreCorto}</h3>
+                    </Col>
                 </InputGroup>
                 <InputGroup size="large">
                     <Col span={4}> 
                     <FormItem label="Usuario">
                     </FormItem></Col>
-                    <Col span={18}><Input type="textarea" disabled={true} placeholder={this.state.info.username}/></Col>
+                    <Col span={18}>
+                    <h3>{this.state.info.username}</h3>
+                    </Col>
                 </InputGroup>
                 <InputGroup size="large">
                     <Col span={4}> 
                     <FormItem label="Rol">
                     </FormItem></Col>
-                    <Col span={18}><Input type="textarea" disabled={true} placeholder={this.state.info.rol.nombre}/></Col>
+                    <Col span={18}>
+                        <h3>{this.state.info.rol.nombre}</h3>
+                    </Col>
                 </InputGroup>
                 <InputGroup size="large">
                     <Col span={4}> 
                     <FormItem label="Oficina">
                     </FormItem></Col>
-                    <Col span={18}><Input type="textarea" disabled={true} placeholder={this.state.info.colaborador.oficina.codigo}/></Col>
+                    <Col span={18}>
+                        <h3>{this.state.info.colaborador.oficina.codigo}</h3>
+                    </Col>
                 </InputGroup>
                 <WrappedForm wrappedComponentRef={this.save} onCancel={this.cancelModal} onOk={this.guardarContraseña} visible={this.state.modalChange}/>
                 </TheContent>
