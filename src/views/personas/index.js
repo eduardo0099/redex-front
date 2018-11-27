@@ -4,6 +4,7 @@ import { TheContent, TheHeader } from '../../components/layout';
 import PersonasList from './PersonasList';
 import PersonasForm from './PersonasForm';
 import API from '../../Services/Api';
+import notify from '../../utils/notify';
 
 export default class Personas extends React.Component {
 
@@ -31,9 +32,15 @@ export default class Personas extends React.Component {
       }
       
       subir = () => {
-        API.post('personas/carga', this.state.formData)
-          .then(response => {
+        API.post('personas/carga', this.state.formData).then(response => {
             this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
+            notify.success({
+              message: 'Se cargo correctamente el archivo de personas'
+            });
+        }).catch((error)=>{
+          notify.success({
+            message: 'No se pudo cargar el archivo de personas'
+          });
         })
       }
 

@@ -3,7 +3,7 @@ import {  Modal, Form, Input ,Dropdown, Menu, Col,Divider,Select} from 'antd';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
-class CambioContraseña extends React.Component{
+class CambioContrasenha extends React.Component{
     render(){
         const {visible,onCancel,onOk,form} = this.props;
         const {getFieldDecorator} = form;
@@ -46,6 +46,6 @@ class CambioContraseña extends React.Component{
     }
 }
 
-const WrappedForm = Form.create()(CambioContraseña);
+const WrappedForm = Form.create()(CambioContrasenha);
 
 export default WrappedForm;

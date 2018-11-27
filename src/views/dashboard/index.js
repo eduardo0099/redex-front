@@ -4,6 +4,7 @@ import { TheContent, TheHeader } from "../../components/layout";
 import CrimsonChartCard from "../../components/CrimsonChartCard";
 import API from "../../Services/Api";
 import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend,AreaChart, Area,ComposedChart, Line} from 'recharts';
+import notify from '../../utils/notify';
 
 const Option = Select.Option;
 const RangePicker = DatePicker.RangePicker;
@@ -89,6 +90,10 @@ class Dashboard extends Component {
       console.dir(response);
       this.setState({
         vuelos:response.data
+      }).catch((eror)=>{
+        notify.error({
+          message: "No se pudo dibujar la grafica"
+        })
       })
     })
   }
@@ -103,6 +108,10 @@ class Dashboard extends Component {
       console.log("Oficinas:",response.data)
       this.setState({...this.state,
         oficinas:response.data
+      }).catch((eror)=>{
+        notify.error({
+          message: "No se pudo dibujar la grafica"
+        })
       })
     })
   }
@@ -114,7 +123,11 @@ class Dashboard extends Component {
     API.post(`dashboard/paquetesXoficinaXfecha_linea`,data).then(response=>{
       console.log("Devuelve api:",response.data);
       this.setState({...this.state,oficina:response.data})
-    }).catch()
+    }).catch((eror)=>{
+      notify.error({
+        message: "No se pudo dibujar la grafica"
+      })
+    })
   }
 
   fetchOficinasOrigen = q => {
