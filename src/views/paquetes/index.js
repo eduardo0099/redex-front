@@ -25,6 +25,7 @@ const Search = Input.Search;
 const Option = Select.Option;
 const FormItem = Form.Item;
 const RangePicker = DatePicker.RangePicker;
+
 export default class Paquetes extends React.Component {
   constructor(props) {
     super(props);
@@ -148,7 +149,11 @@ export default class Paquetes extends React.Component {
             onOk={this.emitirReporte}
             onCancel={this.closeModal}
             title="Emitir Reporte"
+            cancelText = "cancelar"
+            okText = "Generar"
+            okButtonDisabled = {true}
           >
+          <FormItem label="Ingresar el rango de fechas"></FormItem>
             <RangePicker
               style={{ width: "100%" }}
               format="DD/MM/YYYY"

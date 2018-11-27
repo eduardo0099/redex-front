@@ -14,9 +14,6 @@ export default class UsuarioList extends React.Component {
   constructor(props){
     super(props)
     this.listRef = React.createRef();
-    this.state={
-      ds:{}
-    }
   }
 
   componentWillMount(){
@@ -90,11 +87,7 @@ export default class UsuarioList extends React.Component {
     })
   }
 
-  emitirReporteAcciones = (id) =>{
-    //FALTA API
-    
-  }
-
+  
     render(){
       const {onDetalle}  = this.props;
         return (
@@ -199,14 +192,6 @@ export default class UsuarioList extends React.Component {
                         </Menu.Item>
                       ): (null)
                     }
-                    {
-                      record.estado.name === 'ACTIVO' ? (
-                        <Menu.Item>
-                          <a target="_blank" rel="noopener noreferrer" onClick={()=>this.emitirReporteAcciones(record.id)}> Acciones</a>
-                        </Menu.Item>
-                      ): (null)
-                    }
-
                   </Menu>
                 );
                 return (
