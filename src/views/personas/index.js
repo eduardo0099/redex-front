@@ -32,16 +32,23 @@ export default class Personas extends React.Component {
       }
       
       subir = () => {
-        API.post('personas/carga', this.state.formData).then(response => {
-            this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
-            notify.success({
-              message: 'Se cargo correctamente el archivo de personas'
-            });
-        }).catch((error)=>{
-          notify.success({
-            message: 'No se pudo cargar el archivo de personas'
+        if(this.state.formData == ''){
+          notify.warning({
+            message: 'No se seleccionó ningún archivo'
           });
-        })
+        }
+        else{
+          API.post('personas/carga', this.state.formData).then(response => {
+              this.setState({...this.state, cargaVisible: false}, () => this.listRef.current.list());
+              notify.success({
+                message: 'Se cargo correctamente el archivo de personas'
+              });
+          }).catch((error)=>{
+            notify.success({
+              message: 'No se pudo cargar el archivo de personas'
+            });
+          })
+        }
       }
 
       findDetalle = id => {
@@ -87,6 +94,7 @@ export default class Personas extends React.Component {
                 cancelText="Cancelar"
               >
                  <Upload {...props}>
+                 <h3>Para añadir datos en masa, seleccione un archivo txt que contenga la información que desea cargar.</h3>
                   <Button>
                     Seleccionar archivo
                   </Button>

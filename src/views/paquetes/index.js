@@ -58,33 +58,40 @@ export default class Paquetes extends React.Component {
   }
 
   emitirReporte = () => {
-    let data = {
-      inicio: this.state.fechaInicio.format("YYYY-MM-DD"),
-      fin: this.state.fechaFin.format("YYYY-MM-DD")
-    };
-
-    API.get(`reportes/enviosXfechas`, {
-      params: data,
-      responseType: "arraybuffer"
-    })
-      .then(response => {
-        notify.success({
-          message: "Se emitio el reporte de los paquetes registrados correctamente"
-        });
-        getFile(response);
-        this.setState({
-          visible: false
-        });
+    if(this.state.fechaInicio == "" && this.state.fechaFin== ""){
+      notify.warning({
+        message:"No se ha ingresado el rango de fechas"
       })
-      .catch(error => {
-        notify.error({
-          message: "Error",
-          description: "No se pudo emitir el reporte de los paquetes registrados"
-        });
-        this.setState({
-          visible: false
-        });
+    }
+    else{
+      let data = {
+        inicio: this.state.fechaInicio.format("YYYY-MM-DD"),
+        fin: this.state.fechaFin.format("YYYY-MM-DD")
+      };
+
+      API.get(`reportes/enviosXfechas`, {
+        params: data,
+        responseType: "arraybuffer"
+      })
+        .then(response => {
+          notify.success({
+            message: "Se emitio el reporte de los paquetes registrados correctamente"
+          });
+          getFile(response);
+          this.setState({
+            visible: false
+          });
+        })
+        .catch(error => {
+          notify.error({
+            message: "Error",
+            description: "No se pudo emitir el reporte de los paquetes registrados"
+          });
+          this.setState({
+            visible: false
+          });
       });
+    }
   };
 
   mostrarModal = () => {

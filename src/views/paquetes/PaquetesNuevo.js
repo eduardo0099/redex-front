@@ -523,7 +523,11 @@ export default class PaquetesNuevo extends React.Component {
             }
         })
         //this.props.fetch();
-      });
+      }).catch((error)=>{
+        Notify.error({
+          message : "El paquete no pudo ser registrado"
+        })
+      })
     });
   };
 
@@ -579,7 +583,14 @@ export default class PaquetesNuevo extends React.Component {
             }
           });
           this.setState({ modalRegistroOrigen: false });
-        });
+          Notify.success({
+            message : "El registro del remitente se realizo correctamente"
+          })
+        }).catch((error) => {
+          Notify.error({
+            message : "No se pudo registrar al remitente"
+          })
+        })
       }
     );
   };
@@ -620,7 +631,14 @@ export default class PaquetesNuevo extends React.Component {
             }
           });
           this.setState({ modalRegistroDestino: false });
-        });
+          Notify.success({
+            message : "El registro del destinatario se realizo correctamente"
+          })
+        }).catch((error)=>{
+          Notify.error({
+            message:"No se pudo registrar al destinatario"
+          })
+        })
       }
     );
   };

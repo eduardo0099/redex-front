@@ -73,6 +73,10 @@ export default class PersonasForm extends React.Component{
                 this.props.fetch();
                 this.setState({...this.state,visible:false
                 });
+            }).catch((error)=>{
+                Notify.error({
+                    message:"No se pudo actualizar los campos de la persona seleccionada."
+                })
             })
         });
     }

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Layout, Row, Col, Divider,Select,DatePicker,Button } from "antd";
+import { Layout, Row, Col, Divider,Select,DatePicker,Button,Form } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import CrimsonChartCard from "../../components/CrimsonChartCard";
 import API from "../../Services/Api";
@@ -8,6 +8,7 @@ import notify from '../../utils/notify';
 
 const Option = Select.Option;
 const RangePicker = DatePicker.RangePicker;
+const FormItem = Form.Item;
 
 class Dashboard extends Component {
 
@@ -193,30 +194,40 @@ class Dashboard extends Component {
             <Col span={12} style={colStyle}>
               <Divider >Vuelos mas usados</Divider>
               <Row style={colStyle}>
-                <Col span={12}>
+              <Col span={6}><FormItem label="Rango de fechas"></FormItem></Col>
+                <Col span={10}>
                 <RangePicker
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 onChange={this.choose2}/></Col>
-                <Col span={12}><Button onClick={this.dataGrafVuelos} disabled={this.state.btnVuelos}>MOSTRAR</Button></Col>
+                <Col span={8}><Button onClick={this.dataGrafVuelos} disabled={this.state.btnVuelos}>MOSTRAR</Button></Col>
               </Row>
+              {this.state.vuelos.length == 0 ? 
+              <h3>No hay informacion relevante</h3>
+              : 
               <CrimsonChartCard style={{...middleHeight}}>
               {SimpleBarChart}
-              </CrimsonChartCard>
+              </CrimsonChartCard>}
+              
             </Col>
             <Col span={12} style={colStyle}>
               <Divider >Resumen Oficinas</Divider>
               <Row style={colStyle}>
-                <Col span={12}><RangePicker
+                <Col span={6}><FormItem label="Rango de fechas"></FormItem></Col>
+                <Col span={10}><RangePicker
                 style={{ width: "100%" }}
                 format="DD/MM/YYYY"
                 onChange={this.chooseFechaOficinas}
                 /></Col>
-                <Col span={12}><Button onClick={this.dataGrafOficinas} disabled={this.state.btnPaises}>MOSTRAR</Button></Col>
+                <Col span={8}><Button onClick={this.dataGrafOficinas} disabled={this.state.btnPaises}>MOSTRAR</Button></Col>
               </Row>
+              {this.state.oficinas.length == 0 ? 
+              <h3>No hay informacion relevante</h3>
+              : 
               <CrimsonChartCard style={{...middleHeight}} >
               {SimpleAreaChart}
-              </CrimsonChartCard>
+              </CrimsonChartCard>}
+              
             </Col>
           </Row>
         </TheContent>
