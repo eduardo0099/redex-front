@@ -30,10 +30,16 @@ export default class CrimsonUpload extends React.Component {
     }
 
     upload = () => {
-        this.close();
-        const hide = message.loading('Cargando archivo...', 0);
-
-        API.post(this.props.url, this.state.formdata)
+        
+        if(this.state.formdata == ''){
+            notify.warning({
+                message:"No se selecciono ningún archivo"
+            })
+        }
+        else{
+            this.close();
+            const hide = message.loading('Cargando archivo...', 0);
+            API.post(this.props.url, this.state.formdata)
             .then(response => {
                 hide();
                 notify.success({
@@ -42,6 +48,7 @@ export default class CrimsonUpload extends React.Component {
                 })
                 this.props.fetch();
             })
+        }
     }
 
     render() {
@@ -75,6 +82,7 @@ export default class CrimsonUpload extends React.Component {
             cancelText="Cancelar"
           >
             <Upload {...uploadProps}>
+            <h3>Para añadir datos en masa, seleccione un archivo txt que contenga la información que desea cargar.</h3>
               <Button>Seleccionar archivo</Button>
             </Upload>
           </Modal>
