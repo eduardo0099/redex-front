@@ -20,9 +20,8 @@ import PaquetesDetail from "./PaquetesDetail";
 import CrimsonUpload from "../../components/CrimsonUpload";
 import API, { getFile } from "../../Services/Api";
 import notify from "../../utils/notify";
-
-const Search = Input.Search;
-const Option = Select.Option;
+import locale from "antd/lib/date-picker/locale/es_ES";
+import "moment/locale/es";
 const FormItem = Form.Item;
 const RangePicker = DatePicker.RangePicker;
 
@@ -58,12 +57,11 @@ export default class Paquetes extends React.Component {
   }
 
   emitirReporte = () => {
-    if(this.state.fechaInicio == "" && this.state.fechaFin== ""){
+    if (this.state.fechaInicio == "" && this.state.fechaFin == "") {
       notify.warning({
-        message:"No se ha ingresado el rango de fechas"
-      })
-    }
-    else{
+        message: "No se ha ingresado el rango de fechas"
+      });
+    } else {
       let data = {
         inicio: this.state.fechaInicio.format("YYYY-MM-DD"),
         fin: this.state.fechaFin.format("YYYY-MM-DD")
@@ -75,7 +73,8 @@ export default class Paquetes extends React.Component {
       })
         .then(response => {
           notify.success({
-            message: "Se emitio el reporte de los paquetes registrados correctamente"
+            message:
+              "Se emitio el reporte de los paquetes registrados correctamente"
           });
           getFile(response);
           this.setState({
@@ -85,12 +84,13 @@ export default class Paquetes extends React.Component {
         .catch(error => {
           notify.error({
             message: "Error",
-            description: "No se pudo emitir el reporte de los paquetes registrados"
+            description:
+              "No se pudo emitir el reporte de los paquetes registrados"
           });
           this.setState({
             visible: false
           });
-      });
+        });
     }
   };
 
@@ -156,12 +156,13 @@ export default class Paquetes extends React.Component {
             onOk={this.emitirReporte}
             onCancel={this.closeModal}
             title="Emitir Reporte"
-            cancelText = "cancelar"
-            okText = "Generar"
-            okButtonDisabled = {true}
+            cancelText="cancelar"
+            okText="Generar"
+            okButtonDisabled={true}
           >
-          <FormItem label="Ingresar el rango de fechas"></FormItem>
+            <FormItem label="Ingresar el rango de fechas" />
             <RangePicker
+              locale={locale}
               style={{ width: "100%" }}
               format="DD/MM/YYYY"
               onChange={this.chooseDate}
