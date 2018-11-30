@@ -95,7 +95,7 @@ export default class PaquetesList extends React.Component {
                 </Menu>
               );
               return (
-                <Dropdown overlay={menu}>
+                <Dropdown overlay={menu} placement="bottomRight">
                   <a className="ant-dropdown-link" href="#">
                     <Icon type="setting" theme="outlined" />
                   </a>
