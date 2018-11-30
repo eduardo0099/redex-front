@@ -1,6 +1,6 @@
 import React from "react";
 import { Table, Tag, Dropdown, Menu, Icon,Modal,Form,DatePicker} from "antd";
-import API from "../../Services/Api";
+import API,{getFile} from "../../Services/Api";
 import CrimsonTable from "../../components/CrimsonTable";
 import Notify from '../../utils/notify';
 
@@ -40,27 +40,34 @@ export default class OficinasList extends React.Component {
   emitirReporte = () =>{
     let fecha_ini=this.state.fechaInicio.format('YYYY-MM-DD');
     let fecha_fin=this.state.fechaFin.format('YYYY-MM-DD');
-    API.get(`reportes/auditoria`,{
-      params:{
-        inicio:fecha_ini,
-        fin:fecha_fin,
-        idOficina:this.state.idPais
-      }
-    }).then(response=>{
-      Notify.success({
-        message: 'El reporte de auditoria se genero correctamente'
+    if(this.state.fechaInicio ==="" && this.state.fechaFin==""){
+
+      Notify.warning({
+        message: 'No se ha seleccionado el rango de fechas'
       });
+    }
+    else{
+      API.get(`reportes/auditoria`,{
+        params:{
+          inicio:fecha_ini,
+          fin:fecha_fin,
+          idOficina:this.state.idPais
+        },
+        responseType:"arraybuffer"
+      }).then(response=>{
+        getFile(response);
+        Notify.success({
+          message: 'El reporte de auditoria se genero correctamente'
+        });
+      }).catch((error)=>{
+        Notify.error({
+          message: 'El reporte de auditoria no se genero'
+        });
+      })
       this.setState({
         ...this.values, btnOk:true,
       })
-    }).catch((error)=>{
-      Notify.error({
-        message: 'El reporte de auditoria no se genero'
-      });
-      this.setState({
-        ...this.values, btnOk:true,
-      })
-    })
+    }
   }
 
   chooseFecha = values =>{

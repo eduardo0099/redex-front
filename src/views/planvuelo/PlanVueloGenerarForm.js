@@ -52,7 +52,6 @@ export default class GenerarForm extends React.Component {
           };
           console.dir(envelope);
           API.post("/vuelosagendados/generar", envelope).then(response => {
-            this.setState({ ...this.state, visible: false });
             Notify.success({
               message:"Los vuelos agendados se generaron correctamente"
             });
@@ -61,6 +60,7 @@ export default class GenerarForm extends React.Component {
               message:"No se pudo generar los vuelos agendados"
             })
           })
+          this.setState({ ...this.state, visible: false });
         },
         onCancel() {}
       });
