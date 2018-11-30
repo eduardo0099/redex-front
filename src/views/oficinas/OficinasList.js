@@ -4,6 +4,10 @@ import API from "../../Services/Api";
 import CrimsonTable from "../../components/CrimsonTable";
 import Notify from '../../utils/notify';
 
+import locale from 'antd/lib/date-picker/locale/es_ES';
+import moment from 'moment';
+import 'moment/locale/es';
+
 const { Column } = Table;
 const FormItem = Form.Item;
 const RangePicker = DatePicker.RangePicker;
@@ -150,15 +154,6 @@ export default class OficinasList extends React.Component {
                   </a>
                 </Menu.Item>
                 <Menu.Item>
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={()=>this.showModal(record.id)}
-                  >
-                    Auditoria
-                  </a>
-                </Menu.Item>
-                <Menu.Item>
                   {record.estado.name === "ACTIVO" ? (
                     <a
                       target="_blank"
@@ -177,10 +172,20 @@ export default class OficinasList extends React.Component {
                     </a>
                   )}
                 </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={()=>this.showModal(record.id)}
+                  >
+                    Auditoría
+                  </a>
+                </Menu.Item>
               </Menu>
             );
             return (
-              <Dropdown overlay={menu}>
+              <Dropdown overlay={menu} placement="bottomRight">
                 <a className="ant-dropdown-link" href="#">
                   <Icon type="setting" theme="outlined" />
                 </a>
@@ -193,12 +198,14 @@ export default class OficinasList extends React.Component {
       visible={this.state.visible}
       onCancel = {this.cancelModal}
       onOk = {this.emitirReporte}
-      title ="Emitir reporte de auditoria"
+      title ="Emitir reporte de Auditoría"
       okText="Generar"
+      cancelText="Cancelar"
       okButtonDisabled = {this.state.btnOk}
       >
-      <FormItem label="Ingresar el rango de fechas"></FormItem>
+      <FormItem label="Ingresar el rango de fechas" style={{ marginBottom: '10px'}}></FormItem>
       <RangePicker
+        locale={locale}
         style={{ width: "100%" }}
         format="DD/MM/YYYY"
         onChange={this.chooseFecha}/>
