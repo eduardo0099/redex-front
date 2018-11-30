@@ -10,6 +10,7 @@ import map from "./../../utils/files/world-50m-simplified.json";
 import API from './../../Services/Api';
 import { SIGWINCH } from 'constants';
 import moment from 'moment';
+import ModalReporte from './ModalReporte';
 
 class Simulacion extends Component{
     constructor(props) {
@@ -25,16 +26,18 @@ class Simulacion extends Component{
         this.listActions = [];
         this.maxStepConfig = 4; 
         this.state = {
-            windowTime: 5*60*60 *1000, //El ultimo mil es porque es en milisegundos
+            windowTime: 3*60*60 *1000, //El ultimo mil es porque es en milisegundos
             indexLoc: null,
             center: [0,20],
             zoom: 1,
             visibleModalConfig: false,
             tooltipConfig: null,
             myMap:null,
-            frecTime: 1000,
+            frecTime: 120,
             intervalClock: null,
             intervalWindowClock: null,
+            inPause: false,
+            iniTime: 0,
             time: new Date().getTime(),
             realTime: 0,
             infoVuelos:[],
@@ -65,7 +68,9 @@ class Simulacion extends Component{
                     cantidadSalida: 25
                   }*/
             ],
-            num:10
+
+            paquetesEnviados: 0
+
         }
         this.getLocationDef = this.getLocationDef.bind(this);
         this.buildCurves = this.buildCurves.bind(this);
@@ -180,6 +185,7 @@ class Simulacion extends Component{
                         response = response.data
                         for (let i = 0; i < response.length; i++) {
                             let obj = [];
+                            response[i].cantidad = 0; //indica la cantidad  de paquetes que pasaron por el aeropuerto
                             obj.push(response[i].pais.codigoIso);
                             obj.push(response[i]);
                             mapIndexLoc.set(response[i].pais.codigoIso,i);
@@ -224,7 +230,6 @@ class Simulacion extends Component{
         let file = e.target.files[0];
         let formData = new FormData();
         formData.append("file", file);
-        console.log(">>>",file,formData,formData.getAll('file'));
         this.setState({
             archivo: formData
         });
@@ -247,6 +252,7 @@ class Simulacion extends Component{
         let newDateTime = new Date(this.state.time);
         newDateTime.setHours(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]),parseInt(newTimeArr[2]));
         this.setState({
+            iniTime: newDateTime.getTime(),
             time: newDateTime.getTime(),
             realTime: newDateTime.getTime(),
         });
@@ -268,6 +274,7 @@ class Simulacion extends Component{
       let obj;
       let idx;
       let isCollapsed = false;
+      let infoCollapsedFull  = {}
       let objInfoCollap = {};
       while(this.listActions.length != 0 && esTemprano){
         if(this.listActions[0].fechaSalida < this.state.time){
@@ -277,9 +284,10 @@ class Simulacion extends Component{
           if(obj.tipo == "REGISTRO"){
             idx = auxIndex.get(obj.oficinaLlegada);
             auxLocationInfo[idx].capacidadActual++;
+            auxLocationInfo[idx].cantidad++;
             if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
                 isCollapsed = true;
-                objInfoCollap = {code: obj.oficinaLlegada}
+                objInfoCollap = {code: auxLocationInfo[idx].codigo,  maxCap:auxLocationInfo[idx].capacidadMaxima }
             }
             console.log("R");
           }else if(obj.tipo == "SALIDA"){
@@ -296,17 +304,30 @@ class Simulacion extends Component{
       //manejar vuelos terminados
       let liveFlights = this.state.planVuelos.filter(e => e.fechaLlegada > newTime );
       let finishedFlights = this.state.planVuelos.filter(e => e.fechaLlegada <= newTime );
+      let acumSalida = 0;
 
       for(let delElem of finishedFlights){
         let idxDel = auxIndex.get(delElem.oficinaSalida);
         if(auxLocationInfo[idxDel].capacidadActual + delElem.cantidad > auxLocationInfo[idxDel].capacidadMaxima){
             isCollapsed = true;
-            objInfoCollap = {code: delElem.oficinaSalida}
+            objInfoCollap = {code: auxLocationInfo[idxDel].codigo , maxCap: auxLocationInfo[idxDel].capacidadMaxima}
         }
         auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
+        auxLocationInfo[idxDel].cantidad += delElem.cantidad;
+        acumSalida += delElem.cantidadSalida;
       }
       if(isCollapsed){
         console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
+        infoCollapsedFull = {
+            fechaInicial: this.state.iniTime,
+            duracionTotal: this.state.realTime - this.state.iniTime,
+            almacenColapso: objInfoCollap.code,
+            cantidadAumento: objInfoCollap.maxCap*1.1,
+            paquetesEnviados: this.state.paquetesEnviados,
+            oficinas: auxLocationInfo
+        }
+        console.log("******************************************************");
+        console.log("envia para reporte",infoCollapsedFull);
         clearInterval(this.state.intervalClock);
         clearInterval(this.state.intervalWindowClock);
       }
@@ -314,8 +335,9 @@ class Simulacion extends Component{
         locationInfo: auxLocationInfo,
         time: newTime,
         planVuelos: liveFlights.concat(auxPlanesNew),
-        infoCollapsed: objInfoCollap,
+        infoCollapsed: objInfoCollap,   
         collapsed: isCollapsed,
+        paquetesEnviados :acumSalida + this.state.paquetesEnviados,
       });
       //Fin
     }
@@ -354,9 +376,36 @@ class Simulacion extends Component{
         this.setState({
             intervalClock: intClock,
             intervalWindowClock: intWindowClock,
+            inPause: false,
         });
       }
     }
+    handleReplay = () => {
+        let intClock = setInterval(
+            () => this.tickClock()
+            ,this.frecRefreshSimu); 
+  
+        let intWindowClock = setInterval(
+            () => this.sendRequestActions()
+            ,Math.floor(this.state.windowTime/this.state.frecTime));
+
+        this.setState({
+            intervalClock: intClock,
+            intervalWindowClock: intWindowClock,
+            inPause: false,
+        });
+    }
+    handlePause = () => {
+          clearInterval(this.state.intervalClock);
+          clearInterval(this.state.intervalWindowClock);
+
+          this.setState({
+              intervalClock: null,
+              intervalWindowClock: null,
+              inPause: true,
+          });
+    }
+
     isCountrySelected(elem){
         return this.state.selectedCountries.includes(elem);
     }
@@ -416,7 +465,7 @@ class Simulacion extends Component{
         }
     } 
     render(){
-        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries } = this.state;
+        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed} = this.state;
         var divStyle = {
             display:this.state.disableDiv?'block':'none'
         };
@@ -430,11 +479,16 @@ class Simulacion extends Component{
             <TheContent>
             <div>
             {objTime.toLocaleString()}
-            {this.state.isCollapsed ? ("El sistema colapso en el almacen "+ this.state.infoCollapsed.code) : "Aun no colapsa"}
+            {collapsed ? <ModalReporte info={{title:"hola"}}/> : ""}
             </div>
             <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
                 {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
             </Button>
+            { inPause ?
+                <Button onClick={this.handleReplay}>Reanudar</Button>
+                :
+                <Button onClick={this.handlePause}>Pausar</Button>
+            }
             <Modal
                 title="Configuración de la simulación"
                 visible={this.state.visibleModalConfig}
