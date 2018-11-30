@@ -3,12 +3,8 @@ import { Layout ,Select, Modal ,Button, DatePicker, TimePicker, InputNumber } fr
 import { TheContent, TheHeader } from '../../components/layout';
 import { ComposableMap,ZoomableGroup,Geographies,Geography,Markers,Marker,Line,Lines} from 'react-simple-maps';
 import ReactTooltip from 'react-tooltip';
-
-//Imagen del mapa
 import map from "./../../utils/files/world-50m-simplified.json";
-//import locAlm from './../../utils/files/locations.json';
 import API from './../../Services/Api';
-import { SIGWINCH } from 'constants';
 import moment from 'moment';
 import ModalReporte from './ModalReporte';
 
@@ -43,33 +39,16 @@ class Simulacion extends Component{
             infoVuelos:[],
             archivo:{},
             stepConfig:1,
-            collapsed: false,
+
             infoCollapsed: {},
             errorConfig: false,
             locationInfo: [],
             selectedCountries: [],
             planVuelos:[
-               /* {
-                    fechaLlegada: 1355316000000,
-                    oficinaSalida: "BOL",
-                    oficinaLlegada: "PER",
-                    fechaSalida: 1355316900000,
-                    tipo: "SALIDA",
-                    cantidad: 100,
-                    cantidadSalida: 25
-                  },
-                  {
-                    fechaLlegada: 1355316000000,
-                    oficinaSalida: "ECU",
-                    oficinaLlegada: "AUT",
-                    fechaSalida: 1355316900000,
-                    tipo: "SALIDA",
-                    cantidad: 100,
-                    cantidadSalida: 25
-                  }*/
             ],
-
-            paquetesEnviados: 0
+            paquetesEnviados: 0,
+            showModalCollapsed: false,
+            collapsed: false,
 
         }
         this.getLocationDef = this.getLocationDef.bind(this);
@@ -102,7 +81,11 @@ class Simulacion extends Component{
             visibleModalConfig: false,
         });
     }
-
+    handleModalCollap = (e) => {
+        this.setState({
+            showModalCollapsed: false,
+        });
+    }
     contentConfigModal = (numStep) => {
         switch(numStep){
             case 1:
@@ -266,6 +249,7 @@ class Simulacion extends Component{
     tickClock(){
       let oldTime = this.state.time;
       let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
+      console.log(new Date(newTime).toLocaleString());
       //Ini: Calculos que se deben hacer por cada tick del reloj
       let auxLocationInfo = [...this.state.locationInfo];
       let auxIndex = this.state.indexLoc;
@@ -335,9 +319,10 @@ class Simulacion extends Component{
         locationInfo: auxLocationInfo,
         time: newTime,
         planVuelos: liveFlights.concat(auxPlanesNew),
-        infoCollapsed: objInfoCollap,   
+        infoCollapsed: infoCollapsedFull,   
         collapsed: isCollapsed,
         paquetesEnviados :acumSalida + this.state.paquetesEnviados,
+        showModalCollapsed: true,
       });
       //Fin
     }
@@ -350,10 +335,9 @@ class Simulacion extends Component{
             fin: new Date(this.state.realTime + this.state.windowTime), //2018-04-20T03:01:00
             }
         ).then(resp => {
-            console.log("resp.data",resp.data);
-            console.log("resp>",this.listActions.length);
+            //
             this.listActions = this.listActions.concat(resp.data);
-            console.log("new>",this.listActions.length);
+            //
             this.setState({
                 realTime: this.state.realTime + this.state.windowTime + 1
             })
@@ -363,21 +347,35 @@ class Simulacion extends Component{
       if(this.state.intervalClock){
         console.log(">>",this.state.intervalClock);
       }else{
-        let intClock = setInterval(
-          () => this.tickClock()
-          ,this.frecRefreshSimu); 
+        
 
-        let intWindowClock = setInterval(
-            () => this.sendRequestActions()
-           // ,Math.floor(this.state.windowTime/this.state.frecTime));
-           ,Math.floor(this.state.windowTime/this.state.frecTime));
-        console.log("cada x llama" + this.state.windowTime/this.state.frecTime  + " seg")
-        this.sendRequestActions()
-        this.setState({
-            intervalClock: intClock,
-            intervalWindowClock: intWindowClock,
-            inPause: false,
+        API.post('simulacion/window',
+            {
+            simulacion:  1, 
+            inicio: new Date(this.state.realTime), //2018-04-16T19:01:00 
+            fin: new Date(this.state.realTime + this.state.windowTime), //2018-04-20T03:01:00
+            }
+        ).then(resp => {
+            let intClock = setInterval(
+                () => this.tickClock()
+                ,this.frecRefreshSimu); 
+      
+            let intWindowClock = setInterval(
+                  () => this.sendRequestActions()
+                 ,Math.floor(this.state.windowTime/this.state.frecTime));
+            
+            console.log("cada x llama " + Math.floor((this.state.windowTime/this.state.frecTime)/1000)  + " seg")
+            this.listActions = this.listActions.concat(resp.data);
+
+            this.setState({
+                realTime: this.state.realTime + this.state.windowTime + 1,
+                intervalClock: intClock,
+                intervalWindowClock: intWindowClock,
+                inPause: false,
+            })
         });
+
+        
       }
     }
     handleReplay = () => {
@@ -417,12 +415,10 @@ class Simulacion extends Component{
                 this.setState({
                     selectedCountries: this.state.selectedCountries.filter(e => e != geo.properties.ISO_A3)
                 })
-                console.log("quita",this.state.selectedCountries.filter(e => e != geo.properties.ISO_A3));
             }else{
                 this.setState({
                     selectedCountries: [...this.state.selectedCountries,geo.properties.ISO_A3]
                 })
-                console.log("agrega",[...this.state.selectedCountries,geo.properties.ISO_A3]);
             }
         }
     }
@@ -465,12 +461,8 @@ class Simulacion extends Component{
         }
     } 
     render(){
-        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed} = this.state;
-        var divStyle = {
-            display:this.state.disableDiv?'block':'none'
-        };
+        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed,infoCollapsed, showModalCollapsed} = this.state;
         let objTime = new Date(this.state.time);
-        let timeStringFormat = objTime.getFullYear()+"-"+(objTime.getMonth()+1+"").padStart(2,"0")+"-"+(objTime.getDate()+"").padStart(2,"0");
         return(
             <Layout>
             <TheHeader>
@@ -479,7 +471,7 @@ class Simulacion extends Component{
             <TheContent>
             <div>
             {objTime.toLocaleString()}
-            {collapsed ? <ModalReporte info={{title:"hola"}}/> : ""}
+            {collapsed && showModalCollapsed? <ModalReporte onHandleClose={this.handleModalCollap} info={infoCollapsed}/> : ""}
             </div>
             <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
                 {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
@@ -516,6 +508,7 @@ class Simulacion extends Component{
                         onClick={this.handleClickGeography}
                         style={{
                         default: {
+                            //fill: "",
                             fill: this.getLocationDef(geography) ? (this.isCountrySelected(geography.properties.ISO_A3) ? this.colorSelected : this.colorUnSelected ) :  this.colorCommon,
                             stroke: "#607D8B",
                             strokeWidth: 0.75,

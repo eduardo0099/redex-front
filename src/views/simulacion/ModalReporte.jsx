@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
 import { Modal, Button } from 'antd';
+import API, { getFile } from "../../Services/Api";
 
 class ModalReporte extends Component {
     constructor(props) {
         super(props);
         
     }
-    
+    handleExport = () => {
+        API.post(`simulacion/reporte`,this.props.info,{responseType:"arraybuffer"})
+            .then(response => {
+                console.log("eeee, descrgoo");
+                getFile(response);
+            })
+    }
     render() {
         let info = {
             fechaInicial: 121312312,
@@ -24,20 +31,25 @@ class ModalReporte extends Component {
                     cantidad: 2
                 },
             ] 
-          }
-          let fechaInicio = new Date(info.fechaInicial)
-          let fechaFin = new Date(info.fechaInicial + info.duracionTotal)
-          let auxDias = 24*60*60*1000;
-          let dias = Math.floor(info.duracionTotal / auxDias);
-          let horas = (info.duracionTotal % auxDias) / (60*60*1000)
+        }
+
+        info = this.props.info;
+        info.oficinas.sort((a,b)=>{
+            return b.cantidad - a.cantidad
+        })
+        let fechaInicio = new Date(info.fechaInicial)
+        let fechaFin = new Date(info.fechaInicial + info.duracionTotal)
+        let auxDias = 24*60*60*1000;
+        let dias = Math.floor(info.duracionTotal / auxDias);
+        let horas = (info.duracionTotal % auxDias) / (60*60*1000)
 
         return (
             <div >
                 <Modal
                     title="El sistema ha colapsado"
                     visible={true}
-                    onOk={()=>{}}
-                    onCancel={()=>{}}
+                    onOk={this.props.onHandleClose}
+                    onCancel={this.props.onHandleClose}
                 >
                     <div style={{textAlign:'center'}}>
                         <h1 style={{marginBottom:'0',fontWeight:'bold'}}>RESULTADOS</h1>
@@ -76,7 +88,8 @@ class ModalReporte extends Component {
                                 </tr>)
                             })}
                         </tbody>
-                    </table>               
+                    </table>  
+                    <div style={{textAlign:'center'}} onClick={this.handleExport}> Exportar</div>             
                 </Modal>
             </div>
         );
