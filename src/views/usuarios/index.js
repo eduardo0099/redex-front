@@ -23,7 +23,7 @@ export default class Usuarios extends React.Component {
   subir = () => this.uploadRef.current.open();
 
   fetch = () => {
-    this.nuevoRef.current.fetch();
+    this.listRef.current.fetch();
   }
 
   findDetalle = (id) => {

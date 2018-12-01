@@ -197,6 +197,7 @@ export default class UsuarioForm extends React.Component {
       rol:{id:values.rol.key}, oficina:{id:values.oficina.key}}
 
     API.post(`usuarios/save`,usuario).then(response=>{
+      this.props.fetch();
       Notify.success({
         message: 'Usuario registrado'
       });

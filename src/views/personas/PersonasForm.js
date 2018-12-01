@@ -14,9 +14,11 @@ class InnerForm extends React.Component{
         const { visible, onCancel, onCreate, form,title } = this.props;
         const  {getFieldDecorator} = form;
         return(
-            <Modal style={{ top: 20 }} visible={visible} title={title}  
+            <Modal visible={visible} title="Editar persona"  
             onCancel={onCancel}
-            onOk={onCreate}>
+            onOk={onCreate}
+            okText="Guardar"
+            cancelText="Cancelar">
             <FormItem style={{display: 'none'}}>
             {getFieldDecorator("id")(<div></div>)}
             </FormItem>
@@ -73,6 +75,10 @@ export default class PersonasForm extends React.Component{
                 this.props.fetch();
                 this.setState({...this.state,visible:false
                 });
+            }).catch((error)=>{
+                Notify.error({
+                    message:"No se pudo actualizar los campos de la persona seleccionada."
+                })
             })
         });
     }

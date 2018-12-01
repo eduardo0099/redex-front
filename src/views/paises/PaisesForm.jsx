@@ -67,7 +67,7 @@ class InnerForm extends React.Component {
           <FormItem label="ISO">
             {getFieldDecorator("codigoIso")(<Input type="textarea" />)}
           </FormItem>
-          <FormItem label="husoHorario">
+          <FormItem label="Huso horario">
             {getFieldDecorator("husoHorario")(<Input type="textarea" />)}
           </FormItem>
         </Form>
@@ -104,7 +104,8 @@ export default class OficinasForm extends React.PureComponent {
           continente: { value: { key: data.continente.id, label: data.continente.nombre }},
           nombre: { value: data.nombre },
           codigo: { value: data.codigo },
-          codigoIso: { value: data.codigoIso }
+          codigoIso: { value: data.codigoIso },
+          husoHorario: { value: data.husoHorario },
         });
       });
     });

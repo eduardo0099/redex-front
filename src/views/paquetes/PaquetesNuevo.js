@@ -511,19 +511,15 @@ export default class PaquetesNuevo extends React.Component {
         Notify.success({
           message: "Paquete registrado"
         });
-        this.setState({ modalResumen: false });
-        form.resetFields(["descripcion","nombreClienteDestino","oficinaDestino","tipoDocumentoIdentidadDestino","numeroDocumentoDestino"]);
-        form.setFields({
-            notiLlegada:{
-                value:false
-            },notiAbordados:{
-                value:false
-            },notiRegistro:{
-                value:false
-            }
-        })
+        
         //this.props.fetch();
-      });
+      }).catch((error)=>{
+        Notify.error({
+          message : "El paquete no pudo ser registrado"
+        })
+      })
+      this.setState({ modalResumen: false });
+      form.resetFields(["descripcion","nombreClienteDestino","oficinaDestino","tipoDocumentoIdentidadDestino","numeroDocumentoDestino"]);
     });
   };
 
@@ -579,7 +575,14 @@ export default class PaquetesNuevo extends React.Component {
             }
           });
           this.setState({ modalRegistroOrigen: false });
-        });
+          Notify.success({
+            message : "El registro del remitente se realizo correctamente"
+          })
+        }).catch((error) => {
+          Notify.error({
+            message : "No se pudo registrar al remitente"
+          })
+        })
       }
     );
   };
@@ -620,7 +623,14 @@ export default class PaquetesNuevo extends React.Component {
             }
           });
           this.setState({ modalRegistroDestino: false });
-        });
+          Notify.success({
+            message : "El registro del destinatario se realizo correctamente"
+          })
+        }).catch((error)=>{
+          Notify.error({
+            message:"No se pudo registrar al destinatario"
+          })
+        })
       }
     );
   };

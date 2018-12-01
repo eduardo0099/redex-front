@@ -3,6 +3,7 @@ import { Layout, Row, Col,Button,Form,Input,Icon,Tooltip,Modal } from "antd";
 import { TheContent, TheHeader } from "../../components/layout";
 import API from "../../Services/Api";
 import WrappedForm from "./CambioContrasenha";
+import Notify from '../../utils/notify';
 
 const FormItem = Form.Item;
 const InputGroup = Input.Group;
@@ -55,8 +56,27 @@ class Perfil extends Component {
         const form = this.cambioRef.props.form;
         form.validateFields((err, values) => {
             console.log(values);
+            if(err){
+                return;
+            }
+            if(values.nuevaContraseña !== values.copiaContraseña){
+                Notify.error({
+                    message: 'Las contraseñas no son iguales, porfavor ingreselas nuevamente'
+                  });
+                return;
+            }
             this.setState({
                 modalChange:false
+            })
+            let usuario={id:this.state.info.id,password:values.nuevaContraseña}
+            API.post(`/usuarios/actualizarpassword`,usuario).then(response=>{
+                Notify.success({
+                    message: 'La contraseña se actualizo correctamente'
+                });  
+            }).catch((error)=>{
+                Notify.error({
+                    message: 'La contraseña no pudo actualizar'
+                });
             })
         })
     }

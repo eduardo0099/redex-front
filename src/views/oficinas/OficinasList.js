@@ -1,14 +1,28 @@
 import React from "react";
-import { Table, Tag, Dropdown, Menu, Icon} from "antd";
-import API from "../../Services/Api";
+import { Table, Tag, Dropdown, Menu, Icon,Modal,Form,DatePicker} from "antd";
+import API,{getFile} from "../../Services/Api";
 import CrimsonTable from "../../components/CrimsonTable";
+import Notify from '../../utils/notify';
+
+import locale from 'antd/lib/date-picker/locale/es_ES';
+import moment from 'moment';
+import 'moment/locale/es';
 
 const { Column } = Table;
+const FormItem = Form.Item;
+const RangePicker = DatePicker.RangePicker;
 
 export default class OficinasList extends React.Component {
   constructor(props) {
     super(props);
     this.listRef = React.createRef();
+    this.state={
+      visible:false,
+      idPais:"",
+      fechaInicio:"",
+      fechFin:"",
+      btnOk:true,
+    }
   }
 
   fetch = () => {
@@ -27,9 +41,66 @@ export default class OficinasList extends React.Component {
     });
   };
 
+  emitirReporte = () =>{
+    let fecha_ini=this.state.fechaInicio.format('YYYY-MM-DD');
+    let fecha_fin=this.state.fechaFin.format('YYYY-MM-DD');
+    if(this.state.fechaInicio ==="" && this.state.fechaFin==""){
+
+      Notify.warning({
+        message: 'No se ha seleccionado el rango de fechas'
+      });
+    }
+    else{
+      API.get(`reportes/auditoria`,{
+        params:{
+          inicio:fecha_ini,
+          fin:fecha_fin,
+          idOficina:this.state.idPais
+        },
+        responseType:"arraybuffer"
+      }).then(response=>{
+        getFile(response);
+        Notify.success({
+          message: 'El reporte de auditoria se genero correctamente'
+        });
+      }).catch((error)=>{
+        Notify.error({
+          message: 'El reporte de auditoria no se genero'
+        });
+      })
+      this.setState({
+        ...this.values, btnOk:true,
+      })
+    }
+  }
+
+  chooseFecha = values =>{
+    this.setState({
+      ...this.values,
+      fechaInicio: values[0],
+      fechaFin: values[1],
+      btnOk:false
+    }
+    )
+  };
+
+  showModal = id =>{
+    this.setState({
+      visible:true,
+      idPais : id
+    })
+  }
+
+  cancelModal = () =>{
+    this.setState({
+      visible:false,
+    })
+  }
+
   render() {
     const { updateAction } = this.props;
     return (
+      <div>
       <CrimsonTable url="/oficinas" ref={this.listRef}>
         <Column
           title="País"
@@ -108,10 +179,20 @@ export default class OficinasList extends React.Component {
                     </a>
                   )}
                 </Menu.Item>
+                <Menu.Divider />
+                <Menu.Item>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={()=>this.showModal(record.id)}
+                  >
+                    Auditoría
+                  </a>
+                </Menu.Item>
               </Menu>
             );
             return (
-              <Dropdown overlay={menu}>
+              <Dropdown overlay={menu} placement="bottomRight">
                 <a className="ant-dropdown-link" href="#">
                   <Icon type="setting" theme="outlined" />
                 </a>
@@ -120,6 +201,23 @@ export default class OficinasList extends React.Component {
           }}
         />
       </CrimsonTable>
+      <Modal 
+      visible={this.state.visible}
+      onCancel = {this.cancelModal}
+      onOk = {this.emitirReporte}
+      title ="Emitir reporte de Auditoría"
+      okText="Generar"
+      cancelText="Cancelar"
+      okButtonDisabled = {this.state.btnOk}
+      >
+      <FormItem label="Ingresar el rango de fechas" style={{ marginBottom: '10px'}}></FormItem>
+      <RangePicker
+        locale={locale}
+        style={{ width: "100%" }}
+        format="DD/MM/YYYY"
+        onChange={this.chooseFecha}/>
+      </Modal>
+      </div>
     );
   }
 }
