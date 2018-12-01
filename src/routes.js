@@ -11,6 +11,7 @@ import PaquetesNuevo from './views/paquetes/PaquetesNuevo';
 import Roles from './views/roles';
 import Paises from './views/paises';
 import Perfil from './views/perfil';
+import Simulator from './views/ffsimulator';
 
 const RolesEnum = {
   ADMINISTRADOR: 'ADMINISTRADOR',
@@ -95,6 +96,11 @@ const routes = [
     hidden : true,
     roles:[RolesEnum.ADMINISTRADOR]
    },
+   {
+     path:'/simulator2',
+     component: Simulator,
+     name: 'FFSimulator',
+   }
    
 ]
 
