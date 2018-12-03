@@ -5,6 +5,7 @@ import centers from "./../../utils/files/country-centers.json";
 import Flight from './Flight';
 
 const baseColor = "#3498db";
+
 const avoidedCountries = new Set(["ATA", "ATF"]);
 
 const simulationRealRatio = 300; // en 1 segundo de la vida real pasan 300 segundos en la simulacion
@@ -61,16 +62,14 @@ export default class Oficinas extends React.Component {
         const items = ["FR", "PE", "CA", "RU", "CN", "BR", "AR"]
         let item = items[Math.floor(Math.random() * items.length)];
         let item2 = items[Math.floor(Math.random() * items.length)];
-        let d = 5 + Math.random() * 5;
+        let d = 1 + Math.random() * 3;
 
         if (item !== "-99" && item2 !== "-99" && centers[item] && centers[item2]) {
             let flight = { id: Math.random().toString(36).substr(2, 9), from: item.toUpperCase(), to: item2.toUpperCase(), duration: d, rendered: true };
             $react.state.flights.add(flight);
             //setTimeout(() =>  $react.onFlightCompleted(flight), 800);
         }
-        $react.setState({ ...$react.state }, () => {
-            // this.createRandomFlight();
-        });
+        $react.setState({ ...$react.state });
     }
 
     onFlightCompleted(flight) {
@@ -128,11 +127,7 @@ export default class Oficinas extends React.Component {
                         </ComposableMap>
                     </div>
                 </div>
-
-
             </div>
-
-
         );
     }
 }
