@@ -1,11 +1,8 @@
 import React from 'react';
-import { Col, Layout, Button, Menu, Dropdown, Icon } from "antd";
-import { TheContent, TheHeader } from "../../components/layout";
+import { Layout } from "antd";
+import { TheContent } from "../../components/layout";
 import Fullscreen from "react-full-screen";
-
 import Map from './Map';
-
-const baseColor = "#3498db";
 
 export default class FFSimulator extends React.Component {
 
@@ -35,5 +32,4 @@ export default class FFSimulator extends React.Component {
             </Layout>
         )
     }
-
 }

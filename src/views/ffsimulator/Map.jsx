@@ -1,42 +1,18 @@
 import React from 'react';
-import { ComposableMap, ZoomableGroup, Geographies, Geography, Markers, Marker, Line, Lines } from 'react-simple-maps';
+import { ComposableMap, ZoomableGroup, Geographies, Geography, Markers } from 'react-simple-maps';
 import map from "./../../utils/files/world-50m-simplified.json";
 import centers from "./../../utils/files/country-centers.json";
 import Flight from './Flight';
 
 const baseColor = "#3498db";
-
 const avoidedCountries = new Set(["ATA", "ATF"]);
 
-const simulationRealRatio = 300; // en 1 segundo de la vida real pasan 300 segundos en la simulacion
-
-const realTimeToSimulationTime = (realTime) => {
-    return realTime * simulationRealRatio;
-}
-
-const simulationTimeToRealTime = (simulationTime) => {
-    return simulationTime / simulationRealRatio;
-}
-
-const windowInSimulationSeconds = 3600 * 5;
-
-const windowInRealSeconds = simulationTimeToRealTime(windowInSimulationSeconds);
-
-const flip = (toBeFlipped) => {
-    return [toBeFlipped[1], toBeFlipped[0]];
-}
-
-
 export default class Oficinas extends React.Component {
-
     constructor(props) {
         super(props);
         this.state = {
             selectedCountries: new Set(),
-            isFull: false,
-            open: true,
-            flights: new Set(),
-            start: 1
+            flights: new Set()
         }
     }
 
@@ -57,8 +33,7 @@ export default class Oficinas extends React.Component {
         this.setState({ ...this.state, start: this.state.start + 1 });
     }
 
-    createRandomFlight() {
-        let $react = this;
+    createRandomFlight = () => {
         const items = ["FR", "PE", "CA", "RU", "CN", "BR", "AR"]
         let item = items[Math.floor(Math.random() * items.length)];
         let item2 = items[Math.floor(Math.random() * items.length)];
@@ -66,13 +41,13 @@ export default class Oficinas extends React.Component {
 
         if (item !== "-99" && item2 !== "-99" && centers[item] && centers[item2]) {
             let flight = { id: Math.random().toString(36).substr(2, 9), from: item.toUpperCase(), to: item2.toUpperCase(), duration: d, rendered: true };
-            $react.state.flights.add(flight);
-            //setTimeout(() =>  $react.onFlightCompleted(flight), 800);
+            this.state.flights.add(flight);
         }
-        $react.setState({ ...$react.state });
+
+        this.setState({ ...$react.state });
     }
 
-    onFlightCompleted(flight) {
+    onFlightCompleted = (flight) => {
         flight.rendered = false;
     }
 
@@ -80,7 +55,7 @@ export default class Oficinas extends React.Component {
         const { selectedCountries } = this.state;
         return (
             <div>
-                <button onClick={this.createRandomFlight.bind(this)}> Random flights </button>
+                <button onClick={this.createRandomFlight}> Random flight </button>
                 <div className='wrapper'>
                     <div className='map-div'>
                         <ComposableMap className="mapa">
