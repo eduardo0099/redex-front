@@ -30,7 +30,7 @@ export default class Oficinas extends React.Component {
             set.add(key);
         }
 
-        this.setState({ ...this.state, start: this.state.start + 1 });
+        this.setState({ ...this.state});
     }
 
     createRandomFlight = () => {
@@ -44,7 +44,7 @@ export default class Oficinas extends React.Component {
             this.state.flights.add(flight);
         }
 
-        this.setState({ ...$react.state });
+        this.setState({ ...this.state });
     }
 
     onFlightCompleted = (flight) => {
