@@ -39,11 +39,10 @@ export default class Flight extends React.Component {
     }
 
     printInfo = () => {
-        const { from, to, projection } = this.props;
+        const { from, to } = this.props;
         console.log('props', this.props);
         console.log('from',countryCenters[from]);
         console.log('to', countryCenters[to]);
-
     }
 
     render() {

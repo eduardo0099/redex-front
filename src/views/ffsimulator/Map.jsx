@@ -47,36 +47,29 @@ export default class Oficinas extends React.Component {
         let key = geography.properties.ISO_A3;
         let set = this.state.selectedCountries;
 
-        let flight = { from: geography.properties.ISO_A2, to:"PE", duration: .5, rendered: true };
-        setTimeout(() => this.onFlightCompleted(flight), 800);
-
-        this.state.flights.add(flight);
-
         if (set.has(key)) {
             set.delete(key);
         } else {
             set.add(key);
         }
 
-        this.setState({ ...this.state, start: this.state.start+1 });
+        this.setState({ ...this.state, start: this.state.start + 1 });
     }
 
     createRandomFlight() {
         let $react = this;
-        const items =["FR", "PE", "CA", "RU", "CN", "BR", "AR"]
+        const items = ["FR", "PE", "CA", "RU", "CN", "BR", "AR"]
+        let item = items[Math.floor(Math.random() * items.length)];
+        let item2 = items[Math.floor(Math.random() * items.length)];
+        let d = 5 + Math.random() * 5;
 
-      
-            let item = items[Math.floor(Math.random()*items.length)];
-            let item2 = items[Math.floor(Math.random()*items.length)];
-            let d = 5 + Math.random()*5;
-
-            if(item !== "-99" && item2 !== "-99" && centers[item] && centers[item2]){
-                let flight = { id: Math.random().toString(36).substr(2, 9), from: item.toUpperCase(), to: item2.toUpperCase(), duration: d, rendered: true };
-                $react.state.flights.add(flight);
-                //setTimeout(() =>  $react.onFlightCompleted(flight), 800);
-            }
-        $react.setState({ ... $react.state }, () =>{
-           // this.createRandomFlight();
+        if (item !== "-99" && item2 !== "-99" && centers[item] && centers[item2]) {
+            let flight = { id: Math.random().toString(36).substr(2, 9), from: item.toUpperCase(), to: item2.toUpperCase(), duration: d, rendered: true };
+            $react.state.flights.add(flight);
+            //setTimeout(() =>  $react.onFlightCompleted(flight), 800);
+        }
+        $react.setState({ ...$react.state }, () => {
+            // this.createRandomFlight();
         });
     }
 
@@ -129,7 +122,7 @@ export default class Oficinas extends React.Component {
                                     }
                                 </Geographies>
                                 <Markers>
-                                    { [...this.state.flights].map((flight, index) => flight.rendered ? <Flight key={flight.id} {...flight}/> : null ) }
+                                    {[...this.state.flights].map((flight, index) => flight.rendered ? <Flight key={flight.id} {...flight} /> : null)}
                                 </Markers>
                             </ZoomableGroup>
                         </ComposableMap>
