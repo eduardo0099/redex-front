@@ -6,11 +6,6 @@ const paths = require('./paths');
 
 var http = require("http");
 
-setInterval(function() {
-    http.get("http://redex-front.herokuapp.com");
-    http.get("http://redex-backend.herokuapp.com");
-    http.get("http://redex-trecking.herokuapp.com");
-}, 300000); 
 
 
 // Make sure that including paths.js after env.js will read .env variables.
