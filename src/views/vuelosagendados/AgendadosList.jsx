@@ -89,8 +89,10 @@ export default class OficinasList extends React.Component {
             switch (estado.name) {
               case "CREADO":
                 return <Tag color="geekblue"> Creado </Tag>;
-              case "INACTIVO":
-                return <Tag color="red"> Inactivo </Tag>;
+              case "FINALIZADO":
+                return <Tag color="red"> Finalizado </Tag>;
+              case "ACTIVO":
+                return <Tag color="green"> Activo </Tag>;
               default:
                 return null;
             }

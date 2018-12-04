@@ -454,13 +454,13 @@ class Simulacion extends Component{
             
             if(infoObj){
                 return (
-                    <div>{elem.properties.NAME + " - " +elem.properties.ISO_A3 +" - " + infoObj.codigo }
+                    <div>{elem.properties.NAME_ES + " - " +elem.properties.ISO_A3 +" - " + infoObj.codigo }
                         <div>{"Capacidad: " + infoObj.capacidadActual + "/" + infoObj.capacidadMaxima}</div>
                     </div>
                 )
             }else{
                 return (
-                    <div>{elem.properties.NAME}</div>
+                    <div>{elem.properties.NAME_ES}</div>
                 )
             }  
         }
