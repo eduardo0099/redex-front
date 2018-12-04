@@ -7,17 +7,16 @@ import map from "./../../utils/files/world-50m-simplified.json";
 import API from './../../Services/Api';
 import moment from 'moment';
 import ModalReporte from './ModalReporte';
-
+import mathjs from 'mathjs';
 class Simulacion extends Component{
     constructor(props) {
         super(props);
-        this.cont = 0;
         this.colorSelected = '#c7a602';
-        this.colorCommon = '#ECEFF1';
+        this.colorCommon = '#3e3e3e';
         this.colorUnSelected = '#f5cc00';
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
-        this.frecRefreshSimu = 1000;
+        this.frecRefreshSimu = 50;
         this.foo = new Date();
         this.listActions = [];
         this.maxStepConfig = 4; 
@@ -45,6 +44,15 @@ class Simulacion extends Component{
             locationInfo: [],
             selectedCountries: [],
             planVuelos:[
+                /*{
+                    fechaLlegada: 1543795200000,
+                    oficinaSalida: "BOL",
+                    oficinaLlegada: "PER",
+                    fechaSalida: new Date().setHours(18,41,0,0),
+                    tipo: "SALIDA",
+                    cantidad: 100,
+                    cantidadSalida: 25
+                }*/
             ],
             paquetesEnviados: 0,
             showModalCollapsed: false,
@@ -161,7 +169,6 @@ class Simulacion extends Component{
             .then(response => {
                 if(this.state.stepConfig == 1){
                     API.get('/simulacion/oficinas').then(response =>{
-                        console.log("offiii",response)
                         let selectedCountries = [];
                         let aux = [];
                         let mapIndexLoc = new Map();
@@ -234,6 +241,7 @@ class Simulacion extends Component{
         let newTimeArr = timeString.split(":");
         let newDateTime = new Date(this.state.time);
         newDateTime.setHours(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]),parseInt(newTimeArr[2]));
+        console.log("eee real",newDateTime);
         this.setState({
             iniTime: newDateTime.getTime(),
             time: newDateTime.getTime(),
@@ -310,8 +318,6 @@ class Simulacion extends Component{
             paquetesEnviados: this.state.paquetesEnviados,
             oficinas: auxLocationInfo
         }
-        console.log("******************************************************");
-        console.log("envia para reporte",infoCollapsedFull);
         clearInterval(this.state.intervalClock);
         clearInterval(this.state.intervalWindowClock);
       }
@@ -425,7 +431,6 @@ class Simulacion extends Component{
     getLocationDef(obj){
         let objLoc = this.state.locationInfo.find(e => e.pais.codigoIso == obj.properties.ISO_A3);
         if(objLoc){
-            this.cont++;
             return objLoc;
         }
         return false;
@@ -460,8 +465,26 @@ class Simulacion extends Component{
             }  
         }
     } 
+    handleBorrar = () => {
+
+        var aaa = 60000
+        setInterval(() => {
+            this.setState({
+                time: this.state.time + aaa
+            })
+        },10)
+    }
+    getHexColor = (max, act) => {
+        let esc = Math.round(255*act/max);
+        
+        let p1 = Number(esc).toString(16).padStart(2, "0");
+        let p2 = Number(118).toString(16).padStart(2, "0");
+        let p3 = Number(118).toString(16).padStart(2, "0");
+
+        return '#'+p1+p2+p3;
+    }
     render(){
-        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed,infoCollapsed, showModalCollapsed} = this.state;
+        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed,infoCollapsed, showModalCollapsed,time} = this.state;
         let objTime = new Date(this.state.time);
         return(
             <Layout>
@@ -476,6 +499,7 @@ class Simulacion extends Component{
             <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
                 {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
             </Button>
+            <Button onClick={this.handleBorrar}>Borrar</Button>
             { inPause ?
                 <Button onClick={this.handleReplay}>Reanudar</Button>
                 :
@@ -508,10 +532,10 @@ class Simulacion extends Component{
                         onClick={this.handleClickGeography}
                         style={{
                         default: {
-                            //fill: "",
-                            fill: this.getLocationDef(geography) ? (this.isCountrySelected(geography.properties.ISO_A3) ? this.colorSelected : this.colorUnSelected ) :  this.colorCommon,
-                            stroke: "#607D8B",
-                            strokeWidth: 0.75,
+                            fill: this.getLocationDef(geography) ? this.getHexColor(this.getLocationDef(geography).capacidadMaxima,this.getLocationDef(geography).capacidadActual) : "#607D8B",
+                            //fill: "#607D8B",
+                            stroke: this.getLocationDef(geography) ? (this.isCountrySelected(geography.properties.ISO_A3) ? this.colorSelected : this.colorUnSelected ) :  this.colorCommon,
+                            strokeWidth: 1.5,
                             outline: "none",
                         },
                         hover: {
@@ -532,7 +556,7 @@ class Simulacion extends Component{
                 }
                 </Geographies>
                 <Markers>
-                        {locationInfo.map((item, i) => { 
+                        {/*locationInfo.map((item, i) => { 
                             return (
                                     <Marker key={i} 
                                             marker={{ coordinates: [ item.pais.longitud, item.pais.latitud ] }}
@@ -545,9 +569,53 @@ class Simulacion extends Component{
                                             >                                      
                                         <circle cx={ 0 } cy={ 0 } r={ 3 } />                              
                                     </Marker>);
+                        })*/}
+                        {
+                            planVuelos.map((item,i)=>{
+                            let salida =this.state.myMap.get(item.oficinaSalida);
+                            let llegada=this.state.myMap.get(item.oficinaLlegada);
+                            //item.fechaLlegada, item.fechaSalida
+                            /*let salida ={
+                                pais:{
+                                    longitud: -75.015152,
+                                    latitud: -9.1899672
+                                }
+                            }
+                            let llegada ={
+                                pais:{
+                                    longitud: -3.70325,
+                                    latitud:40.4167
+                                }
+                            }
+                            */
+                            let distX = mathjs.distance({pointOneX: salida.pais.longitud, pointOneY: 0},{pointTwoX: llegada.pais.longitud, pointTwoY: 0});
+                            let distY = mathjs.distance({pointOneX: salida.pais.latitud, pointOneY: 0},{pointTwoX: llegada.pais.latitud, pointTwoY: 0});
+                            let auxTime = time > item.fechaLlegada ? item.fechaLlegada : time;
+
+                            let segX = (auxTime - item.fechaSalida) * (distX)/(item.fechaLlegada - item.fechaSalida);
+                            let segY = (auxTime - item.fechaSalida) * (distY)/(item.fechaLlegada - item.fechaSalida) 
+
+
+                            let xPoint = (llegada.pais.longitud > salida.pais.longitud ? salida.pais.longitud + segX : salida.pais.longitud - segX );
+                            let yPoint = (llegada.pais.latitud > salida.pais.latitud ? salida.pais.latitud + segY : salida.pais.latitud - segY);
+                            console.log(xPoint,yPoint);
+                            return(
+                                <Marker
+                                    key={i}
+                                    marker={{ coordinates: [ xPoint, yPoint ] }}
+                                    preserveMarkerAspect={false}
+                                    style={{
+                                        default: { fill: "#000" },
+                                        hover:   { fill: "#999" },
+                                        pressed: { fill: "#000" },
+                                        }}
+                                >
+                                    <circle cx={ 0 } cy={ 0 } r={ 3 } />     
+                                </Marker> 
+                            )
                         })}
                 </Markers>  
-                <Lines>
+                {/*<Lines>
                   {planVuelos.filter(
                       pv => 
                         (selectedCountries.includes(pv.oficinaLlegada) 
@@ -557,6 +625,7 @@ class Simulacion extends Component{
                     let llegada=this.state.myMap.get(item.oficinaLlegada);
                     return(
                       <Line
+                        key={i}
                         className="world-map-arc"
                         line={{
                                 coordinates: {
@@ -574,7 +643,7 @@ class Simulacion extends Component{
                       />
                     )
                   })}
-            </Lines>
+                </Lines>*/}
               </ZoomableGroup>
             </ComposableMap>
             <ReactTooltip id='modal-city'
