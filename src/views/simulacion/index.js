@@ -562,12 +562,12 @@ class Simulacion extends Component{
                                             marker={{ coordinates: [ item.pais.longitud, item.pais.latitud ] }}
                                             preserveMarkerAspect={false}
                                             style={{
-                                                default: { fill: "#000" },
+                                                default: { fill: "#0000007a" },
                                                 hover:   { fill: "#999" },
                                                 pressed: { fill: "#000" },
                                               }}
                                             >                                      
-                                        <circle cx={ 0 } cy={ 0 } r={ 3 } />                              
+                                        <circle cx={ 0 } cy={ 0 } r={ 1 } />                              
                                     </Marker>);
                         })*/}
                         {
