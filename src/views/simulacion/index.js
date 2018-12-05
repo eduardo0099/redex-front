@@ -348,7 +348,7 @@ class Simulacion extends Component{
         ).then(resp => {
             if(resp.data.status == 0){ // sigo pidiendo
                 sem.take(()=>{
-                    this.listActions = this.listActions.concat(resp.data.list);
+                    this.listActions = this.listActions.concat(resp.data.listActions);
                     sem.leave();
                 });
                 this.setState({
@@ -380,7 +380,7 @@ class Simulacion extends Component{
             ).then(resp => {
                 if(resp.data.status == 0){
                     sem.take(()=>{
-                        this.listActions = this.listActions.concat(resp.data.list);
+                        this.listActions = this.listActions.concat(resp.data.listActions);
                         sem.leave();
                         let intClock = setInterval(
                             () => this.tickClock()
