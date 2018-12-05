@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout ,Select, Modal ,Button, DatePicker, TimePicker, InputNumber } from 'antd';
+import { Layout , Modal ,Button, DatePicker, TimePicker, InputNumber, Spin } from 'antd';
 import { TheContent, TheHeader } from '../../components/layout';
 import { ComposableMap,ZoomableGroup,Geographies,Geography,Markers,Marker,Line,Lines} from 'react-simple-maps';
 import ReactTooltip from 'react-tooltip';
@@ -8,6 +8,8 @@ import API from './../../Services/Api';
 import moment from 'moment';
 import ModalReporte from './ModalReporte';
 import mathjs from 'mathjs';
+var sem = require('semaphore')(1);
+
 class Simulacion extends Component{
     constructor(props) {
         super(props);
@@ -25,6 +27,7 @@ class Simulacion extends Component{
             indexLoc: null,
             center: [0,20],
             zoom: 1,
+            loading: 0,
             visibleModalConfig: false,
             tooltipConfig: null,
             myMap:null,
@@ -44,7 +47,7 @@ class Simulacion extends Component{
             locationInfo: [],
             selectedCountries: [],
             planVuelos:[
-                /*{
+               /* {
                     fechaLlegada: 1543795200000,
                     oficinaSalida: "BOL",
                     oficinaLlegada: "PER",
@@ -141,7 +144,6 @@ class Simulacion extends Component{
                             Intervalo de tiempo: <InputNumber min={1} defaultValue={this.state.windowTime} onChange={this.handleWindowTimeChange} />
                         </div>
                         <p>La velocidad se ve incrementada x<strong>{this.state.frecTime}</strong></p>
-                        {this.state.errorConfig ? <div style={{color:'#f5222d'}} className="error-config">Hubo un error al subir el archivo, intentelo de nuevo</div> : '' }
                     </div>
                 );
         }
@@ -257,7 +259,6 @@ class Simulacion extends Component{
     tickClock(){
       let oldTime = this.state.time;
       let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
-      console.log(new Date(newTime).toLocaleString());
       //Ini: Calculos que se deben hacer por cada tick del reloj
       let auxLocationInfo = [...this.state.locationInfo];
       let auxIndex = this.state.indexLoc;
@@ -270,24 +271,27 @@ class Simulacion extends Component{
       let objInfoCollap = {};
       while(this.listActions.length != 0 && esTemprano){
         if(this.listActions[0].fechaSalida < this.state.time){
+            sem.take(()=>{
+                obj = this.listActions.shift();
+                sem.leave();
 
-          obj = this.listActions.shift();
-
-          if(obj.tipo == "REGISTRO"){
-            idx = auxIndex.get(obj.oficinaLlegada);
-            auxLocationInfo[idx].capacidadActual++;
-            auxLocationInfo[idx].cantidad++;
-            if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
-                isCollapsed = true;
-                objInfoCollap = {code: auxLocationInfo[idx].codigo,  maxCap:auxLocationInfo[idx].capacidadMaxima }
-            }
-            console.log("R");
-          }else if(obj.tipo == "SALIDA"){
-            auxPlanesNew.push(obj);
-            idx = auxIndex.get(obj.oficinaLlegada);
-            auxLocationInfo[idx].capacidadActual -= obj.cantidad;
-            console.log("S");
-          }
+                if(obj.tipo == "REGISTRO"){
+                    idx = auxIndex.get(obj.oficinaLlegada);
+                    auxLocationInfo[idx].capacidadActual++;
+                    auxLocationInfo[idx].cantidad++;
+                    if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
+                        isCollapsed = true;
+                        objInfoCollap = {code: auxLocationInfo[idx].codigo,  maxCap:auxLocationInfo[idx].capacidadMaxima }
+                    }
+                    console.log("R");
+                }else if(obj.tipo == "SALIDA"){
+                    auxPlanesNew.push(obj);
+                    idx = auxIndex.get(obj.oficinaLlegada);
+                    auxLocationInfo[idx].capacidadActual -= obj.cantidad;
+                    console.log("S");
+                }
+            });
+            
         }else{
           esTemprano = false;
         }
@@ -334,54 +338,71 @@ class Simulacion extends Component{
     }
 
     sendRequestActions(){
+        console.log("pide a las ", new Date(this.state.time));
         API.post('simulacion/window',
             {
             simulacion:  1, 
-            inicio: new Date(this.state.realTime), //2018-04-16T19:01:00 
-            fin: new Date(this.state.realTime + this.state.windowTime), //2018-04-20T03:01:00
+            inicio: new Date(this.state.realTime - 5*60*60*1000), //2018-04-16T19:01:00 
+            fin: new Date(this.state.realTime + this.state.windowTime - 5*60*60*1000), //2018-04-20T03:01:00
             }
         ).then(resp => {
-            //
-            this.listActions = this.listActions.concat(resp.data);
-            //
-            this.setState({
-                realTime: this.state.realTime + this.state.windowTime + 1
-            })
+            if(resp.data.status == 0){ // sigo pidiendo
+                sem.take(()=>{
+                    this.listActions = this.listActions.concat(resp.data.list);
+                    sem.leave();
+                });
+                this.setState({
+                    realTime: this.state.realTime + this.state.windowTime
+                });
+            }else{
+                clearInterval(this.state.intervalWindowClock);
+                this.setState({
+                    realTime: this.state.realTime + this.state.windowTime,
+                    intervalWindowClock: null,
+                })
+            }
         });
     }
     handleStartClock(){
       if(this.state.intervalClock){
         console.log(">>",this.state.intervalClock);
       }else{
-        
+        console.log("pide a las ", new Date(this.state.time));
+        this.setState({
+            loading: 1,
+        }, () => {
+            API.post('simulacion/window',
+                {
+                simulacion:  1, 
+                inicio: new Date(this.state.realTime - 5*60*60*1000), //2018-04-16T19:01:00 
+                fin: new Date(this.state.realTime + this.state.windowTime - 5*60*60*1000), //2018-04-20T03:01:00
+                }
+            ).then(resp => {
+                if(resp.data.status == 0){
+                    sem.take(()=>{
+                        this.listActions = this.listActions.concat(resp.data.list);
+                        sem.leave();
+                        let intClock = setInterval(
+                            () => this.tickClock()
+                            ,this.frecRefreshSimu); 
+                
+                        let intWindowClock = setInterval(
+                            () => this.sendRequestActions()
+                            ,Math.floor(this.state.windowTime/this.state.frecTime));
 
-        API.post('simulacion/window',
-            {
-            simulacion:  1, 
-            inicio: new Date(this.state.realTime), //2018-04-16T19:01:00 
-            fin: new Date(this.state.realTime + this.state.windowTime), //2018-04-20T03:01:00
-            }
-        ).then(resp => {
-            let intClock = setInterval(
-                () => this.tickClock()
-                ,this.frecRefreshSimu); 
-      
-            let intWindowClock = setInterval(
-                  () => this.sendRequestActions()
-                 ,Math.floor(this.state.windowTime/this.state.frecTime));
-            
-            console.log("cada x llama " + Math.floor((this.state.windowTime/this.state.frecTime)/1000)  + " seg")
-            this.listActions = this.listActions.concat(resp.data);
-
-            this.setState({
-                realTime: this.state.realTime + this.state.windowTime + 1,
-                intervalClock: intClock,
-                intervalWindowClock: intWindowClock,
-                inPause: false,
-            })
+                        this.setState({
+                            realTime: this.state.realTime + this.state.windowTime,
+                            intervalClock: intClock,
+                            intervalWindowClock: intWindowClock,
+                            inPause: false,
+                            loading: 0,
+                        })
+                    });
+                }else{
+                    console.log("HA OCURRIDO UN ERROR EN LA PRIMERA VENTANA DE TIEMPO");
+                }
+            });
         });
-
-        
       }
     }
     handleReplay = () => {
@@ -465,15 +486,7 @@ class Simulacion extends Component{
             }  
         }
     } 
-    handleBorrar = () => {
 
-        var aaa = 60000
-        setInterval(() => {
-            this.setState({
-                time: this.state.time + aaa
-            })
-        },10)
-    }
     getHexColor = (max, act) => {
         let esc = Math.round(255*act/max);
         
@@ -484,14 +497,16 @@ class Simulacion extends Component{
         return '#'+p1+p2+p3;
     }
     render(){
-        const { locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed,infoCollapsed, showModalCollapsed,time} = this.state;
+        const {loading, locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed,infoCollapsed, showModalCollapsed,time} = this.state;
         let objTime = new Date(this.state.time);
         return(
             <Layout>
             <TheHeader>
-                <h1> Simulación </h1>
+                <h1> Simulación</h1>
+                
             </TheHeader>
             <TheContent>
+            {loading == 1 ? <div style={{position:'fixed', top:'50%',left:'50%'}}><Spin /></div> : '' }
             <div>
             {objTime.toLocaleString()}
             {collapsed && showModalCollapsed? <ModalReporte onHandleClose={this.handleModalCollap} info={infoCollapsed}/> : ""}
@@ -499,7 +514,6 @@ class Simulacion extends Component{
             <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
                 {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
             </Button>
-            <Button onClick={this.handleBorrar}>Borrar</Button>
             { inPause ?
                 <Button onClick={this.handleReplay}>Reanudar</Button>
                 :
@@ -610,7 +624,7 @@ class Simulacion extends Component{
                                         pressed: { fill: "#000" },
                                         }}
                                 >
-                                    <circle cx={ 0 } cy={ 0 } r={ 3 } />     
+                                    <circle cx={ 0 } cy={ 0 } r={ 1 } />     
                                 </Marker> 
                             )
                         })}

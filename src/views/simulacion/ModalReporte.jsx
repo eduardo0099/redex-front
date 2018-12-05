@@ -10,12 +10,11 @@ class ModalReporte extends Component {
     handleExport = () => {
         API.post(`simulacion/reporte`,this.props.info,{responseType:"arraybuffer"})
             .then(response => {
-                console.log("eeee, descrgoo");
                 getFile(response);
             })
     }
     render() {
-        let info = {
+        /*let info = {
             fechaInicial: 121312312,
             duracionTotal: 1200000000,
             almacenColapso: "SKBO", //ok
@@ -32,8 +31,8 @@ class ModalReporte extends Component {
                 },
             ] 
         }
-
-        info = this.props.info;
+*/
+        let info = this.props.info;
         info.oficinas.sort((a,b)=>{
             return b.cantidad - a.cantidad
         })
@@ -89,7 +88,7 @@ class ModalReporte extends Component {
                             })}
                         </tbody>
                     </table>  
-                    <div style={{textAlign:'center'}} onClick={this.handleExport}> Exportar</div>             
+                    <Button type="primary" style={{textAlign:'center'}} onClick={this.handleExport}> Exportar</Button>             
                 </Modal>
             </div>
         );
