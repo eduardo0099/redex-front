@@ -165,7 +165,6 @@ class Simulacion extends Component{
                 urlApi = '';
                 break;
         }
-        console.log("envia",urlApi,this.state.archivo);
         if(urlApi != ''){
             API.post(urlApi, this.state.archivo)
             .then(response => {
@@ -181,7 +180,6 @@ class Simulacion extends Component{
                             obj.push(response[i].pais.codigoIso);
                             obj.push(response[i]);
                             mapIndexLoc.set(response[i].pais.codigoIso,i);
-                            //selectedCountries.push(response[i].pais.codigoIso);
                             aux.push(obj);
                         }
                         this.setState({
@@ -243,7 +241,6 @@ class Simulacion extends Component{
         let newTimeArr = timeString.split(":");
         let newDateTime = new Date(this.state.time);
         newDateTime.setHours(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]),parseInt(newTimeArr[2]));
-        console.log("eee real",newDateTime);
         this.setState({
             iniTime: newDateTime.getTime(),
             time: newDateTime.getTime(),
@@ -283,12 +280,12 @@ class Simulacion extends Component{
                         isCollapsed = true;
                         objInfoCollap = {code: auxLocationInfo[idx].codigo,  maxCap:auxLocationInfo[idx].capacidadMaxima }
                     }
-                    console.log("R");
+                    //console.log("R");
                 }else if(obj.tipo == "SALIDA"){
                     auxPlanesNew.push(obj);
                     idx = auxIndex.get(obj.oficinaLlegada);
                     auxLocationInfo[idx].capacidadActual -= obj.cantidad;
-                    console.log("S");
+                    //console.log("S");
                 }
             });
             
@@ -301,7 +298,7 @@ class Simulacion extends Component{
       let liveFlights = this.state.planVuelos.filter(e => e.fechaLlegada > newTime );
       let finishedFlights = this.state.planVuelos.filter(e => e.fechaLlegada <= newTime );
       let acumSalida = 0;
-
+      
       for(let delElem of finishedFlights){
         let idxDel = auxIndex.get(delElem.oficinaSalida);
         if(auxLocationInfo[idxDel].capacidadActual + delElem.cantidad > auxLocationInfo[idxDel].capacidadMaxima){
@@ -313,7 +310,7 @@ class Simulacion extends Component{
         acumSalida += delElem.cantidadSalida;
       }
       if(isCollapsed){
-        console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
+        //console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
         infoCollapsedFull = {
             fechaInicial: this.state.iniTime,
             duracionTotal: this.state.realTime - this.state.iniTime,
@@ -342,8 +339,8 @@ class Simulacion extends Component{
         API.post('simulacion/window',
             {
             simulacion:  1, 
-            inicio: new Date(this.state.realTime - 5*60*60*1000), //2018-04-16T19:01:00 
-            fin: new Date(this.state.realTime + this.state.windowTime - 5*60*60*1000), //2018-04-20T03:01:00
+            inicio: new Date(this.state.realTime - 5*60*60*1000),
+            fin: new Date(this.state.realTime + this.state.windowTime - 5*60*60*1000),
             }
         ).then(resp => {
             if(resp.data.status == 0){ // sigo pidiendo
@@ -497,7 +494,7 @@ class Simulacion extends Component{
         return '#'+p1+p2+p3;
     }
     render(){
-        const {loading, locationInfo, planVuelos, windowTime, frecTime ,selectedCountries, inPause ,collapsed,infoCollapsed, showModalCollapsed,time} = this.state;
+        const {loading, planVuelos, inPause ,collapsed,infoCollapsed, showModalCollapsed,time} = this.state;
         let objTime = new Date(this.state.time);
         return(
             <Layout>
@@ -547,7 +544,6 @@ class Simulacion extends Component{
                         style={{
                         default: {
                             fill: this.getLocationDef(geography) ? this.getHexColor(this.getLocationDef(geography).capacidadMaxima,this.getLocationDef(geography).capacidadActual) : "#607D8B",
-                            //fill: "#607D8B",
                             stroke: this.getLocationDef(geography) ? (this.isCountrySelected(geography.properties.ISO_A3) ? this.colorSelected : this.colorUnSelected ) :  this.colorCommon,
                             strokeWidth: 1.5,
                             outline: "none",
@@ -570,38 +566,11 @@ class Simulacion extends Component{
                 }
                 </Geographies>
                 <Markers>
-                        {/*locationInfo.map((item, i) => { 
-                            return (
-                                    <Marker key={i} 
-                                            marker={{ coordinates: [ item.pais.longitud, item.pais.latitud ] }}
-                                            preserveMarkerAspect={false}
-                                            style={{
-                                                default: { fill: "#0000007a" },
-                                                hover:   { fill: "#999" },
-                                                pressed: { fill: "#000" },
-                                              }}
-                                            >                                      
-                                        <circle cx={ 0 } cy={ 0 } r={ 1 } />                              
-                                    </Marker>);
-                        })*/}
                         {
                             planVuelos.map((item,i)=>{
                             let salida =this.state.myMap.get(item.oficinaSalida);
                             let llegada=this.state.myMap.get(item.oficinaLlegada);
-                            //item.fechaLlegada, item.fechaSalida
-                            /*let salida ={
-                                pais:{
-                                    longitud: -75.015152,
-                                    latitud: -9.1899672
-                                }
-                            }
-                            let llegada ={
-                                pais:{
-                                    longitud: -3.70325,
-                                    latitud:40.4167
-                                }
-                            }
-                            */
+
                             let distX = mathjs.distance({pointOneX: salida.pais.longitud, pointOneY: 0},{pointTwoX: llegada.pais.longitud, pointTwoY: 0});
                             let distY = mathjs.distance({pointOneX: salida.pais.latitud, pointOneY: 0},{pointTwoX: llegada.pais.latitud, pointTwoY: 0});
                             let auxTime = time > item.fechaLlegada ? item.fechaLlegada : time;
@@ -629,41 +598,11 @@ class Simulacion extends Component{
                             )
                         })}
                 </Markers>  
-                {/*<Lines>
-                  {planVuelos.filter(
-                      pv => 
-                        (selectedCountries.includes(pv.oficinaLlegada) 
-                            || selectedCountries.includes(pv.oficinaSalida))
-                        ).map((item,i)=>{
-                    let salida =this.state.myMap.get(item.oficinaSalida);
-                    let llegada=this.state.myMap.get(item.oficinaLlegada);
-                    return(
-                      <Line
-                        key={i}
-                        className="world-map-arc"
-                        line={{
-                                coordinates: {
-                                    start: [salida.pais.longitud,salida.pais.latitud],
-                                    end: [llegada.pais.longitud, llegada.pais.latitud]
-                                }
-                        }}
-                        preserveMarkerAspect={false}
-                        buildPath={this.buildCurves}
-                        style={{
-                            default: { stroke: "#FF4233" },
-                            hover:   { stroke: "#999" },
-                            pressed: { stroke: "#000" },
-                          }}
-                      />
-                    )
-                  })}
-                </Lines>*/}
               </ZoomableGroup>
             </ComposableMap>
             <ReactTooltip id='modal-city'
                 getContent={this.getContentModalCity}
             />
-            
             </TheContent>
             </Layout>
         );
