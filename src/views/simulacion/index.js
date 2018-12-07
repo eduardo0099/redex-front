@@ -18,7 +18,7 @@ class Simulacion extends Component{
         this.colorUnSelected = '#f5cc00';
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
-        this.frecRefreshSimu = 50;
+        this.frecRefreshSimu = 1000;
         this.foo = new Date();
         this.listActions = [];
         this.maxStepConfig = 4; 
@@ -170,6 +170,7 @@ class Simulacion extends Component{
             .then(response => {
                 if(this.state.stepConfig == 1){
                     API.get('/simulacion/oficinas').then(response =>{
+                        console.log("ofis",response.data);
                         let selectedCountries = [];
                         let aux = [];
                         let mapIndexLoc = new Map();
@@ -382,10 +383,10 @@ class Simulacion extends Component{
                         let intClock = setInterval(
                             () => this.tickClock()
                             ,this.frecRefreshSimu); 
-                
+
                         let intWindowClock = setInterval(
                             () => this.sendRequestActions()
-                            ,Math.floor(this.state.windowTime/this.state.frecTime));
+                            ,Math.floor(this.state.windowTime/(this.state.frecTime)));
 
                         this.setState({
                             realTime: this.state.realTime + this.state.windowTime,
@@ -581,7 +582,6 @@ class Simulacion extends Component{
 
                             let xPoint = (llegada.pais.longitud > salida.pais.longitud ? salida.pais.longitud + segX : salida.pais.longitud - segX );
                             let yPoint = (llegada.pais.latitud > salida.pais.latitud ? salida.pais.latitud + segY : salida.pais.latitud - segY);
-                            console.log(xPoint,yPoint);
                             return(
                                 <Marker
                                     key={i}
