@@ -2,7 +2,7 @@
 const use_heroku = false ;
 
 
-const url = use_heroku ? 'https://redex-backend.herokuapp.com/' : 'http://localhost:5000/';
+const url = use_heroku ? 'https://redex-backend.herokuapp.com/' : 'http://192.168.1.15:5000/';
 
 export default url;
 
