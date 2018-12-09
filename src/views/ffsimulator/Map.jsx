@@ -8,6 +8,7 @@ import CountryTooltip from './CountryTooltip';
 import config from './config';
 import animations from './animations';
 import { Movement } from './movements';
+import { printTime } from './time';
 
 import { Queue, PriorityQueue } from './structures';
 
@@ -25,55 +26,85 @@ export default class SimulationMap extends React.Component {
         this.composableMapRef = React.createRef();
         this.markersRef = React.createRef();
         this.state = {
-            start: new Date(2018, 7, 15, 0, 0, 0, 0).getTime(),
-            now: new Date(2018, 7, 15, 0, 0, 0, 0).getTime(),
+            start: Date.UTC(2018, 7, 15, 0, 0, 0, 0),
+            now: Date.UTC(2018, 7, 15, 0, 0, 0, 0),
             currentWindow: null,
             flights: new Set(),
             selectedCountries: new Set(),
             oficinas: new Map(),
             actions: new Queue(),
             clockIdentifier: null,
-            windiwIdentifier: null,
+            windowIdentifier: null,
         }
     }
 
     startSimulation = () => {
         movements = new PriorityQueue((a, b) => a.instant !== b.instant ? a.instant - b.instant : a.type - b.type);
+        let windowIdentifier = null;
+
         this.setState({ ...this.state, currentWindow: 0 }, () => {
             this.getWindow();
-            //setInterval(this.getWindow, config.simulationTimeToRealTime(config.windowSize));
-            /*
+            windowIdentifier = setInterval(this.getWindow, config.simulationTimeToRealTime(config.windowSize));
+
             setTimeout(() => {
                 setInterval(this.tickClock, config.simulationTimeToRealTime(config.refreshRate));
             }, config.simulationTimeToRealTime(config.windowSize));
-            */
+
+            this.setState({ ...this.state, windowIdentifier: windowIdentifier })
         });
 
     }
 
     tickClock = () => {
-        const { now, actions, flights } = this.state;
+        const { now, actions, flights, oficinas } = this.state;
         let max = now + config.refreshRate;
 
+        console.log(`START ticking from ${printTime(now)} to ${printTime(max)}` );
+        
         while (actions.head() && actions.head().fechaSalida <= max && actions.head().fechaSalida > now) {
             const action = actions.pop();
             switch (action.tipo) {
                 case "SALIDA":
-                    movements.push(Movement.createFlightDeparture(action));
+
+                    if (action.cantidad > 0){
+                        movements.push(Movement.createFlightDeparture(action));
+                        movements.push(Movement.createFlightArrivalEntradaPaquetes(action));
+                    }
+
                     if (action.cantidadSalida > 0)
-                        movements.push(Movement.createFlightArrival(action));
+                        movements.push(Movement.createFlightArrivalSalidaPaquetes(action));
 
                     const flight = action;
                     const duration = config.simulationTimeToRealTime((flight.fechaLlegada - flight.fechaSalida) / 1000);
+
                     flights.add({ from: flight.oficinaLlegada, to: flight.oficinaSalida, duration: duration, end: flight.fechaLlegada });
                     break;
-                case "ENTRADA":
+                case "REGISTRO":
                     movements.push(Movement.createPackage(action));
                     break;
             }
         }
 
-        this.setState({ ...this.state, flights: flights, now: max });
+        while (!movements.isEmpty() && movements.peek().instant <= max) {
+            const movement = movements.pop();
+            let oficina = oficinas.get(movement.where);
+            switch (movement.type) {
+                case Movement.ENTRADA:
+                    oficina.capacidadActual += movement.qty;
+                    break;
+                case Movement.SALIDA:
+                    oficina.capacidadActual -= movement.qty;
+                    break;
+            }
+
+            if(oficina.capacidadActual > oficina.capacidadMaxima){
+                console.error('Collapsed at', new Date(Date.UTC(movement.instant)), movement.where, oficina);
+            }
+        }
+
+        this.setState({ ...this.state, flights: flights, now: max, oficinas: this.state.oficinas }, () => {
+            console.log(`STOPP ticking from ${printTime(now)} to ${printTime(max)}` );
+        });
     }
 
     getWindow = () => {
@@ -87,18 +118,25 @@ export default class SimulationMap extends React.Component {
             fin: new Date(windowEnd)
         }
 
+        console.log("REQUESTING WINDOW", window);
+        
         API.post('simulacion/window', window)
             .then(response => {
                 if (response.data.status === 0) {
                     semaphore.take(() => {
                         actions.enqueueAll(response.data.listActions);
                         semaphore.leave();
-                        this.setState({ ...this.state, currentWindow: currentWindow + 1 }, () => this.getWindow());
+                        this.setState({ ...this.state, currentWindow: currentWindow + 1 });
                     })
                 } else {
+                    clearInterval(this.state.windowIdentifier);
                     console.error("Simulation is ded");
                 }
 
+            })
+            .catch(err => {
+                clearInterval(this.state.windowIdentifier);
+                console.error("Simulation died abrupbtly");
             })
     }
 

@@ -1,8 +1,8 @@
 import { Time, buildTime, msToTime } from './time';
 
-const RATIO = 300;
-const WINDOW_SIZE = buildTime(5, Time.HOURS);
-const REFRESH_RATE = buildTime(10, Time.MINUTES);
+const RATIO = 600;
+const WINDOW_SIZE = buildTime(3, Time.HOURS);
+const REFRESH_RATE = buildTime(20, Time.MINUTES);
 
 const config = {
     ratio: RATIO,
