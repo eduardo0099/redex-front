@@ -19,7 +19,6 @@ class Simulacion extends Component{
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
         this.frecRefreshSimu = 1000;
-        this.foo = new Date();
         this.listActions = [];
         this.maxStepConfig = 4; 
         this.state = {
@@ -232,7 +231,8 @@ class Simulacion extends Component{
     }
     handleTimeDateChange(objData, dataString){
       let newTimeArr = dataString.split("-");
-      let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]-1),parseInt(newTimeArr[2]));
+      //let newDateTime = new Date(Date.UTC(parseInt(newTimeArr[0]),parseInt(newTimeArr[1])-1,parseInt(newTimeArr[2])));
+      let newDateTime = new Date(parseInt(newTimeArr[0]),parseInt(newTimeArr[1])-1,parseInt(newTimeArr[2]));
       this.setState({
         time: newDateTime.getTime(),
         realTime: newDateTime.getTime(),
@@ -241,7 +241,7 @@ class Simulacion extends Component{
     handleTimeChange = (objTime, timeString) => {
         let newTimeArr = timeString.split(":");
         let newDateTime = new Date(this.state.time);
-        newDateTime.setHours(parseInt(newTimeArr[0]),parseInt(newTimeArr[1]),parseInt(newTimeArr[2]));
+        newDateTime.setHours(parseInt(newTimeArr[0])-5,parseInt(newTimeArr[1]),parseInt(newTimeArr[2]));
         this.setState({
             iniTime: newDateTime.getTime(),
             time: newDateTime.getTime(),
@@ -258,7 +258,7 @@ class Simulacion extends Component{
       let oldTime = this.state.time;
       let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
       //Ini: Calculos que se deben hacer por cada tick del reloj
-      let auxLocationInfo = [...this.state.locationInfo];
+      let auxLocationInfo = JSON.parse(JSON.stringify(this.state.locationInfo));
       let auxIndex = this.state.indexLoc;
       let auxPlanesNew = [];
       let esTemprano = true;
@@ -268,7 +268,7 @@ class Simulacion extends Component{
       let infoCollapsedFull  = {}
       let objInfoCollap = {};
       while(this.listActions.length != 0 && esTemprano){
-        if(this.listActions[0].fechaSalida < this.state.time){
+        if(this.listActions[0].fechaSalida < newTime){
             sem.take(()=>{
                 obj = this.listActions.shift();
                 sem.leave();
@@ -277,6 +277,10 @@ class Simulacion extends Component{
                     idx = auxIndex.get(obj.oficinaLlegada);
                     auxLocationInfo[idx].capacidadActual++;
                     auxLocationInfo[idx].cantidad++;
+
+                    //auxLocationInfo[idx].capacidadActual += obj.cantidad;
+                    //auxLocationInfo[idx].cantidad  += obj.cantidad;
+
                     if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
                         isCollapsed = true;
                         objInfoCollap = {code: auxLocationInfo[idx].codigo,  maxCap:auxLocationInfo[idx].capacidadMaxima }
@@ -284,7 +288,7 @@ class Simulacion extends Component{
                     //console.log("R");
                 }else if(obj.tipo == "SALIDA"){
                     auxPlanesNew.push(obj);
-                    idx = auxIndex.get(obj.oficinaLlegada);
+                    idx = auxIndex.get(obj.oficinaSalida);
                     auxLocationInfo[idx].capacidadActual -= obj.cantidad;
                     //console.log("S");
                 }
@@ -298,23 +302,28 @@ class Simulacion extends Component{
       //manejar vuelos terminados
       let liveFlights = this.state.planVuelos.filter(e => e.fechaLlegada > newTime );
       let finishedFlights = this.state.planVuelos.filter(e => e.fechaLlegada <= newTime );
+
       let acumSalida = 0;
       
       for(let delElem of finishedFlights){
-        let idxDel = auxIndex.get(delElem.oficinaSalida);
+        let idxDel = auxIndex.get(delElem.oficinaLlegada);
         if(auxLocationInfo[idxDel].capacidadActual + delElem.cantidad > auxLocationInfo[idxDel].capacidadMaxima){
             isCollapsed = true;
             objInfoCollap = {code: auxLocationInfo[idxDel].codigo , maxCap: auxLocationInfo[idxDel].capacidadMaxima}
+            auxLocationInfo[idxDel].capacidadActual += delElem.cantidad
+        }else{
+            auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
         }
-        auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
-        auxLocationInfo[idxDel].cantidad += delElem.cantidad;
+        if(auxLocationInfo[idxDel].capacidadActual < 0){
+            console.log("NEGATIVO",auxLocationInfo[idxDel],delElem);
+        }
         acumSalida += delElem.cantidadSalida;
       }
       if(isCollapsed){
         //console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
         infoCollapsedFull = {
             fechaInicial: this.state.iniTime,
-            duracionTotal: this.state.realTime - this.state.iniTime,
+            duracionTotal: newTime - this.state.iniTime,
             almacenColapso: objInfoCollap.code,
             cantidadAumento: objInfoCollap.maxCap*1.1,
             paquetesEnviados: this.state.paquetesEnviados,
@@ -336,44 +345,46 @@ class Simulacion extends Component{
     }
 
     sendRequestActions(){
-        console.log("pide a las ", new Date(this.state.time));
-        API.post('simulacion/window',
-            {
-            simulacion:  1, 
-            inicio: new Date(this.state.realTime - 5*60*60*1000),
-            fin: new Date(this.state.realTime + this.state.windowTime - 5*60*60*1000),
-            }
-        ).then(resp => {
-            if(resp.data.status == 0){ // sigo pidiendo
-                sem.take(()=>{
-                    this.listActions = this.listActions.concat(resp.data.listActions);
-                    sem.leave();
-                });
-                this.setState({
-                    realTime: this.state.realTime + this.state.windowTime
-                });
-            }else{
-                clearInterval(this.state.intervalWindowClock);
-                this.setState({
-                    realTime: this.state.realTime + this.state.windowTime,
-                    intervalWindowClock: null,
-                })
-            }
-        });
+            API.post('simulacion/window',
+                {
+                simulacion:  1, 
+                inicio: new Date(this.state.realTime/* - 5*60*60*1000*/),
+                fin: new Date(this.state.realTime + this.state.windowTime /*- 5*60*60*1000*/),
+                }
+            ).then(resp => {
+                if(resp.data.status == 0){ // sigo pidiendo
+                    sem.take(()=>{
+                        this.listActions = this.listActions.concat(resp.data.listActions);
+                        console.log(">>>",this.listActions.length);
+                        sem.leave();
+                        this.setState({
+                            realTime: this.state.realTime + this.state.windowTime
+                        },() => {
+                            this.sendRequestActions();
+                        });
+                    });
+                }else{
+                    clearInterval(this.state.intervalWindowClock);
+                    this.setState({
+                        realTime: this.state.realTime + this.state.windowTime,
+                        intervalWindowClock: null,
+                    })
+                }
+            });
+        
     }
     handleStartClock(){
       if(this.state.intervalClock){
         console.log(">>",this.state.intervalClock);
       }else{
-        console.log("pide a las ", new Date(this.state.time));
         this.setState({
             loading: 1,
         }, () => {
             API.post('simulacion/window',
                 {
                 simulacion:  1, 
-                inicio: new Date(this.state.realTime - 5*60*60*1000), //2018-04-16T19:01:00 
-                fin: new Date(this.state.realTime + this.state.windowTime - 5*60*60*1000), //2018-04-20T03:01:00
+                inicio: new Date(this.state.realTime /* - 5*60*60*1000*/), //2018-04-16T19:01:00 
+                fin: new Date(this.state.realTime + this.state.windowTime /* - 5*60*60*1000*/), //2018-04-20T03:01:00
                 }
             ).then(resp => {
                 if(resp.data.status == 0){
@@ -383,17 +394,19 @@ class Simulacion extends Component{
                         let intClock = setInterval(
                             () => this.tickClock()
                             ,this.frecRefreshSimu); 
-
+/*
                         let intWindowClock = setInterval(
                             () => this.sendRequestActions()
                             ,Math.floor(this.state.windowTime/(this.state.frecTime)));
-
+*/                    
                         this.setState({
                             realTime: this.state.realTime + this.state.windowTime,
                             intervalClock: intClock,
-                            intervalWindowClock: intWindowClock,
+                            //intervalWindowClock: intWindowClock,
                             inPause: false,
                             loading: 0,
+                        },()=>{
+                            this.sendRequestActions();
                         })
                     });
                 }else{
@@ -495,7 +508,7 @@ class Simulacion extends Component{
         return '#'+p1+p2+p3;
     }
     render(){
-        const {loading, planVuelos, inPause ,collapsed,infoCollapsed, showModalCollapsed,time} = this.state;
+        const {loading, planVuelos, inPause ,collapsed,infoCollapsed, showModalCollapsed,time, locationInfo} = this.state;
         let objTime = new Date(this.state.time);
         return(
             <Layout>
@@ -504,9 +517,10 @@ class Simulacion extends Component{
                 
             </TheHeader>
             <TheContent>
+            <div style={{position:'relative'}}>
             {loading == 1 ? <div style={{position:'fixed', top:'50%',left:'50%'}}><Spin /></div> : '' }
             <div>
-            {objTime.toLocaleString()}
+            {objTime.toLocaleString('en-GB', { timeZone: 'UTC' })}
             {collapsed && showModalCollapsed? <ModalReporte onHandleClose={this.handleModalCollap} info={infoCollapsed}/> : ""}
             </div>
             <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
@@ -525,6 +539,16 @@ class Simulacion extends Component{
             >
                 {this.contentConfigModal(this.state.stepConfig)}
             </Modal>
+            <div className="cities">
+                <strong>LISTA:</strong>
+                {JSON.parse(JSON.stringify(locationInfo)).sort((a,b) => {
+                    return b.capacidadActual - a.capacidadActual;
+                }).map((obj,idx) => {
+                    return (
+                        <div key={idx} style={{fontSize:'16px',textAlign:'left'}}><strong>{obj.codigo + ": "+obj.capacidadActual}</strong></div>
+                    );
+                })}
+            </div>
             <ComposableMap
                         className="mapa"
                         projectionConfig={{
@@ -603,6 +627,7 @@ class Simulacion extends Component{
             <ReactTooltip id='modal-city'
                 getContent={this.getContentModalCity}
             />
+            </div>
             </TheContent>
             </Layout>
         );
