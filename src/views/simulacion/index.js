@@ -21,6 +21,7 @@ class Simulacion extends Component{
         this.frecRefreshSimu = 1000;
         this.listActions = [];
         this.maxStepConfig = 4; 
+        this.ventana = null;
         this.state = {
             windowTime: 3*60*60 *1000, //El ultimo mil es porque es en milisegundos
             indexLoc: null,
@@ -68,11 +69,8 @@ class Simulacion extends Component{
         //Zoom the city
         this.isCountrySelected = this.isCountrySelected.bind(this);
         this.handleFrecTimeChange = this.handleFrecTimeChange.bind(this);
-        this.tickClock = this.tickClock.bind(this);
-        this.handleStartClock = this.handleStartClock.bind(this);
         this.handleTimeDateChange = this.handleTimeDateChange.bind(this);
         this.handleWindowTimeChange = this.handleWindowTimeChange.bind(this);
-        this.sendRequestActions = this.sendRequestActions.bind(this);
     }
     componentWillMount(){
         setTimeout(()=>{
@@ -253,10 +251,13 @@ class Simulacion extends Component{
         frecTime: value,
       });
     }
-    
-    tickClock(){
+
+    tickClock = () => {
       let oldTime = this.state.time;
       let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
+      if(newTime >= this.state.realTime){
+        newTime = this.state.realTime
+        }
       //Ini: Calculos que se deben hacer por cada tick del reloj
       let auxLocationInfo = JSON.parse(JSON.stringify(this.state.locationInfo));
       let auxIndex = this.state.indexLoc;
@@ -268,7 +269,7 @@ class Simulacion extends Component{
       let infoCollapsedFull  = {}
       let objInfoCollap = {};
       while(this.listActions.length != 0 && esTemprano){
-        if(this.listActions[0].fechaSalida < newTime){
+        if(this.listActions[0].fechaSalida <= newTime){
             sem.take(()=>{
                 obj = this.listActions.shift();
                 sem.leave();
@@ -277,9 +278,6 @@ class Simulacion extends Component{
                     idx = auxIndex.get(obj.oficinaLlegada);
                     auxLocationInfo[idx].capacidadActual++;
                     auxLocationInfo[idx].cantidad++;
-
-                    //auxLocationInfo[idx].capacidadActual += obj.cantidad;
-                    //auxLocationInfo[idx].cantidad  += obj.cantidad;
 
                     if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
                         isCollapsed = true;
@@ -332,7 +330,13 @@ class Simulacion extends Component{
         clearInterval(this.state.intervalClock);
         clearInterval(this.state.intervalWindowClock);
       }
+      if(newTime >= this.state.realTime){
+        console.log("FIN>>>",newTime,this.state.realTime,this.state.intervalClock,this.ventana)
+        clearInterval(this.ventana);
+        console.log("lenacc",this.listActions.length);
+        }
       this.setState({
+        intervalClock: null,
         locationInfo: auxLocationInfo,
         time: newTime,
         planVuelos: liveFlights.concat(auxPlanesNew),
@@ -344,7 +348,7 @@ class Simulacion extends Component{
       //Fin
     }
 
-    sendRequestActions(){
+    sendRequestActions = () => {
             API.post('simulacion/window',
                 {
                 simulacion:  1, 
@@ -357,13 +361,31 @@ class Simulacion extends Component{
                         this.listActions = this.listActions.concat(resp.data.listActions);
                         console.log(">>>",this.listActions.length);
                         sem.leave();
+                        var intClock = setInterval(
+                            () => this.tickClock()
+                            ,this.frecRefreshSimu); 
+                        
+                        this.ventana = intClock;
+                        console.log("ven",this.ventana);
+
                         this.setState({
-                            realTime: this.state.realTime + this.state.windowTime
+                            realTime: this.state.realTime + this.state.windowTime,
+                            intervalClock: intClock,
                         },() => {
-                            this.sendRequestActions();
+                            //this.sendRequestActions();
                         });
                     });
                 }else{
+                    sem.take(()=>{
+                        this.listActions = this.listActions.concat(resp.data.listActions);
+                        sem.leave();
+                        var intClock = setInterval(
+                            () => this.tickClock()
+                            ,this.frecRefreshSimu); 
+                        
+                        this.ventana = intClock;
+                    });
+
                     clearInterval(this.state.intervalWindowClock);
                     this.setState({
                         realTime: this.state.realTime + this.state.windowTime,
@@ -373,7 +395,7 @@ class Simulacion extends Component{
             });
         
     }
-    handleStartClock(){
+    handleStartClock = () => {
       if(this.state.intervalClock){
         console.log(">>",this.state.intervalClock);
       }else{
@@ -391,7 +413,7 @@ class Simulacion extends Component{
                     sem.take(()=>{
                         this.listActions = this.listActions.concat(resp.data.listActions);
                         sem.leave();
-                        let intClock = setInterval(
+                        var intClock = setInterval(
                             () => this.tickClock()
                             ,this.frecRefreshSimu); 
 /*
@@ -399,6 +421,8 @@ class Simulacion extends Component{
                             () => this.sendRequestActions()
                             ,Math.floor(this.state.windowTime/(this.state.frecTime)));
 */                    
+                        this.ventana = intClock;
+                        console.log("ven",this.ventana);
                         this.setState({
                             realTime: this.state.realTime + this.state.windowTime,
                             intervalClock: intClock,
@@ -406,7 +430,7 @@ class Simulacion extends Component{
                             inPause: false,
                             loading: 0,
                         },()=>{
-                            this.sendRequestActions();
+                            //this.sendRequestActions();
                         })
                     });
                 }else{
@@ -526,6 +550,7 @@ class Simulacion extends Component{
             <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
                 {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
             </Button>
+            <Button onClick={this.sendRequestActions}>Pedir</Button>
             { inPause ?
                 <Button onClick={this.handleReplay}>Reanudar</Button>
                 :
