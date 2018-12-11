@@ -59,7 +59,7 @@ class ModalReporte extends Component {
                         <tbody>
                             <tr>
                                 <td>Fecha inicio: {fechaInicio.toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
-                                <td>Fecha fin: {fechaFin.toLocaleString()}</td>
+                                <td>Fecha fin: {fechaFin.toLocaleString('en-GB', { timeZone: 'UTC' })}</td>
                             </tr>
                             <tr>
                                 <td>Duración: {dias} días y {horas.toFixed(1)} horas</td>

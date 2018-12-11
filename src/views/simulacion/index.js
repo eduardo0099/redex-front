@@ -257,7 +257,9 @@ class Simulacion extends Component{
       let newTime = this.state.time + this.frecRefreshSimu*this.state.frecTime;
       if(newTime >= this.state.realTime){
         newTime = this.state.realTime
-        }
+
+      }
+      let timeColap;
       //Ini: Calculos que se deben hacer por cada tick del reloj
       let auxLocationInfo = JSON.parse(JSON.stringify(this.state.locationInfo));
       let auxIndex = this.state.indexLoc;
@@ -281,6 +283,8 @@ class Simulacion extends Component{
 
                     if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
                         isCollapsed = true;
+                        console.log("cae",obj);
+                        timeColap = obj.fechaSalida;
                         objInfoCollap = {code: auxLocationInfo[idx].codigo,  maxCap:auxLocationInfo[idx].capacidadMaxima }
                     }
                     //console.log("R");
@@ -307,6 +311,8 @@ class Simulacion extends Component{
         let idxDel = auxIndex.get(delElem.oficinaLlegada);
         if(auxLocationInfo[idxDel].capacidadActual + delElem.cantidad > auxLocationInfo[idxDel].capacidadMaxima){
             isCollapsed = true;
+            timeColap = delElem.fechaLlegada;
+            console.log("cae",delElem);
             objInfoCollap = {code: auxLocationInfo[idxDel].codigo , maxCap: auxLocationInfo[idxDel].capacidadMaxima}
             auxLocationInfo[idxDel].capacidadActual += delElem.cantidad
         }else{
@@ -318,21 +324,22 @@ class Simulacion extends Component{
         acumSalida += delElem.cantidadSalida;
       }
       if(isCollapsed){
-        //console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
+        console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
         infoCollapsedFull = {
             fechaInicial: this.state.iniTime,
-            duracionTotal: newTime - this.state.iniTime,
+            duracionTotal: timeColap - this.state.iniTime,
             almacenColapso: objInfoCollap.code,
             cantidadAumento: objInfoCollap.maxCap*1.1,
             paquetesEnviados: this.state.paquetesEnviados,
             oficinas: auxLocationInfo
         }
-        clearInterval(this.state.intervalClock);
+        clearInterval(this.ventana);
         clearInterval(this.state.intervalWindowClock);
       }
       if(newTime >= this.state.realTime){
         console.log("FIN>>>",newTime,this.state.realTime,this.state.intervalClock,this.ventana)
         clearInterval(this.ventana);
+        this.ventana = null;
         console.log("lenacc",this.listActions.length);
         }
       this.setState({
@@ -361,29 +368,33 @@ class Simulacion extends Component{
                         this.listActions = this.listActions.concat(resp.data.listActions);
                         console.log(">>>",this.listActions.length);
                         sem.leave();
-                        var intClock = setInterval(
-                            () => this.tickClock()
-                            ,this.frecRefreshSimu); 
-                        
-                        this.ventana = intClock;
-                        console.log("ven",this.ventana);
-
+                        if(!this.ventana){
+                            var intClock = setInterval(
+                                () => this.tickClock()
+                                ,this.frecRefreshSimu); 
+                            
+                            this.ventana = intClock;
+                            console.log("ven",this.ventana);
+                        }
                         this.setState({
                             realTime: this.state.realTime + this.state.windowTime,
                             intervalClock: intClock,
                         },() => {
-                            //this.sendRequestActions();
+                            this.sendRequestActions();
                         });
                     });
                 }else{
                     sem.take(()=>{
                         this.listActions = this.listActions.concat(resp.data.listActions);
                         sem.leave();
-                        var intClock = setInterval(
-                            () => this.tickClock()
-                            ,this.frecRefreshSimu); 
-                        
-                        this.ventana = intClock;
+                        if(!this.ventana){
+                            var intClock = setInterval(
+                                () => this.tickClock()
+                                ,this.frecRefreshSimu); 
+                            
+                            this.ventana = intClock;
+                            console.log("ven",this.ventana);
+                        }
                     });
 
                     clearInterval(this.state.intervalWindowClock);
@@ -430,7 +441,7 @@ class Simulacion extends Component{
                             inPause: false,
                             loading: 0,
                         },()=>{
-                            //this.sendRequestActions();
+                            this.sendRequestActions();
                         })
                     });
                 }else{
@@ -570,7 +581,7 @@ class Simulacion extends Component{
                     return b.capacidadActual - a.capacidadActual;
                 }).map((obj,idx) => {
                     return (
-                        <div key={idx} style={{fontSize:'16px',textAlign:'left'}}><strong>{obj.codigo + ": "+obj.capacidadActual}</strong></div>
+                        <div key={idx} style={{fontSize:'16px',textAlign:'left'}}><strong>{idx+1+")"+obj.codigo + ": "+obj.capacidadActual}</strong></div>
                     );
                 })}
             </div>
