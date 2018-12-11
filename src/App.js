@@ -14,8 +14,6 @@ class App extends Component {
 
       if(ds){
         authorizedRoutes = routes.filter(route => !route.roles || route.roles.includes(ds.rol.codigo.name));
-      }else{
-        authorizedRoutes = routes;
       }
 
     return (

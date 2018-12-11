@@ -99,6 +99,7 @@ const routes = [
    {
      path:'/simulator2',
      component: Simulator,
+     hidden: true,
      name: 'FFSimulator',
    }
    

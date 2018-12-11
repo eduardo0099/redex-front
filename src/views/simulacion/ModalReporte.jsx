@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Modal, Button } from 'antd';
 import API, { getFile } from "../../Services/Api";
+import url from './../../Services/backend';
 
 class ModalReporte extends Component {
     constructor(props) {
@@ -12,6 +13,9 @@ class ModalReporte extends Component {
             .then(response => {
                 getFile(response);
             })
+    }
+    handleExportPath = () => {
+        window.open(url+ 'simulacion/paquetesEntregados', '_blank');
     }
     render() {
         /*let info = {
@@ -87,8 +91,15 @@ class ModalReporte extends Component {
                                 </tr>)
                             })}
                         </tbody>
-                    </table>  
-                    <Button type="primary" style={{textAlign:'center'}} onClick={this.handleExport}> Exportar</Button>             
+                    </table>
+                    <div>
+                        <Button type="primary" style={{textAlign:'center'}} onClick={this.handleExport}>Exportar</Button>
+
+                    </div>
+                    <div>
+                    <Button type="primary" style={{textAlign:'center'}} onClick={this.handleExportPath}>Obtener Rutas</Button>             
+                            
+                    </div>  
                 </Modal>
             </div>
         );

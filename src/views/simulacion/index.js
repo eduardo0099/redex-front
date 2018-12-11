@@ -19,6 +19,10 @@ class Simulacion extends Component{
         this.colorHover = '#607D8B';
         this.colorPressed = '#FF5722';
         this.frecRefreshSimu = 1000;
+        this.percentColors = [
+            { pct: 0.0, color: { r: 102, g: 210, b: 102 } },
+            { pct: 0.5, color: { r: 243, g: 243, b: 86 } },
+            { pct: 1.0, color: { r: 243, g: 68, b: 68 } } ];
         this.listActions = [];
         this.maxStepConfig = 4; 
         this.ventana = null;
@@ -94,6 +98,41 @@ class Simulacion extends Component{
             showModalCollapsed: false,
         });
     }
+    restartSimu = () => {
+        API.get('simulacion/eliminar')
+            .then(response => {
+                this.listActions = [];
+                this.setState({
+                    windowTime: 3*60*60 *1000,
+                    indexLoc: null,
+                    center: [0,20],
+                    zoom: 1,
+                    loading: 0,
+                    visibleModalConfig: false,
+                    tooltipConfig: null,
+                    myMap:null,
+                    frecTime: 120,
+                    intervalClock: null,
+                    intervalWindowClock: null,
+                    inPause: false,
+                    iniTime: 0,
+                    time: new Date().getTime(),
+                    realTime: 0,
+                    infoVuelos:[],
+                    archivo:{},
+                    stepConfig:1,
+
+                    infoCollapsed: {},
+                    errorConfig: false,
+                    locationInfo: [],
+                    selectedCountries: [],
+                    planVuelos:[],
+                    paquetesEnviados: 0,
+                    showModalCollapsed: false,
+                    collapsed: false,
+                })
+            });
+    }
     contentConfigModal = (numStep) => {
         switch(numStep){
             case 1:
@@ -167,7 +206,7 @@ class Simulacion extends Component{
             .then(response => {
                 if(this.state.stepConfig == 1){
                     API.get('/simulacion/oficinas').then(response =>{
-                        console.log("ofis",response.data);
+                        console.log("oficinas:",response.data);
                         let selectedCountries = [];
                         let aux = [];
                         let mapIndexLoc = new Map();
@@ -283,16 +322,13 @@ class Simulacion extends Component{
 
                     if(auxLocationInfo[idx].capacidadActual > auxLocationInfo[idx].capacidadMaxima){
                         isCollapsed = true;
-                        console.log("cae",obj);
                         timeColap = obj.fechaSalida;
                         objInfoCollap = {code: auxLocationInfo[idx].codigo,  maxCap:auxLocationInfo[idx].capacidadMaxima }
                     }
-                    //console.log("R");
                 }else if(obj.tipo == "SALIDA"){
                     auxPlanesNew.push(obj);
                     idx = auxIndex.get(obj.oficinaSalida);
                     auxLocationInfo[idx].capacidadActual -= obj.cantidad;
-                    //console.log("S");
                 }
             });
             
@@ -312,19 +348,16 @@ class Simulacion extends Component{
         if(auxLocationInfo[idxDel].capacidadActual + delElem.cantidad > auxLocationInfo[idxDel].capacidadMaxima){
             isCollapsed = true;
             timeColap = delElem.fechaLlegada;
-            console.log("cae",delElem);
             objInfoCollap = {code: auxLocationInfo[idxDel].codigo , maxCap: auxLocationInfo[idxDel].capacidadMaxima}
             auxLocationInfo[idxDel].capacidadActual += delElem.cantidad
         }else{
             auxLocationInfo[idxDel].capacidadActual += delElem.cantidad - delElem.cantidadSalida;
         }
         if(auxLocationInfo[idxDel].capacidadActual < 0){
-            console.log("NEGATIVO",auxLocationInfo[idxDel],delElem);
         }
         acumSalida += delElem.cantidadSalida;
       }
       if(isCollapsed){
-        console.log("COLLAPSED!!!",isCollapsed,objInfoCollap)
         infoCollapsedFull = {
             fechaInicial: this.state.iniTime,
             duracionTotal: timeColap - this.state.iniTime,
@@ -337,10 +370,8 @@ class Simulacion extends Component{
         clearInterval(this.state.intervalWindowClock);
       }
       if(newTime >= this.state.realTime){
-        console.log("FIN>>>",newTime,this.state.realTime,this.state.intervalClock,this.ventana)
         clearInterval(this.ventana);
         this.ventana = null;
-        console.log("lenacc",this.listActions.length);
         }
       this.setState({
         intervalClock: null,
@@ -366,7 +397,6 @@ class Simulacion extends Component{
                 if(resp.data.status == 0){ // sigo pidiendo
                     sem.take(()=>{
                         this.listActions = this.listActions.concat(resp.data.listActions);
-                        console.log(">>>",this.listActions.length);
                         sem.leave();
                         if(!this.ventana){
                             var intClock = setInterval(
@@ -374,7 +404,6 @@ class Simulacion extends Component{
                                 ,this.frecRefreshSimu); 
                             
                             this.ventana = intClock;
-                            console.log("ven",this.ventana);
                         }
                         this.setState({
                             realTime: this.state.realTime + this.state.windowTime,
@@ -393,7 +422,6 @@ class Simulacion extends Component{
                                 ,this.frecRefreshSimu); 
                             
                             this.ventana = intClock;
-                            console.log("ven",this.ventana);
                         }
                     });
 
@@ -408,7 +436,6 @@ class Simulacion extends Component{
     }
     handleStartClock = () => {
       if(this.state.intervalClock){
-        console.log(">>",this.state.intervalClock);
       }else{
         this.setState({
             loading: 1,
@@ -433,7 +460,6 @@ class Simulacion extends Component{
                             ,Math.floor(this.state.windowTime/(this.state.frecTime)));
 */                    
                         this.ventana = intClock;
-                        console.log("ven",this.ventana);
                         this.setState({
                             realTime: this.state.realTime + this.state.windowTime,
                             intervalClock: intClock,
@@ -455,24 +481,25 @@ class Simulacion extends Component{
         let intClock = setInterval(
             () => this.tickClock()
             ,this.frecRefreshSimu); 
-  
-        let intWindowClock = setInterval(
+            this.ventana = intClock;
+        /*let intWindowClock = setInterval(
             () => this.sendRequestActions()
             ,Math.floor(this.state.windowTime/this.state.frecTime));
-
+*/
         this.setState({
             intervalClock: intClock,
-            intervalWindowClock: intWindowClock,
+            //intervalWindowClock: intWindowClock,
             inPause: false,
         });
     }
     handlePause = () => {
           clearInterval(this.state.intervalClock);
-          clearInterval(this.state.intervalWindowClock);
+          clearInterval(this.ventana);
+          //clearInterval(this.state.intervalWindowClock);
 
           this.setState({
               intervalClock: null,
-              intervalWindowClock: null,
+              //intervalWindowClock: null,
               inPause: true,
           });
     }
@@ -532,13 +559,29 @@ class Simulacion extends Component{
             }  
         }
     } 
-
+ 
     getHexColor = (max, act) => {
-        let esc = Math.round(255*act/max);
-        
-        let p1 = Number(esc).toString(16).padStart(2, "0");
-        let p2 = Number(118).toString(16).padStart(2, "0");
-        let p3 = Number(118).toString(16).padStart(2, "0");
+        let pct = act/max;
+        for (var i = 1; i < this.percentColors.length - 1; i++) {
+            if (pct < this.percentColors[i].pct) {
+                break;
+            }
+        }
+        var lower = this.percentColors[i - 1];
+        var upper = this.percentColors[i];
+        var range = upper.pct - lower.pct;
+        var rangePct = (pct - lower.pct) / range;
+        var pctLower = 1 - rangePct;
+        var pctUpper = rangePct;
+        var color = {
+            r: Math.floor(lower.color.r * pctLower + upper.color.r * pctUpper),
+            g: Math.floor(lower.color.g * pctLower + upper.color.g * pctUpper),
+            b: Math.floor(lower.color.b * pctLower + upper.color.b * pctUpper)
+        };
+
+        let p1 = Number(color.r).toString(16).padStart(2, "0");
+        let p2 = Number(color.g).toString(16).padStart(2, "0");
+        let p3 = Number(color.b).toString(16).padStart(2, "0");
 
         return '#'+p1+p2+p3;
     }
@@ -554,19 +597,22 @@ class Simulacion extends Component{
             <TheContent>
             <div style={{position:'relative'}}>
             {loading == 1 ? <div style={{position:'fixed', top:'50%',left:'50%'}}><Spin /></div> : '' }
-            <div>
-            {objTime.toLocaleString('en-GB', { timeZone: 'UTC' })}
+            
             {collapsed && showModalCollapsed? <ModalReporte onHandleClose={this.handleModalCollap} info={infoCollapsed}/> : ""}
+            <div style={{position: 'absolute',bottom: '53px',left: '50%',transform: 'translateX(-50%)',border: '1px solid #888686',padding: '5px 10px',borderRadius: '10px'}}>
+                <div style={{fontWeight:'bold',fontSize:'20px'}}>{objTime.toLocaleString('en-GB', { timeZone: 'UTC' })}</div>
+                
+                
+                <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
+                    {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
+                </Button>
+                { inPause ?
+                    <Button onClick={this.handleReplay}>Reanudar</Button>
+                    :
+                    <Button onClick={this.handlePause}>Pausar</Button>
+                }
+                <Button type="primary" onClick={this.restartSimu} >Resetear</Button>
             </div>
-            <Button type="primary" onClick={this.state.stepConfig > this.maxStepConfig? this.handleStartClock : this.handleOpenModalConfig}>
-                {this.state.stepConfig > this.maxStepConfig? "Iniciar simulación" : "Establecer Configuraciones" }
-            </Button>
-            <Button onClick={this.sendRequestActions}>Pedir</Button>
-            { inPause ?
-                <Button onClick={this.handleReplay}>Reanudar</Button>
-                :
-                <Button onClick={this.handlePause}>Pausar</Button>
-            }
             <Modal
                 title="Configuración de la simulación"
                 visible={this.state.visibleModalConfig}
@@ -576,12 +622,12 @@ class Simulacion extends Component{
                 {this.contentConfigModal(this.state.stepConfig)}
             </Modal>
             <div className="cities">
-                <strong>LISTA:</strong>
+                <strong style={{textDecoration: 'underline'}}>LISTA:</strong>
                 {JSON.parse(JSON.stringify(locationInfo)).sort((a,b) => {
                     return b.capacidadActual - a.capacidadActual;
                 }).map((obj,idx) => {
                     return (
-                        <div key={idx} style={{fontSize:'16px',textAlign:'left'}}><strong>{idx+1+")"+obj.codigo + ": "+obj.capacidadActual}</strong></div>
+                        <div key={idx} style={{fontSize:'10px',textAlign:'left'}}><strong>{idx+1+")"+obj.codigo + ": "+obj.capacidadActual}</strong></div>
                     );
                 })}
             </div>
@@ -604,9 +650,9 @@ class Simulacion extends Component{
                         onClick={this.handleClickGeography}
                         style={{
                         default: {
-                            fill: this.getLocationDef(geography) ? this.getHexColor(this.getLocationDef(geography).capacidadMaxima,this.getLocationDef(geography).capacidadActual) : "#607D8B",
+                            fill: this.getLocationDef(geography) ? this.getHexColor(this.getLocationDef(geography).capacidadMaxima,this.getLocationDef(geography).capacidadActual) : "#AEC6CF",
                             stroke: this.getLocationDef(geography) ? (this.isCountrySelected(geography.properties.ISO_A3) ? this.colorSelected : this.colorUnSelected ) :  this.colorCommon,
-                            strokeWidth: 1.5,
+                            strokeWidth: 0.3,
                             outline: "none",
                         },
                         hover: {
@@ -648,7 +694,7 @@ class Simulacion extends Component{
                                     marker={{ coordinates: [ xPoint, yPoint ] }}
                                     preserveMarkerAspect={false}
                                     style={{
-                                        default: { fill: "#000" },
+                                        default: { fill: "#00000059" },
                                         hover:   { fill: "#999" },
                                         pressed: { fill: "#000" },
                                         }}

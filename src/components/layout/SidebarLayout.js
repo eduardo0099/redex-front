@@ -18,8 +18,7 @@ export default class SidebarLayout extends React.Component {
     const currentPath = this.props.route.match.path;
 
     const ds = JSON.parse(localStorage.getItem('datasession'));
-    //const authorizedRoutes = routes.filter(route => (!route.roles || route.roles.includes(ds.rol.codigo.name)) && (route.hidden=== undefined || !route.hidden) );
-    const authorizedRoutes = routes.filter(route => ((route.hidden=== undefined || !route.hidden)) );
+    const authorizedRoutes = routes.filter(route => (!route.roles || route.roles.includes(ds.rol.codigo.name)) && (route.hidden=== undefined || !route.hidden) );
 
     authorizedRoutes.forEach((route, i) => {
       if (currentPath.includes(route.path)) {
