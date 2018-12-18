@@ -694,6 +694,12 @@ class Simulacion extends Component{
                                     marker={{ coordinates: [ xPoint, yPoint ] }}
                                     preserveMarkerAspect={false}
                                     style={{
+                                        default: { 
+                                            fill: this.getHexColor(item.capacidadMaxima,item.cantidad)+"59",
+                                            stroke: "#FFF",
+                                            strokeWidth: 0.5,
+                                            outline: "none",
+                                        },
                                         default: { fill: "#00000059" },
                                         hover:   { fill: "#999" },
                                         pressed: { fill: "#000" },
