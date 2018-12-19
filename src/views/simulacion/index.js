@@ -23,6 +23,10 @@ class Simulacion extends Component{
             { pct: 0.0, color: { r: 102, g: 210, b: 102 } },
             { pct: 0.5, color: { r: 243, g: 243, b: 86 } },
             { pct: 1.0, color: { r: 243, g: 68, b: 68 } } ];
+		this.percentColorsFlights = [
+            { pct: 0.0, color: { r: 0, g: 128, b: 0 } },
+            { pct: 0.5, color: { r: 255, g: 255, b: 0 } },
+            { pct: 1.0, color: { r: 255, g: 0, b: 0 } } ];
         this.listActions = [];
         this.maxStepConfig = 4; 
         this.ventana = null;
@@ -560,15 +564,15 @@ class Simulacion extends Component{
         }
     } 
  
-    getHexColor = (max, act) => {
+    getHexColor = (max, act, percentColors) => {
         let pct = act/max;
-        for (var i = 1; i < this.percentColors.length - 1; i++) {
-            if (pct < this.percentColors[i].pct) {
+        for (var i = 1; i < percentColors.length - 1; i++) {
+            if (pct < percentColors[i].pct) {
                 break;
             }
         }
-        var lower = this.percentColors[i - 1];
-        var upper = this.percentColors[i];
+        var lower = percentColors[i - 1];
+        var upper = percentColors[i];
         var range = upper.pct - lower.pct;
         var rangePct = (pct - lower.pct) / range;
         var pctLower = 1 - rangePct;
@@ -695,9 +699,9 @@ class Simulacion extends Component{
                                     preserveMarkerAspect={false}
                                     style={{
                                         default: { 
-                                            fill: this.getHexColor(item.capacidadMaxima,item.cantidad)+"59",
+                                            fill: this.getHexColor(item.capacidadMaxima,item.cantidad, this.percentColorsFlights),
                                             stroke: "#000",
-                                            strokeWidth: 0.5,
+                                            strokeWidth: 0.1,
                                             outline: "none",
                                         },
                                         hover:   { fill: "#999" },
