@@ -654,7 +654,7 @@ class Simulacion extends Component{
                         onClick={this.handleClickGeography}
                         style={{
                         default: {
-                            fill: this.getLocationDef(geography) ? this.getHexColor(this.getLocationDef(geography).capacidadMaxima,this.getLocationDef(geography).capacidadActual) : "#AEC6CF",
+                            fill: this.getLocationDef(geography) ? this.getHexColor(this.getLocationDef(geography).capacidadMaxima,this.getLocationDef(geography).capacidadActual,this.percentColors) : "#AEC6CF",
                             stroke: this.getLocationDef(geography) ? (this.isCountrySelected(geography.properties.ISO_A3) ? this.colorSelected : this.colorUnSelected ) :  this.colorCommon,
                             strokeWidth: 0.3,
                             outline: "none",
