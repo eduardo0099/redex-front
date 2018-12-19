@@ -696,11 +696,10 @@ class Simulacion extends Component{
                                     style={{
                                         default: { 
                                             fill: this.getHexColor(item.capacidadMaxima,item.cantidad)+"59",
-                                            stroke: "#FFF",
+                                            stroke: "#000",
                                             strokeWidth: 0.5,
                                             outline: "none",
                                         },
-                                        default: { fill: "#00000059" },
                                         hover:   { fill: "#999" },
                                         pressed: { fill: "#000" },
                                         }}
