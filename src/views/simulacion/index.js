@@ -700,7 +700,7 @@ class Simulacion extends Component{
                                     style={{
                                         default: { 
                                             fill: this.getHexColor(item.capacidadMaxima,item.cantidad, this.percentColorsFlights),
-                                            stroke: "#000",
+                                            stroke: "#00000021",
                                             strokeWidth: 0.1,
                                             outline: "none",
                                         },
