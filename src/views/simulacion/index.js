@@ -66,8 +66,8 @@ class Simulacion extends Component{
                 }*/
             ],
             paquetesEnviados: 0,
-            showModalCollapsed: false,
-            collapsed: false,
+            showModalCollapsed: true,
+            collapsed: true,
 
         }
         this.getLocationDef = this.getLocationDef.bind(this);

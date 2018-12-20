@@ -18,25 +18,37 @@ class ModalReporte extends Component {
         window.open(url+ 'simulacion/paquetesEntregados', '_blank');
     }
     render() {
-        /*let info = {
-            fechaInicial: 121312312,
-            duracionTotal: 1200000000,
+        let info = {
+            fechaInicial: 1533704400000,
+            duracionTotal: 13060200000,
             almacenColapso: "SKBO", //ok
-            cantidadAumento: 223, //ok
-            paquetesEnviados: 12121, //ok
+            cantidadAumento: 660, //ok
+            paquetesEnviados: 1475513, //ok
             oficinas: [
                 {
-                    codigo: "SKBO",
-                    cantidad: 121212
+                    codigo: "LFPG",
+                    cantidad: 58412
                 },
                 {
-                    codigo: "SPIM",
-                    cantidad: 2
+                    codigo: "SKBO",
+                    cantidad: 58292
+                },
+				{
+                    codigo: "EFHK",
+                    cantidad: 55772
+                },
+                {
+                    codigo: "SGAS",
+                    cantidad: 53450
+                },
+				{
+                    codigo: "LBSF",
+                    cantidad: 51259
                 },
             ] 
         }
-*/
-        let info = this.props.info;
+
+        //let info = this.props.info;
         info.oficinas.sort((a,b)=>{
             return b.cantidad - a.cantidad
         })
