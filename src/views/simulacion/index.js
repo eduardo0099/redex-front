@@ -589,6 +589,50 @@ class Simulacion extends Component{
 
         return '#'+p1+p2+p3;
     }
+	
+	getHexColor2 = (max,act,percentColors) => {
+		let color = {}
+		
+		if(act < 25){
+			color.r = 0;
+			color.g = 176;
+			color.b = 80;
+		}else if (act < 50){
+			color.r = 153;
+			color.g = 255;
+			color.b = 102;
+		}else if( act < 75){
+			color.r = 204;
+			color.g = 204;
+			color.b = 0;
+		}else if(act < 100){
+			color.r = 255;
+			color.g = 255;
+			color.b = 0;
+		}else if (act < 125){
+			color.r = 255;
+			color.g = 192;
+			color.b = 0;
+		}else if (act < 150){
+			color.r = 255;
+			color.g = 153;
+			color.b = 51;
+		}else if (act <175){
+			color.r = 248;
+			color.g = 96;
+			color.b = 48;
+		}else{
+			color.r = 255;
+			color.g = 0;
+			color.b = 0;
+		}
+		
+		let p1 = Number(color.r).toString(16).padStart(2, "0");
+        let p2 = Number(color.g).toString(16).padStart(2, "0");
+        let p3 = Number(color.b).toString(16).padStart(2, "0");
+
+        return '#'+p1+p2+p3;
+	}		
     render(){
         const {loading, planVuelos, inPause ,collapsed,infoCollapsed, showModalCollapsed,time, locationInfo} = this.state;
         let objTime = new Date(this.state.time);
@@ -699,7 +743,7 @@ class Simulacion extends Component{
                                     preserveMarkerAspect={false}
                                     style={{
                                         default: { 
-                                            fill: this.getHexColor(item.capacidadMaxima,item.cantidad, this.percentColorsFlights),
+                                            fill: this.getHexColor2(item.capacidadMaxima,item.cantidad, this.percentColorsFlights),
                                             stroke: "#00000021",
                                             strokeWidth: 0.1,
                                             outline: "none",
